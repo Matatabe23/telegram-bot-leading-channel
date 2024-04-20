@@ -1,19 +1,27 @@
-require('dotenv').config();
+require('dotenv').config()
+const sequelize = require('./db')
+const express = require('express')
+const models = require('./models/models')
+const TelegramBot = require('./routerBot/index')
 
-const TelegramBot = require('node-telegram-bot-api');
-const token = process.env.API_TELEGRAM_BOT_TOKEN;
+const cors = require('cors')
+const router = require('./router/index')
 
-// Создание экземпляра бота
-const bot = new TelegramBot(token, { polling: true });
+const PORT = process.env.PORT || 5000
 
-// ID вашего канала (можно найти через бота @userinfobot)
-const channelId = process.env.CHAT_ID_DEV;
+const app = express() 
+app.use(cors())
+app.use(express.json())
+app.use('/api', router)
 
-// Функция для публикации сообщений в канал
-function publishToChannel(message: string) {
-  bot.sendMessage(channelId, message);
+const start = async () => {
+	try {
+		await sequelize.authenticate() 
+		await sequelize.sync() 
+		app.listen(PORT, () => console.log(`Server started on port ${PORT}`))
+	} catch (e) {
+		console.log(e) 
+	}
 }
 
-// Пример использования
-const message = 'Новый пост в канале!';
-publishToChannel(message);
+start()
