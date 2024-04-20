@@ -1,0 +1,19 @@
+# Dependency directories
+node_modules/
+
+# Environment configuration
+.env
+
+# Build artifacts
+dist/
+build/
+out/
+
+# IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*

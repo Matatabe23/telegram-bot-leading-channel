@@ -1,0 +1,26 @@
+{
+  "name": "news-bot",
+  "version": "1.0.0",
+  "description": "Бот для публикации новостей в телеграмм канале",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "ts-node-dev index.ts"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "node.js",
+    "typeScript",
+    "news",
+    "publishing"
+  ],
+  "author": "QUGOR",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "node-telegram-bot-api": "^0.65.1"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^2.0.0"
+  }
+}
