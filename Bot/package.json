@@ -2,9 +2,9 @@
   "name": "news-bot",
   "version": "1.0.0",
   "description": "Бот для публикации новостей в телеграмм канале",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev index.ts"
+    "dev": "ts-node-dev index.js"
   },
   "keywords": [
     "telegram",
