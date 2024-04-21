@@ -1,13 +1,13 @@
 const { msUntilNextTargetTime } = require('../utilities/timeUntilNextTimer');
 const { dataBasePost, imageData } = require('../models/models')
 const { publishTime } = require('../const');
-import { IpublishTime } from '../page-constructor.i'
+import { IpublishTime } from '../types'
 
 export async function sendMessageAtScheduledTime(bot: any) {
   async function scheduleNextMessage(time: IpublishTime) {
     setTimeout(async () => {
       const postWithImages = await dataBasePost.findOne({
-        order: [['id', 'ASC']], // Сортировка по возрастанию id
+        order: [['id', 'ASC']],
         include: imageData
       });
       

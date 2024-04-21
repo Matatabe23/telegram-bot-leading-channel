@@ -27,6 +27,8 @@ const start = async () => {
 start()
 
 
+
+//Кастомное сохранение img пока не сделал админ панель)
 const { dataBasePost, imageData } = require('./models/models');
 const fs = require('fs');
 
