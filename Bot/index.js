@@ -27,7 +27,7 @@ const start = async () => {
 start()
 
 
-// const { dataBasePost, imageData } = require('./models/models');
+const { dataBasePost, imageData } = require('./models/models');
 const fs = require('fs');
 
 async function saveImagesWithPost(images) {
@@ -50,5 +50,5 @@ async function saveImagesWithPost(images) {
   }
 }
 
-const images = ['./image/1.png', './image/2.png', './image/3.png', './image/4.png',];
+const images = ['./image/1.png', './image/2.png'];
 // saveImagesWithPost(images);
