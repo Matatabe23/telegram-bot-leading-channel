@@ -40,7 +40,7 @@ async function saveImagesWithPost(images) {
 
       await imageData.create({
         image: fs.readFileSync(imagePath),
-        DataBasePostId: postId
+        dataBasePostId: postId
       });
     }
 
@@ -50,5 +50,8 @@ async function saveImagesWithPost(images) {
   }
 }
 
-const images = ['./image/1.png', './image/2.png'];
+const images = [
+  './image/5.png',
+  './image/6.png'
+];
 // saveImagesWithPost(images);

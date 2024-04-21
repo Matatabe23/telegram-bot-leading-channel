@@ -3,31 +3,46 @@ const { dataBasePost, imageData } = require('../models/models')
 const { publishTime } = require('../const');
 import { IpublishTime } from '../page-constructor.i'
 
-export function sendMessageAtScheduledTime(bot: any) {
-  publishTime.forEach(async (time: IpublishTime) => {
-    const postWithImages = await dataBasePost.findOne({
-      order: [['id', 'ASC']], // Сортировка по возрастанию id
-      include: imageData
-    });
-    if (!postWithImages) return
-
-    const media = postWithImages.imageData.map((item: any) => {
-      return {
-        type: 'photo',
-        media: item.image
-      }
-    })
-    const postId = postWithImages.id
-
-    setTimeout(() => {
+export async function sendMessageAtScheduledTime(bot: any) {
+  async function scheduleNextMessage(time: IpublishTime) {
+    setTimeout(async () => {
+      const postWithImages = await dataBasePost.findOne({
+        order: [['id', 'ASC']], // Сортировка по возрастанию id
+        include: imageData
+      });
+      
+      if (!postWithImages) return;
+  
+      const media = postWithImages.imageData.map((item: any) => {
+        return {
+          type: 'photo',
+          media: item.image,
+          id: item.id
+        }
+      });
+      
+      const postId = postWithImages.id;
+      
       bot.sendMediaGroup(process.env.CHAT_ID_DEV, media)
         .then(async () => {
-          sendMessageAtScheduledTime(bot);
+          media.map(async (item:any) => {
+            await imageData.destroy({
+              where: { id: item.id },
+            });
+          });
+          await dataBasePost.destroy({
+            where: { id: postId },
+          });
+          scheduleNextMessage(time);
         })
         .catch((error: any) => {
           console.error('Ошибка при отправке сообщения:', error);
-          sendMessageAtScheduledTime(bot);
+          scheduleNextMessage(time);
         });
     }, msUntilNextTargetTime(time.hour, time.minute));
-  });
+  }
+  
+  for (const time of publishTime) {
+    await scheduleNextMessage(time);
+  }
 }
