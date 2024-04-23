@@ -10,14 +10,16 @@
 
     <div v-if="islogin" class="main__registration">
       <h1>Регистрация</h1>
-      <input type="text" v-model="regInfo.name" placeholder="Введите ваше имя пользователя">
-      <input type="password" v-model="regInfo.password" placeholder="Введите пароль" />
+      <input type="text" v-model="name" placeholder="Введите ваше имя пользователя">
+      <input type="password" v-model="password" placeholder="Введите пароль" />
       <input type="password" v-model="confirmPassword" placeholder="Повторите пароль" />
       <MainButton class="main__main-button" @click="register">Зарегистрироваться</MainButton>
       <MainButton class="main__main-button" @click="toggleRegistration">Отмена</MainButton>
     </div>
 
     <Loader v-if="loader" />
+
+    <popup-message ref="popup"></popup-message>
   </div>
 </template>
 
@@ -34,10 +36,8 @@ export default {
         name: "",
         password: ""
       },
-      regInfo: {
         name: "",
         password: "",
-      },
       confirmPassword: "",
     }
   },
@@ -51,13 +51,14 @@ export default {
     async register() {
       try {
         this.loader = true;
-        console.log(process.env.VUE_APP_SERVER_API)
-
-        const response = await registration(this.regInfo.name, this.regInfo.password);
-        console.log(response)
+        await registration(this.name, this.password, this.confirmPassword);
+        this.$refs.popup.showMessage('Успешная регистрация!', 5000);
         this.islogin = false
-      } catch (e) {
-        console.log(e)
+        this.name =''
+        this.password = '',
+        this.confirmPassword = ''
+      } catch (e: any) {
+        this.$refs.popup.showMessage(e.response.data.message, 10000);
       } finally{
         this.loader = false;
       }

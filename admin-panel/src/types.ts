@@ -7,6 +7,7 @@ export interface IMainPages {
   islogin: boolean,
   loader: boolean,
   auth: authInfo,
-  regInfo: authInfo,
+  name: string,
+  password: string,
   confirmPassword: string
 }

@@ -6,10 +6,16 @@ const adminDto = require('../dtos/adminDtos')
 
 class AdministratorController {
 	async registration(req:any, res:any) {
-		const { email, name, password, role } = req.body;
+		const { name, password, confirmPassword } = req.body;
 		if (!password) {
 			return res.status(400).json({ message: 'Некорректный пароль' });
 		}
+    if(password.length < 8){
+      return res.status(400).json({ message: 'Пароли слишком короткий, минимум 8 символов' });
+    }
+    if(password !== confirmPassword){
+      return res.status(400).json({ message: 'Пароли не совпадают' });
+    }
 		const candidate = await administrators.findOne({
 			where: sequelize.where(sequelize.fn('lower', sequelize.col('name')), name.toLowerCase())
 		});
@@ -17,7 +23,7 @@ class AdministratorController {
 			return res.status(400).json({ message: 'Пользователь с таким name уже существует' });
 		}
 		const hashPassword = await bcrypt.hash(password, 5);
-		const user = await administrators.create({ email, name, role, password: hashPassword });
+		const user = await administrators.create({ name, password: hashPassword });
 		const resultDto = new adminDto(user)
 		const token = tokenService.generateToken({ ...resultDto })
 		return res.json({ token, user: resultDto });
