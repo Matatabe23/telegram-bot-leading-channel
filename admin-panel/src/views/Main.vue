@@ -49,6 +49,7 @@ export default {
       try{
         this.loader = true;
         await login(this.auth.name, this.auth.password);
+        this.$router.push('/publishing-panel')
         this.$refs.popup.showMessage('Успешная авторизация!', 10000);
       } catch (e: any){
         this.$refs.popup.showMessage(e.response.data.message, 10000);

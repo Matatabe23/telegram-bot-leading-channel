@@ -1,10 +1,15 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Main from '@/views/Main.vue';
+import PublishingPanel from '@/views/PublishingPanel.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: Main
+  },
+  {
+    path: '/publishing-panel',
+    component: PublishingPanel
   },
 ]
 
