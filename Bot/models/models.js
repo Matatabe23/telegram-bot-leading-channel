@@ -4,7 +4,13 @@ const {EAdministratorRole} = require('../types')
 
 const administrators = db.define('administrators', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  name: { type: DataTypes.STRING, require: true },
+  name: {
+		type: DataTypes.STRING,
+		unique: true,
+		set(value) {
+			this.setDataValue('name', value.toLowerCase());
+		},
+	},
 	password: { type: DataTypes.STRING },
   role: { type: DataTypes.STRING, defaultValue: EAdministratorRole.USER },
 })

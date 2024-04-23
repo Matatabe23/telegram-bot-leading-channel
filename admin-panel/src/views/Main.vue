@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import { IMainPages } from '@/types'
-import { registration } from '@/http/adminAPI'
+import { registration, login } from '@/http/adminAPI'
 
 export default {
   data(): IMainPages {
@@ -45,8 +45,17 @@ export default {
     toggleRegistration() {
       this.islogin = !this.islogin
     },
-    login() {
-      this.islogin = !this.islogin
+    async login() {
+      try{
+        this.loader = true;
+        await login(this.auth.name, this.auth.password);
+        this.$refs.popup.showMessage('Успешная авторизация!', 10000);
+      } catch (e: any){
+        this.$refs.popup.showMessage(e.response.data.message, 10000);
+      } finally {
+        this.loader = false;
+      }
+
     },
     async register() {
       try {
