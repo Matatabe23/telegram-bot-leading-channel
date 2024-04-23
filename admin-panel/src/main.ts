@@ -1,10 +1,19 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import './registerServiceWorker'
 import router from './router'
 import store from './store'
 
-createApp(App)
+import componentUI from '@/components/UI'
+import componentPanels from '@/components/Panel'
+
+const app = createApp(App)
+
+const components = [...componentUI, ...componentPanels];
+components.forEach((component: any) => {
+  app.component(component.name, component);
+});
+
+app
   .use(store)
   .use(router)
   .mount('#app')

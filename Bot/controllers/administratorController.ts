@@ -11,7 +11,7 @@ class AdministratorController {
 			return res.status(400).json({ message: 'Некорректный пароль' });
 		}
 		const candidate = await administrators.findOne({
-			where: sequelize.where(sequelize.fn('lower', sequelize.col('name')), email.toLowerCase())
+			where: sequelize.where(sequelize.fn('lower', sequelize.col('name')), name.toLowerCase())
 		});
 		if (candidate) {
 			return res.status(400).json({ message: 'Пользователь с таким name уже существует' });

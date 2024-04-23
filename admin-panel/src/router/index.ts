@@ -1,15 +1,15 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
-import Authorization from '@/views/Authorization.vue'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import Main from '@/views/Main.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    component: Authorization
+    component: Main
   },
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(process.env.BASE_URL),
   routes
 })
 
