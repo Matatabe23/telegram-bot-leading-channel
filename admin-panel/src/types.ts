@@ -20,4 +20,5 @@ export interface adminData {
 
 export interface AuthState {
   adminData: adminData | null,
+  auth: boolean
 }

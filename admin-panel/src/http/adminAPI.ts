@@ -16,13 +16,13 @@ export const login = async (name:string, password:string) => {
 	return jwtDecode(data.token)
 }
 
-// //Проверка данных пользователя
-// export const CheckDataWeb = async () => {
-// 	const { data } = await $autHost.get('api/admin/CheckDataWeb',) 
-// 	localStorage.setItem('token', data.token )
-// 	localStorage.setItem('admin', JSON.stringify(data.admin));
-// 	return jwtDecode(data.token)
-// }
+//Проверка данных пользователя
+export const checkDataWeb = async () => {
+	const { data } = await $autHost.get('api/admin/CheckDataWeb',) 
+	localStorage.setItem('token', data.token )
+	localStorage.setItem('admin', JSON.stringify(data.admin));
+	return jwtDecode(data.token)
+}
 
 // //Изменение данных в профиле
 // export const UpdateInfo = async (adminId, NewInfo) => {

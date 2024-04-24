@@ -1,12 +1,15 @@
 import { GetterTree, MutationTree, ActionTree } from 'vuex';
 import { AuthState, adminData } from '@/types'
+import { checkDataWeb } from '@/http/adminAPI';
 
 const state: AuthState = {
-  adminData: null
+  adminData: null,
+  auth: false,
 };
 
 const getters: GetterTree<AuthState, any> = {
-  getadminData: (state) => state.adminData
+  getAdminData: (state) => state.adminData,
+  getAuthInfo: (state) => state.auth,
 };
 
 const mutations: MutationTree<AuthState> = {
@@ -16,13 +19,24 @@ const mutations: MutationTree<AuthState> = {
       name: adminData.name,
       role: adminData.role
     }
+    state.auth = true;
+  },
+  setExitAuth: (state) => {
+    state.auth = false;
   }
 };
 
 const actions: ActionTree<AuthState, any> = {
-  storeadminData: ({ commit }, adminData: adminData) => {
-    commit('setAdminData', adminData);
-  }
+  storeAdminData: ({ commit }, adminData: adminData) => commit('setAdminData', adminData),
+  checkDataWeb: async ({ commit }) => {
+    try{
+      const response = await checkDataWeb()
+      commit('setAdminData', response)
+      state.auth = true;
+    } catch(e){
+      console.log(e)
+    }
+  },
 };
 
 export default {

@@ -27,7 +27,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IMainPages, adminData } from '@/types'
-import { useStore, mapActions } from 'vuex';
+import { mapActions } from 'vuex';
 import { registration, login } from '@/http/adminAPI'
 
 export default defineComponent({
@@ -46,7 +46,7 @@ export default defineComponent({
   },
   methods: {
     ...mapActions({
-      storeadminData: 'storeadminData'
+      storeAdminData: 'storeAdminData'
     }),
 
     toggleRegistration() {
@@ -58,12 +58,11 @@ export default defineComponent({
 
         const response = await login(this.auth.name, this.auth.password);
 
-        this.storeadminData(response);
+        this.storeAdminData(response);
 
         this.$router.push('/publishing-panel');
       } catch (e: any) {
-        console.log(e)
-        // (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);
+        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);
       } finally {
         this.loader = false;
       }
@@ -72,12 +71,15 @@ export default defineComponent({
     async register() {
       try {
         this.loader = true;
+
         await registration(this.name, this.password, this.confirmPassword);
+
         (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Успешная регистрация!', 10000);
+
         this.islogin = false
         this.name = ''
         this.password = '',
-        this.confirmPassword = ''
+          this.confirmPassword = ''
       } catch (e: any) {
         (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);
       } finally {

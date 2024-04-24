@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { mapActions } from 'vuex';
 
 export default defineComponent({
   data() {
@@ -11,8 +12,13 @@ export default defineComponent({
       
     }
   },
+  methods:{
+    ...mapActions({
+      checkDataWeb: 'checkDataWeb'
+    })
+  },
   mounted(){
-    
+    this.checkDataWeb()
   }
 });
 </script>

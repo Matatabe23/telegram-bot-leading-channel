@@ -11,7 +11,7 @@ module.exports = function (req: any, res: any, next: any) {
 			return res.status(401).json({ message: EMiddlewareErrors.NOT_AUTHORIZED }) 
 		}
 		const decoded = jwt.verify(token, process.env.SECRET_KEY_ACCESS);
-		req.user = decoded;
+		req.admin = decoded;
 		next();
 	} catch (e) {
 		res.status(401).json({ message: EMiddlewareErrors.ERROR })
