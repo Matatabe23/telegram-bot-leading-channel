@@ -1,7 +1,5 @@
 <template>
-  <div class="app">
-    <router-view/>
-  </div>
+  <router-view/>
 </template>
 
 <style lang="scss">
@@ -22,5 +20,4 @@ body {
   --button-hover-color: #2980b9; /* Цвет кнопок при наведении */
   --button-text-color: #fff; /* Цвет текста на кнопках */
 }
-
 </style>

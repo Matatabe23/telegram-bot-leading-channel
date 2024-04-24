@@ -1,4 +1,4 @@
-# admin-panel
+# uyk
 
 ## Project setup
 ```

@@ -9,5 +9,5 @@ export interface IMainPages {
   auth: authInfo,
   name: string,
   password: string,
-  confirmPassword: string
+  confirmPassword: string,
 }

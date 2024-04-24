@@ -24,10 +24,11 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { IMainPages } from '@/types'
 import { registration, login } from '@/http/adminAPI'
 
-export default {
+export default defineComponent({
   data(): IMainPages {
     return {
       islogin: false,
@@ -50,9 +51,9 @@ export default {
         this.loader = true;
         await login(this.auth.name, this.auth.password);
         this.$router.push('/publishing-panel')
-        this.$refs.popup.showMessage('Успешная авторизация!', 10000);
+        // this.$refs.popup.showMessage('Успешная авторизация!', 10000);
       } catch (e: any){
-        this.$refs.popup.showMessage(e.response.data.message, 10000);
+        // this.$refs.popup.showMessage(e.response.data.message, 10000);
       } finally {
         this.loader = false;
       }
@@ -62,20 +63,20 @@ export default {
       try {
         this.loader = true;
         await registration(this.name, this.password, this.confirmPassword);
-        this.$refs.popup.showMessage('Успешная регистрация!', 5000);
+        // this.$refs.popup.showMessage('Успешная регистрация!', 5000);
         this.islogin = false
         this.name =''
         this.password = '',
         this.confirmPassword = ''
       } catch (e: any) {
-        this.$refs.popup.showMessage(e.response.data.message, 10000);
+        // this.$refs.popup.showMessage(e.response.data.message, 10000);
       } finally{
         this.loader = false;
       }
     },
 
   },
-};
+});
 </script>
 
 <style lang="scss">
@@ -113,3 +114,4 @@ export default {
   }
 }
 </style>
+
