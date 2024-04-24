@@ -1,5 +1,6 @@
 <template>
   <div class="main">
+
     <div v-if="!islogin" class="main__authorization">
       <h1>Авторизация</h1>
       <input type="text" v-model="auth.name" placeholder="Введите ваше имя пользователя" />
@@ -25,7 +26,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { IMainPages } from '@/types'
+import { IMainPages, adminData } from '@/types'
+import { useStore, mapActions } from 'vuex';
 import { registration, login } from '@/http/adminAPI'
 
 export default defineComponent({
@@ -37,23 +39,31 @@ export default defineComponent({
         name: "",
         password: ""
       },
-        name: "",
-        password: "",
+      name: "",
+      password: "",
       confirmPassword: "",
     }
   },
   methods: {
+    ...mapActions({
+      storeadminData: 'storeadminData'
+    }),
+
     toggleRegistration() {
       this.islogin = !this.islogin
     },
     async login() {
-      try{
+      try {
         this.loader = true;
-        await login(this.auth.name, this.auth.password);
-        this.$router.push('/publishing-panel')
-        // this.$refs.popup.showMessage('Успешная авторизация!', 10000);
-      } catch (e: any){
-        // this.$refs.popup.showMessage(e.response.data.message, 10000);
+
+        const response = await login(this.auth.name, this.auth.password);
+
+        this.storeadminData(response);
+
+        this.$router.push('/publishing-panel');
+      } catch (e: any) {
+        console.log(e)
+        // (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);
       } finally {
         this.loader = false;
       }
@@ -63,18 +73,17 @@ export default defineComponent({
       try {
         this.loader = true;
         await registration(this.name, this.password, this.confirmPassword);
-        // this.$refs.popup.showMessage('Успешная регистрация!', 5000);
+        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Успешная регистрация!', 10000);
         this.islogin = false
-        this.name =''
+        this.name = ''
         this.password = '',
         this.confirmPassword = ''
       } catch (e: any) {
-        // this.$refs.popup.showMessage(e.response.data.message, 10000);
-      } finally{
+        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);
+      } finally {
         this.loader = false;
       }
     },
-
   },
 });
 </script>
@@ -114,4 +123,3 @@ export default defineComponent({
   }
 }
 </style>
-

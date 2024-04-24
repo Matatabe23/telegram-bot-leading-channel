@@ -11,3 +11,13 @@ export interface IMainPages {
   password: string,
   confirmPassword: string,
 }
+
+export interface adminData {
+  id: number,
+  name: string,
+  role: string
+}
+
+export interface AuthState {
+  adminData: adminData | null,
+}
