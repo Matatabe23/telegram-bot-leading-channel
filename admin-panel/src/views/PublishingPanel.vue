@@ -1,6 +1,5 @@
 <template>
   <div class="publishing-panel">
-    adasd
   </div>
 </template>
 

@@ -1,5 +1,8 @@
 <template>
-  <router-view />
+  <div class="app">
+    <TreePanel />
+    <router-view />
+  </div>
 </template>
 
 <script lang="ts">
@@ -9,15 +12,15 @@ import { mapActions } from 'vuex';
 export default defineComponent({
   data() {
     return {
-      
+
     }
   },
-  methods:{
+  methods: {
     ...mapActions({
       checkDataWeb: 'checkDataWeb'
     })
   },
-  mounted(){
+  mounted() {
     this.checkDataWeb()
   }
 });
@@ -49,5 +52,9 @@ body {
   /* Цвет кнопок при наведении */
   --button-text-color: #fff;
   /* Цвет текста на кнопках */
+}
+
+.app{
+  display: flex;
 }
 </style>
