@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <TreePanel />
+    <TreePanel v-if="$route.path !== '/'"/>
     <router-view />
   </div>
 </template>

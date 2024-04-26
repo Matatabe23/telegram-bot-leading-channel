@@ -93,6 +93,7 @@ export default defineComponent({
 <style lang="scss">
 .main {
   display: flex;
+  width: 300vh;
   justify-content: center;
   align-items: center;
   height: 100vh;

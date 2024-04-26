@@ -1,28 +1,48 @@
 const { Posts } = require('../models/models');
 
 class PostsController {
-	async push(req:any, res:any) {
+  async publication(req: any, res: any) {
+    try {
+      const posts = req.body
+      console.log(posts)
+
+      res.send();
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+    }
+  }
+
+  async editing(req: any, res: any) {
     try {
 
-        res.send();
+      res.send();
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Server Error');
+      console.error(error);
+      res.status(500).send('Server Error');
     }
-}
+  }
 
-	async delete(req: any, res: any) {
-		try {
-			const { id } = req.body;
+  async receiving(req: any, res: any) {
+    try {
 
-			await Posts.destroy({ where: { id: id } });
+      res.send();
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+    }
+  }
 
-			res.send('Пост успешно удален');
-		} catch (error) {
-			console.error(error);
-			res.status(500).send('Server Error');
-		}
-	}
+  async delete(req: any, res: any) {
+    try {
+      const { id } = req.body;
+
+      res.send('Пост успешно удален');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+    }
+  }
 }
 
 module.exports = new PostsController();

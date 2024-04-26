@@ -18,7 +18,7 @@ export default defineComponent({
   name: 'TreePanel',
   data() {
     return {
-      isOpen: true
+      isOpen: false
     }
   },
 });
