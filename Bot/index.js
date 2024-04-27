@@ -53,7 +53,7 @@ async function saveImagesWithPost(images) {
 }
 
 const images = [
-  './image/5.png',
-  './image/6.png'
+  './image/1.jpg',
+  './image/2.jpg'
 ];
 // saveImagesWithPost(images);

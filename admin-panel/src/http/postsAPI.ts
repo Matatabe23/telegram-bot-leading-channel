@@ -1,9 +1,11 @@
-import { $autHost, $host } from "@/http/index";
-import { jwtDecode } from "jwt-decode";
+import { $host } from "@/http/index";
 
 // Функция публикации поста
-export const publication = async (photos: any) => {
-  console.log(photos)
-	const { data } = await $host.post('api/posts/publication', photos.result)
-	// return jwtDecode(data)
+export const publication = async (files: FileList) => {
+  const formData = new FormData();
+  for (let i = 0; i < files.length; i++) {
+    formData.append('files[]', files[i]);
+  }
+  const { data } = await $host.post('api/posts/publication', formData);
+  return data;
 }

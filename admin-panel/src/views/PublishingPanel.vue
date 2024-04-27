@@ -10,33 +10,35 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from 'vue';
 import { publication } from '@/http/postsAPI';
 
-export default {
+export default defineComponent({
   data() {
     return {
       images: [] as any,
     };
   },
   methods: {
-  async handleFileUpload(event) {
-    const files = event.target.files;
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.images.push({
-          url: e.target.result,
-          file: file,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-    await publication(this.images)
+    async handleFileUpload(event: any) {
+      const files = event.target.files;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target) {
+            this.images.push({
+              url: e.target.result,
+              file: file,
+            });
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+      console.log(await publication(files));
+    },
   },
-},
-
-}
+})
 </script>
 
 <style lang="scss">
