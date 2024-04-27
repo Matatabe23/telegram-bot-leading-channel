@@ -1,5 +1,5 @@
 export const publishTime = [
-  { hour: 11, minute: 30 },
-  { hour: 11, minute: 31 },
-  { hour: 11, minute: 32 },
+  { hour: 0, minute: 13 },
+  { hour: 0, minute: 14 },
+  { hour: 0, minute: 15 },
 ]

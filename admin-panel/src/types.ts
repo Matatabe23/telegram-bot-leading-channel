@@ -22,3 +22,8 @@ export interface AuthState {
   adminData: adminData | null,
   auth: boolean
 }
+
+export interface IPublishingPanel {
+  images: string[],
+  imagePost: any
+}
