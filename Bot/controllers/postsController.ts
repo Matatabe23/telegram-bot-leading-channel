@@ -2,6 +2,7 @@ const { Posts } = require('../models/models');
 const multer = require('multer');
 const { dataBasePost, imageData } = require('../models/models');
 const fs = require('fs');
+const { instantPublicationPosts } = require('../routerBot/instantPublicationPosts')
 
 const upload = multer({ dest: 'image/' });
 
@@ -21,6 +22,15 @@ class PostsController {
         }
 
         const files = req.files;
+        const waterMark = Boolean(req.body.waterMark);
+        const instantPublication = JSON.parse(req.body.instantPublication);
+        console.log(JSON.parse(req.body.instantPublication))
+
+        if (instantPublication === true) {
+          await instantPublicationPosts(files);
+          res.send('Успешная моментальная публикация')
+          return
+        }
 
         for (const file of files) {
           await imageData.create({
@@ -36,9 +46,9 @@ class PostsController {
             }
           });
         }
-        
 
-        res.send(files);
+
+        res.send('Успешное сохранение в базу данных!');
       });
     } catch (error) {
       console.error(error);

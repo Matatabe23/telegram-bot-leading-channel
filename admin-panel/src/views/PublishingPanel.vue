@@ -16,6 +16,7 @@
           <input id="file-upload" type="file" multiple @change="handleFileUpload">
         </div>
         <MainCheckBox label="Водяной знак" height="20px" v-model="waterMark" />
+        <MainCheckBox label="Опубликовать сразу" height="20px" v-model="instantPublication" />
 
         <MainButton @click="publication">Опубликовать</MainButton>
 
@@ -38,7 +39,8 @@ export default defineComponent({
       loader: false,
       images: [],
       imagePost: [],
-      waterMark: false
+      waterMark: false,
+      instantPublication: false
     };
   },
   methods: {
@@ -65,11 +67,12 @@ export default defineComponent({
 
         this.loader = true;
 
-        const result = await publication(this.imagePost, this.waterMark);
+        const result = await publication(this.imagePost, this.waterMark, this.instantPublication);
+        console.log(result)
         if (result) {
           this.images = [];
           this.imagePost = [];
-          (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Успешное добавление в базу данных!', 5000);
+          (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(result, 5000);
         }
       } catch (e: any) {
         (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);

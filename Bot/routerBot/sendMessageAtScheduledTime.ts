@@ -2,8 +2,9 @@ const { msUntilNextTargetTime } = require('../utilities/timeUntilNextTimer');
 const { dataBasePost, imageData } = require('../models/models')
 const { publishTime } = require('../const');
 import { IpublishTime } from '../types'
+const bot = require('./index')
 
-export async function sendMessageAtScheduledTime(bot: any) {
+export async function sendMessageAtScheduledTime() {
   async function scheduleNextMessage(time: IpublishTime) {
     setTimeout(async () => {
       const postWithImages = await dataBasePost.findOne({

@@ -27,5 +27,6 @@ export interface IPublishingPanel {
   loader: boolean,
   images: string[],
   imagePost: any,
-  waterMark: boolean
+  waterMark: boolean,
+  instantPublication: boolean
 }
