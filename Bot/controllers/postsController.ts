@@ -28,7 +28,6 @@ class PostsController {
             dataBasePostId: postId
           });
 
-
           fs.unlink(`${file.destination}${file.filename}`, (err: any) => {
             if (err) {
               console.error('Ошибка при удалении файла:', err);
