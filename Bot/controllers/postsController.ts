@@ -22,9 +22,8 @@ class PostsController {
         }
 
         const files = req.files;
-        const waterMark = Boolean(req.body.waterMark);
+        const waterMark = JSON.parse(req.body.waterMark);
         const instantPublication = JSON.parse(req.body.instantPublication);
-        console.log(JSON.parse(req.body.instantPublication))
 
         if (instantPublication === true) {
           await instantPublicationPosts(files);
@@ -46,7 +45,6 @@ class PostsController {
             }
           });
         }
-
 
         res.send('Успешное сохранение в базу данных!');
       });

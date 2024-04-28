@@ -28,5 +28,6 @@ export interface IPublishingPanel {
   images: string[],
   imagePost: any,
   waterMark: boolean,
-  instantPublication: boolean
+  instantPublication: boolean,
+  isSettingsPanelOpen: boolean
 }

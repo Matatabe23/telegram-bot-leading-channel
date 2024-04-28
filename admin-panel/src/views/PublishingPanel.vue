@@ -15,14 +15,19 @@
           </label>
           <input id="file-upload" type="file" multiple @change="handleFileUpload">
         </div>
-        <MainCheckBox label="Водяной знак" height="20px" v-model="waterMark" />
-        <MainCheckBox label="Опубликовать сразу" height="20px" v-model="instantPublication" />
 
+        <MainButton @click="isSettingsPanelOpen = !isSettingsPanelOpen">Настройки</MainButton>
         <MainButton @click="publication">Опубликовать</MainButton>
 
       </div>
     </div>
 
+    <div class="publishing-panel__settings-panel" v-if="isSettingsPanelOpen">
+      <MainCheckBox label="Водяной знак" height="20px" v-model="waterMark" />
+      <MainCheckBox label="Опубликовать сразу" height="20px" v-model="instantPublication" />
+    </div>
+
+    <div class="publishing-panel__overlay" v-if="isSettingsPanelOpen" @click="isSettingsPanelOpen = !isSettingsPanelOpen"/>
     <Loader v-if="loader" />
     <popup-message ref="popup"></popup-message>
   </div>
@@ -40,7 +45,8 @@ export default defineComponent({
       images: [],
       imagePost: [],
       waterMark: false,
-      instantPublication: false
+      instantPublication: false,
+      isSettingsPanelOpen: false
     };
   },
   methods: {
@@ -60,7 +66,7 @@ export default defineComponent({
     },
     async publication() {
       try {
-        if(!this.imagePost.length){
+        if (!this.imagePost.length) {
           (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Некорректные данные', 5000);
           return
         }
@@ -79,8 +85,27 @@ export default defineComponent({
       } finally {
         this.loader = false;
       }
+    },
+    getSettings() {
+      const waterMarkString = localStorage.getItem('waterMark');
+      const instantPublication = localStorage.getItem('instantPublication');
+      if (waterMarkString !== null && instantPublication !== null) {
+        this.waterMark = JSON.parse(waterMarkString);
+        this.instantPublication = JSON.parse(instantPublication);
+      }
     }
   },
+  watch: {
+    waterMark() {
+      localStorage.setItem('waterMark', JSON.stringify(this.waterMark))
+    },
+    instantPublication() {
+      localStorage.setItem('instantPublication', JSON.stringify(this.instantPublication))
+    },
+  },
+  mounted() {
+    this.getSettings()
+  }
 })
 </script>
 
@@ -147,6 +172,34 @@ export default defineComponent({
 
   #file-upload {
     display: none;
+  }
+
+  &__settings-panel {
+    position: fixed;
+    background-color: gray;
+    width: 500px;
+    min-height: 200px;
+    border-radius: 20px;
+    gap: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    justify-items: center;
+    align-items: center;
+    padding: 10px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+
+  &__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 5;
   }
 }
 </style>
