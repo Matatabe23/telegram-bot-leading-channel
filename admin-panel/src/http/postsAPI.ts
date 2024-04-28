@@ -1,7 +1,7 @@
 import { $host } from "@/http/index";
 
 // Функция публикации поста
-export const publication = async (files: FileList) => {
+export const publication = async (files: FileList, waterMark:boolean) => {
   const formData = new FormData();
   for (let i = 0; i < files.length; i++) {
     formData.append('files[]', files[i]);
