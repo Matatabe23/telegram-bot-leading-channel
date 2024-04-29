@@ -1,11 +1,12 @@
-const bcrypt = require('bcrypt');
-const sequelize = require('../db');
 const { administrators } = require('../models/models');
 const tokenService = require('../service/token-service')
 const adminDto = require('../dtos/adminDtos')
+const sequelize = require('../db');
+import bcrypt from 'bcrypt';
+import { Request, Response } from 'express';
 
 class AdministratorController {
-  async registration(req: any, res: any) {
+  async registration(req: Request, res: Response) {
     const { name, password, confirmPassword } = req.body;
     if (!password) {
       return res.status(400).json({ message: 'Некорректный пароль' });
@@ -29,7 +30,7 @@ class AdministratorController {
     return res.json({ token, admin: resultDto });
   }
 
-  async login(req: any, res: any) {
+  async login(req: Request, res: Response) {
     let { name, password } = req.body;
     if (!name || !password) {
       return res.status(400).json({ message: 'Некорректные данные' });
@@ -49,8 +50,8 @@ class AdministratorController {
   }
 
 
-  async CheckDataWeb(req: any, res: any) {
-    const id = req.admin.id;
+  async CheckDataWeb(req: Request, res: Response) {
+    const id = req.body.id;
     const admin = await administrators.findOne({ where: { id } });
     if (!admin) return
     const resultDto = new adminDto(admin)

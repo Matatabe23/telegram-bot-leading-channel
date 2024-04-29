@@ -3,8 +3,9 @@ const multer = require('multer');
 const { dataBasePost, imageData } = require('../models/models');
 const fs = require('fs');
 const { instantPublicationPosts } = require('../routerBot/instantPublicationPosts')
+import {multerPath} from '../const/const'
 
-const upload = multer({ dest: 'image/' });
+const upload = multer({ dest: multerPath });
 
 class PostsController {
   async publication(req: any, res: any) {
