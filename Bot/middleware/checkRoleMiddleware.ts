@@ -1,46 +1,46 @@
 const jwt = require('jsonwebtoken');
 const { administrators } = require('../models/models');
-import { EMiddlewareErrors } from '../types'
-const {Roles} = require('../const')
+import { NOT_AUTHORIZED, NO_ACCESS, USER_NOT_FOUND } from '../const'
+const { roles } = require('../const')
 
 
 //Компонент не доделан!!!
 
 module.exports = (Action: string) => {
-	return async (req: any, res: any, next: any) => {
-		if (req.method === "OPTIONS") {
-			next();
-		}
-		try {
-			const token = req.headers.authorization.split(' ')[1];
-			if (!token) {
-				return res.status(401).json({ message: EMiddlewareErrors.NOT_AUTHORIZED });
-			}
-			const decoded = jwt.verify(token, process.env.SECRET_KEY_ACCESS);
-			const id = decoded.id;
-			const candidate = await administrators.findOne({ where: { id } });
+  return async (req: any, res: any, next: any) => {
+    if (req.method === "OPTIONS") {
+      next();
+    }
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      if (!token) {
+        return res.status(401).json({ message: NOT_AUTHORIZED });
+      }
+      const decoded = jwt.verify(token, process.env.SECRET_KEY_ACCESS);
+      const id = decoded.id;
+      const candidate = await administrators.findOne({ where: { id } });
 
-			if (!candidate) {
-				return res.status(401).json({ message: EMiddlewareErrors.USER_NOT_FOUND });
-			}
+      if (!candidate) {
+        return res.status(401).json({ message: USER_NOT_FOUND });
+      }
 
-			const userRole = candidate.role;
+      const userRole = candidate.role;
 
-			let validRoles = Roles;
+      let validRoles = roles;
 
-			validRoles = Roles.filter(role => role[Action]);
-			
+      validRoles = roles.filter(role => role[Action]);
 
-			const hasAccess = validRoles.some(role => role.NameRole === userRole);
 
-			if (!hasAccess) {
-				return res.status(403).json({ message: EMiddlewareErrors.NO_ACCESS });
-			}
+      const hasAccess = validRoles.some(role => role.NameRole === userRole);
 
-			req.user = decoded;
-			next();
-		} catch (e) {
-			res.status(401).json({ message: EMiddlewareErrors.NOT_AUTHORIZED });
-		}
-	};
+      if (!hasAccess) {
+        return res.status(403).json({ message: NO_ACCESS });
+      }
+
+      req.user = decoded;
+      next();
+    } catch (e) {
+      res.status(401).json({ message: NOT_AUTHORIZED });
+    }
+  };
 };
