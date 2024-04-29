@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-import { NOT_AUTHORIZED, ERROR } from '../const'
+import { NOT_AUTHORIZED, ERROR } from '../const/const'
 
 module.exports = function (req: any, res: any, next: any) {
 	if (req.method === "OPTIONS") {

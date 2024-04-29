@@ -1,9 +1,9 @@
-const {bot} = require('./index')
+const { bot } = require('./index')
 const fs = require('fs');
 
 export async function instantPublicationPosts(files: any) {
-  const media:any = []
-  for(const file of files){
+  const media: any = []
+  for (const file of files) {
     const mediaBlock = {
       type: 'photo',
       media: fs.readFileSync(file.path),
@@ -20,15 +20,20 @@ export async function instantPublicationPosts(files: any) {
     });
   }
 
+  if (media.lenght > 10) {
+    console.error('Слишком много медиафайлов');
+    return
+  }
+
   try {
     bot.sendMediaGroup(process.env.CHAT_ID_DEV, media)
       .then(async () => {
-        
+
       })
       .catch((error: any) => {
         console.error('Ошибка при отправке сообщения:', error);
       });
-  } catch (e:any) {
+  } catch (e: any) {
     console.log(e)
   }
 }

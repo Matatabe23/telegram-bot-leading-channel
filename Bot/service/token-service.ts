@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-import { IAdminDto } from '../types'
+import { IAdminDto } from '../type/types'
 
 class TokenService {
 	generateToken(payload: IAdminDto) {

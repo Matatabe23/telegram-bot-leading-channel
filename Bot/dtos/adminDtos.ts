@@ -1,4 +1,4 @@
-import { IAdminDto } from '../types'
+import { IAdminDto } from '../type/types'
 
 module.exports = class AdminDto {
 	id: number;

@@ -1,7 +1,7 @@
 const { msUntilNextTargetTime } = require('../utilities/timeUntilNextTimer');
 const { dataBasePost, imageData } = require('../models/models')
-const { publishTime } = require('../const');
-import { IPublishTime } from '../types'
+const { publishTime } = require('../const/const');
+import { IPublishTime } from '../type/types'
 const bot = require('./index')
 
 export async function sendMessageAtScheduledTime() {
@@ -23,6 +23,11 @@ export async function sendMessageAtScheduledTime() {
       });
       
       const postId = postWithImages.id;
+
+      if(media.lenght > 10) {
+        console.error('Слишком много медиафайлов');
+        return
+      }
       
       bot.sendMediaGroup(process.env.CHAT_ID_DEV, media)
         .then(async () => {

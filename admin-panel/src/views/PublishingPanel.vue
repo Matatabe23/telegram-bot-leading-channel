@@ -75,8 +75,11 @@ export default defineComponent({
 
         this.loader = true;
 
+        if (this.imagePost.length > 10) {
+          (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Не более 10 медиафайлов!', 10000);
+          return
+        }
         const result = await publication(this.imagePost, this.waterMark, this.instantPublication);
-        console.log(result)
         if (result) {
           this.images = [];
           this.imagePost = [];

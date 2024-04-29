@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { administrators } = require('../models/models');
-import { NOT_AUTHORIZED, NO_ACCESS, USER_NOT_FOUND } from '../const'
-const { roles } = require('../const')
+import { NOT_AUTHORIZED, NO_ACCESS, USER_NOT_FOUND, roles } from '../const/const'
 
 
 //Компонент не доделан!!!

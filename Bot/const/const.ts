@@ -1,4 +1,4 @@
-import {EAdministratorRole, IAdministratorRole} from './types'
+import {EAdministratorRole, IAdministratorRole} from '../type/types'
 
 export const publishTime = [
   { hour: 17, minute: 0 },

@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize')
 const db = require('../db')
-const {EAdministratorRole} = require('../types')
+const {EAdministratorRole} = require('../type/types')
 
 const administrators = db.define('administrators', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
