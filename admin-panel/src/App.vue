@@ -1,13 +1,13 @@
 <template>
   <div class="app">
-    <TreePanel v-if="$route.path !== '/'"/>
+    <TreePanel v-if="$route.path !== '/'" />
     <router-view />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default defineComponent({
   data() {
@@ -18,10 +18,24 @@ export default defineComponent({
   methods: {
     ...mapActions({
       checkDataWeb: 'checkDataWeb'
-    })
+    }),
+
+    async getDataAdmin() {
+      await this.checkDataWeb();
+      if (this.$route.path === '/' && this.getAuthInfo === true) {
+        await this.$router.push('publishing-panel')
+      } else if(this.$route.path !== '/' && this.getAuthInfo === false) {
+        await this.$router.push('/')
+      }
+    }
   },
   mounted() {
-    this.checkDataWeb()
+    this.getDataAdmin()
+  },
+  computed: {
+    ...mapGetters({
+      getAuthInfo: 'getAuthInfo'
+    })
   }
 });
 </script>
@@ -54,7 +68,7 @@ body {
   /* Цвет текста на кнопках */
 }
 
-.app{
+.app {
   display: flex;
 }
 </style>

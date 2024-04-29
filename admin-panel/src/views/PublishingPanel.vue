@@ -23,11 +23,13 @@
     </div>
 
     <div class="publishing-panel__settings-panel" v-if="isSettingsPanelOpen">
+      <div class="publishing-panel__close" @click="isSettingsPanelOpen = !isSettingsPanelOpen">✖</div>
       <MainCheckBox label="Водяной знак" height="20px" v-model="waterMark" />
       <MainCheckBox label="Опубликовать сразу" height="20px" v-model="instantPublication" />
     </div>
 
-    <div class="publishing-panel__overlay" v-if="isSettingsPanelOpen" @click="isSettingsPanelOpen = !isSettingsPanelOpen"/>
+    <div class="publishing-panel__overlay" v-if="isSettingsPanelOpen"
+      @click="isSettingsPanelOpen = !isSettingsPanelOpen" />
     <Loader v-if="loader" />
     <popup-message ref="popup"></popup-message>
   </div>
@@ -42,11 +44,11 @@ export default defineComponent({
   data(): IPublishingPanel {
     return {
       loader: false,
+      isSettingsPanelOpen: false,
       images: [],
       imagePost: [],
       waterMark: false,
       instantPublication: false,
-      isSettingsPanelOpen: false
     };
   },
   methods: {
@@ -89,8 +91,10 @@ export default defineComponent({
     getSettings() {
       const waterMarkString = localStorage.getItem('waterMark');
       const instantPublication = localStorage.getItem('instantPublication');
-      if (waterMarkString !== null && instantPublication !== null) {
+      if (waterMarkString !== null) {
         this.waterMark = JSON.parse(waterMarkString);
+      }
+      if (instantPublication !== null) {
         this.instantPublication = JSON.parse(instantPublication);
       }
     }
@@ -200,6 +204,14 @@ export default defineComponent({
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 5;
+  }
+
+  &__close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 10px 10px 0 0;
+    cursor: pointer;
   }
 }
 </style>

@@ -1,3 +1,5 @@
+
+
 export interface IpublishTime {
   hour: number,
   minute: number
@@ -11,8 +13,10 @@ export interface IAdminDto {
 }
 
 export enum EAdministratorRole {
+  DEVELOPER = 'developer',
+  ADMIN = 'admin',
+  MODERATOR = 'moderator',
   USER = 'user',
-  OWNER = 'owner'
 }
 
 export enum EMiddlewareErrors {
@@ -20,4 +24,13 @@ export enum EMiddlewareErrors {
   NO_ACCESS = 'Нет доступа',
   USER_NOT_FOUND = 'Пользователь не найден',
   ERROR = 'Ошибка'
+}
+
+export interface IAdministratorRole {
+  id: number,
+  NameRole: string,
+  publisherPanel: boolean,
+  userPanel: boolean,
+  adminlist: boolean,
+  ChangeInfo: string[]
 }

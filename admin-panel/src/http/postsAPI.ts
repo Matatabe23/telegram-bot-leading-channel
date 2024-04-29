@@ -1,4 +1,4 @@
-import { $host } from "@/http/index";
+import { $host, $autHost } from "@/http/index";
 
 // Функция публикации поста
 export const publication = async (files: FileList, waterMark:boolean, instantPublication: boolean) => {
@@ -8,6 +8,11 @@ export const publication = async (files: FileList, waterMark:boolean, instantPub
   }
   formData.append('waterMark', waterMark.toString());
   formData.append('instantPublication', instantPublication.toString());
-  const { data } = await $host.post('api/posts/publication', formData);
+  const { data } = await $autHost.post('api/posts/publication', formData);
+  return data;
+}
+
+export const receiving = async () => {
+  const { data } = await $autHost.get('api/posts/receiving');
   return data;
 }

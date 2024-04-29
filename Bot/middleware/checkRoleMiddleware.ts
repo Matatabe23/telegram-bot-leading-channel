@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
-const { User } = require('../models/models');
+const { administrators } = require('../models/models');
 import { EMiddlewareErrors } from '../types'
+const {Roles} = require('../const')
 
 
 //Компонент не доделан!!!
 
-module.exports = (Action) => {
+module.exports = (Action: string) => {
 	return async (req: any, res: any, next: any) => {
 		if (req.method === "OPTIONS") {
 			next();
@@ -17,7 +18,7 @@ module.exports = (Action) => {
 			}
 			const decoded = jwt.verify(token, process.env.SECRET_KEY_ACCESS);
 			const id = decoded.id;
-			const candidate = await User.findOne({ where: { id } });
+			const candidate = await administrators.findOne({ where: { id } });
 
 			if (!candidate) {
 				return res.status(401).json({ message: EMiddlewareErrors.USER_NOT_FOUND });

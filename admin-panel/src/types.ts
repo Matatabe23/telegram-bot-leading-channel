@@ -25,9 +25,9 @@ export interface AuthState {
 
 export interface IPublishingPanel {
   loader: boolean,
+  isSettingsPanelOpen: boolean
   images: string[],
   imagePost: any,
   waterMark: boolean,
   instantPublication: boolean,
-  isSettingsPanelOpen: boolean
 }

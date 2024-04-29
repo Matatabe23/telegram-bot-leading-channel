@@ -7,12 +7,14 @@
       <h1>Tg-bot</h1>
       <h3 @click="$router.push('/publishing-panel')">Публикация</h3>
       <h3 @click="$router.push('/publishing-panel')">Участники</h3>
+      <h3 @click="exit">Выйти</h3>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { mapActions } from 'vuex';
 
 export default defineComponent({
   name: 'TreePanel',
@@ -21,6 +23,18 @@ export default defineComponent({
       isOpen: false
     }
   },
+  methods: {
+    ...mapActions({
+      setExitAuth: 'setExitAuth'
+    }),
+
+    async exit() {
+      await localStorage.removeItem('admin');
+      await localStorage.removeItem('token');
+      await this.setExitAuth()
+      await this.$router.push('/')
+    }
+  }
 });
 </script>
 

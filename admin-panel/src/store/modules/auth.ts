@@ -17,7 +17,7 @@ const mutations: MutationTree<AuthState> = {
     state.adminData = {
       id: adminData.id,
       name: adminData.name,
-      role: adminData.role
+      role: adminData.role,
     }
     state.auth = true;
   },
@@ -29,14 +29,17 @@ const mutations: MutationTree<AuthState> = {
 const actions: ActionTree<AuthState, any> = {
   storeAdminData: ({ commit }, adminData: adminData) => commit('setAdminData', adminData),
   checkDataWeb: async ({ commit }) => {
-    try{
+    try {
       const response = await checkDataWeb()
       commit('setAdminData', response)
-      state.auth = true;
-    } catch(e){
+      if (response) {
+        state.auth = true;
+      }
+    } catch (e) {
       console.log(e)
     }
   },
+  setExitAuth: ({ commit }) => commit('setExitAuth'),
 };
 
 export default {
