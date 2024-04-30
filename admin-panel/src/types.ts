@@ -32,8 +32,14 @@ export interface IPublish {
   instantPublication: boolean,
 }
 
+interface Post {
+  id: number;
+  description: string;
+  imageData: { id: number; image: string }[];
+}
+
 export interface IPublishPosts {
-  posts: any,
+  posts: Post[],
   loaderPosts: boolean,
   currentPage: number,
   postsPerPage: number,
