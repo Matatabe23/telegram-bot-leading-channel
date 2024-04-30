@@ -2,27 +2,35 @@
   <div class="posts">
 
     <div class="posts__post" v-for="post in posts" :key="post.id">
-      <div class="posts__postImage" v-for="img in post.imageData" :key="img.id">
-        <img :src="img.image" alt="">
-      </div>
-      <div class="posts__controle-button">
-        <button>Редактировать</button>
-        <button>Удалить</button>
-        <button>Открыть</button>
+      <div class="posts__postContent">
+        <div class="posts__postImages">
+          <img class="posts__postImage" v-for="img in post.imageData" :key="img.id" :src="img.image" alt="">
+        </div>
+        <div class="posts__postDetails">
+          <h2 class="posts__postTitle">id: {{ post.id }}</h2>
+          <p class="posts__postDescription">{{ post.description }}</p>
+          <div class="posts__controle-buttons">
+            <button class="posts__editButton">Редактировать</button>
+            <button class="posts__deleteButton">Удалить</button>
+            <button class="posts__openButton">Открыть</button>
+            <button class="posts__pushButton">Опубликовать</button>
+          </div>
+        </div>
       </div>
     </div>
 
 
     <div class="posts__pagination">
-      <button @click="setPage(1)" :disabled="currentPage === 1"><<</button>
-      <button v-for="pageNumber in visiblePages" :key="pageNumber" @click="setPage(pageNumber)"
-        :class="{ 'active': pageNumber === currentPage }">{{ pageNumber }}</button>
-      <button @click="setPage(lastPage)" :disabled="currentPage === lastPage">>></button>
-      <select @change="updatePostsPerPage" v-model="postsPerPage">
-        <option value="3">3</option>
-        <option value="5">5</option>
-        <option value="10">10</option>
-      </select>
+      <button @click="setPage(1)" :disabled="currentPage === 1">
+        <<</button>
+          <button v-for="pageNumber in visiblePages" :key="pageNumber" @click="setPage(pageNumber)"
+            :class="{ 'active': pageNumber === currentPage }">{{ pageNumber }}</button>
+          <button @click="setPage(lastPage)" :disabled="currentPage === lastPage">>></button>
+          <select @change="updatePostsPerPage" v-model="postsPerPage">
+            <option value="3">3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
     </div>
 
 
@@ -57,15 +65,18 @@ export default defineComponent({
       } catch (e: any) {
 
       } finally {
-        this.loaderPosts = false
+        setTimeout(() => {
+          this.loaderPosts = false;
+        }, 500);
       }
     },
     setPage(page: number) {
       this.currentPage = page;
       this.getPosts();
     },
-    updatePostsPerPage(value: any){
+    updatePostsPerPage(value: any) {
       this.postsPerPage = value.target.value
+      this.currentPage = this.lastPage
       this.getPosts();
     }
   },
@@ -107,25 +118,70 @@ export default defineComponent({
   min-height: 500px;
 
   &__post {
-    border: 3px solid gray;
-    border-radius: 5px;
-    background-color: azure;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  &__postContent {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
+    padding: 20px;
+  }
+
+  &__postImages {
+    margin-right: 20px;
+  }
+
+  &__postImage {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
     margin-bottom: 10px;
   }
 
-  &__controle-button {
-    display: flex;
-    justify-content: space-evenly;
+  &__postDetails {
+    flex: 1;
   }
 
-  &__postImage img {
-    height: 100px;
-    margin: 10px;
-    flex-wrap: wrap;
+  &__postTitle {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  &__postDescription {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 15px;
+  }
+
+  &__controle-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  &__editButton,
+  &__deleteButton,
+  &__openButton,
+  &__pushButton {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  &__editButton:hover,
+  &__deleteButton:hover,
+  &__openButton:hover,
+  &__pushButton:hover {
+    background-color: #0056b3;
   }
 
   &__loaderPosts {

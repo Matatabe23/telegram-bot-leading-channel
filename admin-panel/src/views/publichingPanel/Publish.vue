@@ -176,7 +176,7 @@ export default defineComponent({
 
   &__settings-panel {
     position: fixed;
-    background-color: gray;
+    background-color: rgb(100, 100, 100);
     width: 500px;
     min-height: 200px;
     border-radius: 20px;
