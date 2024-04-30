@@ -1,35 +1,45 @@
-const AWS = require('aws-sdk');
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const fs = require('fs');
 
-AWS.config.update({
-  accessKeyId: process.env.S3_ACCESS_KEY_ID,
-  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+const s3Client = new S3Client({
+  region: 'us-east-1',
+  endpoint: 'https://s3.timeweb.cloud',
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+  }
 });
 
-const s3 = new AWS.S3();
 
-// const s3 = new AWS.S3({
-//   accessKeyId: process.env.S3_ACCESS_KEY_ID,
-//   secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
-// });
+export function uploadImageToS3(imagePath:any) {
+  const imgStream = fs.createReadStream(imagePath.path);
 
-export function uploadImageToS3(imagePath:string, keyName:string) {
-  const fileContent = fs.readFileSync(imagePath);
+  const fileName = `${process.env.S3_FOLDER_SAVED}/QugorArts_${Date.now()}.png`;
 
   const params = {
-    Bucket: '2ecf572e-2b873220-cc07-49c8-8678-708468e33070',
-    Key: keyName,
-    Body: fileContent,
-    ACL: 'public-read'
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: fileName,
+    Body: imgStream,
+    ContentType: 'image/png',
+    ContentDisposition: 'inline'
   };
 
-  return new Promise((resolve, reject) => {
-    s3.upload(params, (err:any, data:any) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data.Location);
-      }
+  const uploadCommand = new PutObjectCommand(params);
+  s3Client.send(uploadCommand)
+    .then((data: any) => {
+      // console.log("Изображение успешно загружено. Ссылка на изображение:", `https://s3.timeweb.cloud/${params.Bucket}/${fileName}`);
+      fs.unlink(`${imagePath.destination}${imagePath.filename}`, (err: any) => {
+        if (err) {
+          console.error('Ошибка при удалении файла:', err);
+        } else {
+          console.log('Файл успешно удален:', imagePath.path);
+        }
+      });
+    })
+    .catch((err: any) => {
+      console.error("Ошибка загрузки изображения:", err);
     });
-  });
+  
+
+    return `https://s3.timeweb.cloud/${params.Bucket}/${fileName}`
 }

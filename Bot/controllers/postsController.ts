@@ -33,19 +33,11 @@ class PostsController {
         }
 
         for (const file of files) {
-          uploadImageToS3(file.path, 'QugorArtsTelegramBot')
+          const url = uploadImageToS3(file)
 
-          // await imageData.create({
-          //   image: fs.readFileSync(file.path),
-          //   dataBasePostId: postId
-          // });
-
-          fs.unlink(`${file.destination}${file.filename}`, (err: any) => {
-            if (err) {
-              console.error('Ошибка при удалении файла:', err);
-            } else {
-              console.log('Файл успешно удален:', file.path);
-            }
+          await imageData.create({
+            image: url,
+            dataBasePostId: postId
           });
         }
 

@@ -17,6 +17,7 @@
   "author": "QUGOR",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.565.0",
     "aws-sdk": "^2.1609.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
