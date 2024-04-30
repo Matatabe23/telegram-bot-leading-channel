@@ -3,7 +3,8 @@ const { dataBasePost, imageData } = require('../models/models');
 const fs = require('fs');
 const { instantPublicationPosts } = require('../routerBot/instantPublicationPosts')
 import { multerPath } from '../const/const'
-import {uploadImageToS3} from '../service/s3-service'
+import { uploadImageToS3 } from '../service/s3-service'
+import { addWatermark } from '../service/waterMark-service'
 
 const upload = multer({ dest: multerPath });
 
@@ -27,13 +28,27 @@ class PostsController {
         const instantPublication = JSON.parse(req.body.instantPublication);
 
         if (instantPublication === true) {
+          if (waterMark === true) {
+            // Накладываем водяной знак на каждое изображение
+            for (const file of files) {
+              await addWatermark(file);
+            }
+          }
+
           await instantPublicationPosts(files);
-          res.send('Успешная моментальная публикация')
-          return
+          res.send('Успешная моментальная публикация');
+          return;
         }
 
+
         for (const file of files) {
-          const url = uploadImageToS3(file)
+          let url: string;
+          if (waterMark === true) {
+            await addWatermark(file);
+            url = await uploadImageToS3(file);
+          } else {
+            url = await uploadImageToS3(file);
+          }
 
           await imageData.create({
             image: url,
