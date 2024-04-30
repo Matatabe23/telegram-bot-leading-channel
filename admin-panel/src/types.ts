@@ -23,13 +23,16 @@ export interface AuthState {
   auth: boolean
 }
 
-export interface IPublishingPanel {
+export interface IPublish {
   loader: boolean,
   isSettingsPanelOpen: boolean
   images: string[],
   imagePost: any,
   waterMark: boolean,
   instantPublication: boolean,
+}
+
+export interface IPublishPosts {
   posts: any,
   loaderPosts: boolean,
   currentPage: number,

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Main from '@/views/Main.vue';
-import PublishingPanel from '@/views/PublishingPanel.vue';
+import PublishingPanel from '@/views/publichingPanel/PublishingPanel.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
