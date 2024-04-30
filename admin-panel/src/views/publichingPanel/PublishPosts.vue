@@ -58,12 +58,12 @@ export default defineComponent({
   methods: {
     async getPosts() {
       try {
-        this.loaderPosts = true
-        const posts = await receiving(this.currentPage, this.postsPerPage)
+        this.loaderPosts = true;
+        const posts = await receiving(this.currentPage, this.postsPerPage);
         this.posts = posts.posts;
-        this.totalCount = posts.totalCount
+        this.totalCount = posts.totalCount;
       } catch (e: any) {
-
+        console.error(e);
       } finally {
         setTimeout(() => {
           this.loaderPosts = false;
@@ -74,19 +74,20 @@ export default defineComponent({
       this.currentPage = page;
       this.getPosts();
     },
-    updatePostsPerPage(value: any) {
-      this.postsPerPage = value.target.value
-      this.currentPage = this.lastPage
+    updatePostsPerPage(event: Event) {
+      const value = (event.target as HTMLSelectElement).value;
+      this.postsPerPage = parseInt(value, 10);
+      this.currentPage = 1;
       this.getPosts();
     }
   },
   computed: {
-    lastPage() {
+    lastPage(): number {
       return Math.ceil(this.totalCount / this.postsPerPage);
     },
     visiblePages() {
       const maxVisiblePages = 10; // Максимальное количество отображаемых страниц
-      const totalPages = this.lastPage;
+      const totalPages = Math.ceil(this.totalCount / this.postsPerPage);;
       let startPage = 1;
       let endPage = totalPages;
 
@@ -105,7 +106,7 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.getPosts()
+    this.getPosts();
   }
 })
 </script>
