@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const fs = require('fs');
 
 const s3Client = new S3Client({
@@ -42,4 +42,25 @@ export function uploadImageToS3(imagePath:any) {
   
 
     return `https://s3.timeweb.cloud/${params.Bucket}/${fileName}`
+}
+
+
+
+export async function deleteImageFromS3(imageUrl: string) {
+  const urlParts = imageUrl.split("/");
+  const imageKey = urlParts[urlParts.length - 1];
+
+  const params = new DeleteObjectCommand({
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: `${process.env.S3_FOLDER_SAVED}/${imageKey}`
+  });
+
+  try {
+    const data = await s3Client.send(params);
+    console.log(`Изображение с ключом ${imageKey} успешно удалено из бакета`);
+    return data;
+  } catch (err) {
+    console.error("Ошибка при удалении изображения из хранилища S3:", err);
+    throw err;
+  }
 }

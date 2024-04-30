@@ -1,5 +1,6 @@
 const { dataBasePost, imageData } = require('../models/models')
 import {bot} from '../routerBot/index'
+import {deleteImageFromS3} from '../service/s3-service'
 
 export async function sendMessageAtScheduledTime() {
   const postWithImages = await dataBasePost.findOne({
@@ -30,6 +31,8 @@ export async function sendMessageAtScheduledTime() {
         await imageData.destroy({
           where: { id: item.id },
         });
+
+        deleteImageFromS3(item.media);
       });
       await dataBasePost.destroy({
         where: { id: postId },
