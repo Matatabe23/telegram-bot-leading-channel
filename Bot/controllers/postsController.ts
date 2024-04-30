@@ -11,9 +11,6 @@ const upload = multer({ dest: multerPath });
 class PostsController {
   async publication(req: any, res: any) {
     try {
-      const post = await dataBasePost.create();
-      const postId = post.id;
-
       upload.array('files[]')(req, res, async (err: any) => {
         if (err instanceof multer.MulterError) {
           console.error('Multer error:', err);
@@ -40,6 +37,8 @@ class PostsController {
           return;
         }
 
+        const post = await dataBasePost.create();
+        const postId = post.id;
 
         for (const file of files) {
           let url: string;
