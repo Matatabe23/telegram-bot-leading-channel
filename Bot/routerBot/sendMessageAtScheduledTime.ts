@@ -14,7 +14,8 @@ export async function sendMessageAtScheduledTime() {
     return {
       type: 'photo',
       media: item.image,
-      id: item.id
+      id: item.id,
+      caption: '#QugorArts'
     }
   });
 

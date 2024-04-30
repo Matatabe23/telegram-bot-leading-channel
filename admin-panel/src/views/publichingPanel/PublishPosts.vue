@@ -20,7 +20,7 @@
     </div>
 
 
-    <div class="posts__pagination">
+    <div class="posts__pagination" v-if="posts.length">
       <button @click="setPage(1)" :disabled="currentPage === 1">
         <<</button>
           <button v-for="pageNumber in visiblePages" :key="pageNumber" @click="setPage(pageNumber)"

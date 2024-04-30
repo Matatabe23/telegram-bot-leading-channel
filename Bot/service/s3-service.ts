@@ -57,7 +57,6 @@ export async function deleteImageFromS3(imageUrl: string) {
 
   try {
     const data = await s3Client.send(params);
-    console.log(`Изображение с ключом ${imageKey} успешно удалено из бакета`);
     return data;
   } catch (err) {
     console.error("Ошибка при удалении изображения из хранилища S3:", err);
