@@ -21,7 +21,7 @@ const dataBasePost = db.define('dataBasePost', {
 
 const imageData = db.define('imageData', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  image: { type: DataTypes.BLOB },
+  image: { type: DataTypes.STRING },
 })
 
 dataBasePost.hasMany(imageData);

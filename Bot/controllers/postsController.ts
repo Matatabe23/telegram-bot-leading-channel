@@ -1,9 +1,9 @@
-const { Posts } = require('../models/models');
 const multer = require('multer');
 const { dataBasePost, imageData } = require('../models/models');
 const fs = require('fs');
 const { instantPublicationPosts } = require('../routerBot/instantPublicationPosts')
-import {multerPath} from '../const/const'
+import { multerPath } from '../const/const'
+import {uploadImageToS3} from '../service/s3-service'
 
 const upload = multer({ dest: multerPath });
 
@@ -33,10 +33,12 @@ class PostsController {
         }
 
         for (const file of files) {
-          await imageData.create({
-            image: fs.readFileSync(file.path),
-            dataBasePostId: postId
-          });
+          uploadImageToS3(file.path, 'QugorArtsTelegramBot')
+
+          // await imageData.create({
+          //   image: fs.readFileSync(file.path),
+          //   dataBasePostId: postId
+          // });
 
           fs.unlink(`${file.destination}${file.filename}`, (err: any) => {
             if (err) {
@@ -67,13 +69,26 @@ class PostsController {
 
   async receiving(req: any, res: any) {
     try {
+      const { page, pageSize } = req.query;
+      const offset = (page - 1) * pageSize;
 
-      res.send();
+      const posts = await dataBasePost.findAll({
+        include: [{
+          model: imageData,
+          limit: 1
+        }],
+        limit: parseInt(pageSize),
+        offset: offset
+      });
+      const totalCount = await dataBasePost.count();
+
+      res.send({ posts, totalCount });
     } catch (error) {
       console.error(error);
       res.status(500).send('Server Error');
     }
   }
+
 
   async delete(req: any, res: any) {
     try {

@@ -12,7 +12,7 @@ export const publication = async (files: FileList, waterMark:boolean, instantPub
   return data;
 }
 
-export const receiving = async () => {
-  const { data } = await $autHost.get('api/posts/receiving');
+export const receiving = async (page: number, pageSize: number) => {
+  const { data } = await $autHost.get('api/posts/receiving', { params: { page, pageSize } });
   return data;
 }

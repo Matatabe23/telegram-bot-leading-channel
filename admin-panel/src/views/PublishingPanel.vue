@@ -28,6 +28,30 @@
       <MainCheckBox label="Опубликовать сразу" height="20px" v-model="instantPublication" />
     </div>
 
+    <!-- <div class="publishing-panel__posts">
+
+      <div class="publishing-panel__post" v-for="post in posts" :key="post.id">
+        <div class="publishing-panel__postImage" v-for="img in post.imageData" :key="img.id">
+          <img :src="getImageUrl(img.image)" alt="">
+        </div>
+        <div class="publishing-panel__controle-button">
+          <button>Редактировать</button>
+          <button>Удалить</button>
+          <button>Открыть</button>
+        </div>
+      </div>
+
+
+      <div class="publishing-panel__pagination">
+        <button v-for="page in totalCount" :key="page" @click="setPage(page)">
+          {{ page }}
+        </button>
+      </div>
+
+      <Loader v-if="loaderPosts" class="publishing-panel__loaderPosts" />
+
+    </div> -->
+
     <div class="publishing-panel__overlay" v-if="isSettingsPanelOpen"
       @click="isSettingsPanelOpen = !isSettingsPanelOpen" />
     <Loader v-if="loader" />
@@ -37,7 +61,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { publication } from '@/http/postsAPI';
+import { publication, receiving } from '@/http/postsAPI';
 import { IPublishingPanel } from '@/types';
 
 export default defineComponent({
@@ -49,6 +73,12 @@ export default defineComponent({
       imagePost: [],
       waterMark: false,
       instantPublication: false,
+
+      posts: [],
+      loaderPosts: false,
+      currentPage: 1,
+      postsPerPage: 3,
+      totalCount: 0
     };
   },
   methods: {
@@ -91,7 +121,7 @@ export default defineComponent({
         this.loader = false;
       }
     },
-    getSettings() {
+    async getSettings() {
       const waterMarkString = localStorage.getItem('waterMark');
       const instantPublication = localStorage.getItem('instantPublication');
       if (waterMarkString !== null) {
@@ -100,7 +130,29 @@ export default defineComponent({
       if (instantPublication !== null) {
         this.instantPublication = JSON.parse(instantPublication);
       }
+    },
+    async getPosts() {
+      try {
+        this.loaderPosts = true
+        const posts = await receiving(this.currentPage, this.postsPerPage)
+        this.posts = posts.posts;
+        this.totalCount = Math.ceil(posts.totalCount / this.postsPerPage);
+      } catch (e: any) {
+
+      } finally {
+        this.loaderPosts = false
+      }
+    },
+    getImageUrl(imageData: any) {
+      const blob = new Blob([new Uint8Array(imageData.data)], { type: 'image/png' });
+      const imageUrl = URL.createObjectURL(blob);
+      return imageUrl;
+    },
+    setPage(page: number) {
+      this.currentPage = page;
+      // this.getPosts()
     }
+
   },
   watch: {
     waterMark() {
@@ -112,6 +164,7 @@ export default defineComponent({
   },
   mounted() {
     this.getSettings()
+    this.getPosts()
   }
 })
 </script>
@@ -215,6 +268,40 @@ export default defineComponent({
     top: 0;
     margin: 10px 10px 0 0;
     cursor: pointer;
+  }
+
+
+  &__posts {
+    width: 95%;
+    position: relative;
+    min-width: 500px;
+    min-height: 500px;
+  }
+
+  &__post {
+    border: 3px solid gray;
+    border-radius: 5px;
+    background-color: azure;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  &__controle-button {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  &__postImage img {
+    height: 100px;
+    margin: 10px;
+    flex-wrap: wrap;
+  }
+
+  &__loaderPosts {
+    position: absolute;
   }
 }
 </style>

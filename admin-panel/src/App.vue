@@ -44,7 +44,8 @@ export default defineComponent({
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--background-color)
+  background-color: var(--background-color);
+  min-width: 1000px;
 }
 
 :root {

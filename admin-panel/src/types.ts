@@ -30,4 +30,9 @@ export interface IPublishingPanel {
   imagePost: any,
   waterMark: boolean,
   instantPublication: boolean,
+  posts: any,
+  loaderPosts: boolean,
+  currentPage: number,
+  postsPerPage: number,
+  totalCount: number
 }
