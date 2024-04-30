@@ -143,11 +143,6 @@ export default defineComponent({
         this.loaderPosts = false
       }
     },
-    getImageUrl(imageData: any) {
-      const blob = new Blob([new Uint8Array(imageData.data)], { type: 'image/png' });
-      const imageUrl = URL.createObjectURL(blob);
-      return imageUrl;
-    },
     setPage(page: number) {
       this.currentPage = page;
       // this.getPosts()
