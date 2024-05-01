@@ -11,7 +11,7 @@
           <p class="posts__postDescription">{{ post.description }}</p>
           <div class="posts__controle-buttons">
             <button class="posts__editButton">Редактировать</button>
-            <button class="posts__deleteButton">Удалить</button>
+            <button class="posts__deleteButton" @click=deletePost(post.id)>Удалить</button>
             <button class="posts__openButton">Открыть</button>
             <button class="posts__pushButton">Опубликовать</button>
           </div>
@@ -43,6 +43,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IPublishPosts, post } from '@/types';
+import {deletePost} from '@/http/postsAPI'
 
 export default defineComponent({
   data(): IPublishPosts {
@@ -83,6 +84,10 @@ export default defineComponent({
       const value = (event.target as HTMLSelectElement).value;
       this.postsPerPage = parseInt(value, 10);
       this.currentPage = 1;
+      this.getPosts();
+    },
+    async deletePost(id: number) {
+      await deletePost(id);
       this.getPosts();
     }
   },

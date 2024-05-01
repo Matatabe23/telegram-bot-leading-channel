@@ -7,6 +7,6 @@ import authMiddleware from '../middleware/authMiddleware.js'
 router.post('/publication', authMiddleware, postsController.publication)
 router.put('/editing', authMiddleware, postsController.editing)
 router.get('/receiving', authMiddleware, postsController.receiving)
-router.delete('/delete', authMiddleware, postsController.delete)
+router.delete('/deletePost/:id', authMiddleware, postsController.deletePost)
 
 export default router

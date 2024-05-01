@@ -5,6 +5,7 @@ import { multerPath } from '../const/const.js'
 import { uploadImageToS3 } from '../service/s3-service.js'
 import addWatermark  from '../service/waterMark-service.js'
 import { Request, Response } from 'express'; 
+import { deleteImageFromS3 } from '../service/s3-service.js'
 
 const upload = multer({ dest: multerPath })
 
@@ -103,16 +104,32 @@ class PostsController {
   
 
 
-  async delete(req: Request, res: Response) {
+  async deletePost(req: Request, res: Response) {
     try {
-      const { id } = req.body
+      const { id } = req.params;
+      const post = await dataBasePost.findByPk(id);
+      if (!post) {
+        return res.status(404).send('Пост не найден');
+      }
 
-      res.send('Пост успешно удален')
+      const images = await imageData.findAll({ where: { dataBasePostId: id } });
+
+      for (const image of images) {
+        console.log(image)
+        deleteImageFromS3(image.dataValues.image)
+      }
+
+      await imageData.destroy({ where: { dataBasePostId: id } });
+
+      await post.destroy();
+
+      res.send('Пост успешно удален');
     } catch (error) {
-      console.error(error)
-      res.status(500).send('Server Error')
+      console.error(error);
+      res.status(500).send('Server Error');
     }
   }
+  
 }
 
 export default new PostsController()
