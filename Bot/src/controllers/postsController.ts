@@ -4,11 +4,12 @@ import { instantPublicationPosts } from '../routerBot/instantPublicationPosts.js
 import { multerPath } from '../const/const.js'
 import { uploadImageToS3 } from '../service/s3-service.js'
 import addWatermark  from '../service/waterMark-service.js'
+import { Request, Response } from 'express'; 
 
 const upload = multer({ dest: multerPath })
 
 class PostsController {
-  async publication(req: any, res: any) {
+  async publication(req: Request, res: Response) {
     try {
       upload.array('files[]')(req, res, async (err) => {
         if (err instanceof multer.MulterError) {
@@ -19,13 +20,18 @@ class PostsController {
           return res.status(500).send('Server Error')
         }
 
-        const files = req.files
+        let files: Express.Multer.File[] = [];
+        if (Array.isArray(req.files)) {
+          files = req.files;
+        } else if (req.files && typeof req.files === 'object') {
+          files = Object.values(req.files).reduce((acc: Express.Multer.File[], curr: Express.Multer.File[]) => acc.concat(curr), []);
+        }
+
         const waterMark = JSON.parse(req.body.waterMark)
         const instantPublication = JSON.parse(req.body.instantPublication)
 
         if (instantPublication === true) {
           if (waterMark === true) {
-            // Накладываем водяной знак на каждое изображение
             for (const file of files) {
               await addWatermark(file)
             }
@@ -36,11 +42,11 @@ class PostsController {
           return
         }
 
-        const post:any = await dataBasePost.create()
-        const postId = post.id
+        const post = await dataBasePost.create()
+        const postId = post.dataValues.id
 
         for (const file of files) {
-          let url
+          let url: string
           if (waterMark === true) {
             await addWatermark(file)
             url = await uploadImageToS3(file)
@@ -62,7 +68,7 @@ class PostsController {
     }
   }
 
-  async editing(req: any, res: any) {
+  async editing(req: Request, res: Response) {
     try {
 
       res.send()
@@ -72,30 +78,37 @@ class PostsController {
     }
   }
 
-  async receiving(req: any, res: any) {
+  async receiving(req: Request, res: Response) {
     try {
-      const { page, pageSize } = req.query
-      const offset = (page - 1) * pageSize
-
+      const page = req.query.page ? parseInt(req.query.page.toString()) : 1;
+      const pageSize = req.query.pageSize ? parseInt(req.query.pageSize.toString()) : 10; 
+  
+      if (isNaN(page) || isNaN(pageSize)) {
+        return res.status(400).send('Неверный формат параметров запроса');
+      }
+  
+      const offset = (page - 1) * pageSize;
+  
       const posts = await dataBasePost.findAll({
         include: [{
           model: imageData,
           limit: 1
         }],
-        limit: parseInt(pageSize),
+        limit: pageSize,
         offset: offset
-      })
-      const totalCount = await dataBasePost.count()
-
-      res.send({ posts, totalCount })
+      });
+      const totalCount = await dataBasePost.count();
+  
+      res.send({ posts, totalCount });
     } catch (error) {
-      console.error(error)
-      res.status(500).send('Server Error')
+      console.error(error);
+      res.status(500).send('Server Error');
     }
   }
+  
 
 
-  async delete(req: any, res: any) {
+  async delete(req: Request, res: Response) {
     try {
       const { id } = req.body
 

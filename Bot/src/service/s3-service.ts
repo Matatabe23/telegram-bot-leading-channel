@@ -1,4 +1,4 @@
-import { S3Client, S3ClientConfig, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, S3ClientConfig, PutObjectCommand, DeleteObjectCommand, PutObjectCommandOutput } from "@aws-sdk/client-s3";
 import fs from 'fs';
 
 const s3ClientConfig: S3ClientConfig = {
@@ -26,8 +26,8 @@ export function uploadImageToS3(imagePath: any) {
 
   const uploadCommand = new PutObjectCommand(params);
   s3Client.send(uploadCommand)
-    .then((data) => {
-      // console.log("Изображение успешно загружено. Ссылка на изображение:", `https://s3.timeweb.cloud/${params.Bucket}/${fileName}`);
+    .then((data: PutObjectCommandOutput) => {
+      console.log(data)
       fs.unlink(`${imagePath.destination}${imagePath.filename}`, (err) => {
         if (err) {
           console.error('Ошибка при удалении файла:', err);
@@ -46,7 +46,7 @@ export function uploadImageToS3(imagePath: any) {
 
 
 
-export async function deleteImageFromS3(imageUrl:any) {
+export async function deleteImageFromS3(imageUrl: string) {
   const urlParts = imageUrl.split("/");
   const imageKey = urlParts[urlParts.length - 1];
 

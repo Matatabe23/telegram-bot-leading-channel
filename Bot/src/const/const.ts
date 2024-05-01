@@ -1,9 +1,9 @@
 import {EAdministratorRole, IAdministratorRole} from '../type/types.js'
 
 export const publishTime = [
-  { hour: 14, minute: 31 },
-  { hour: 14, minute: 18 },
-  { hour: 14, minute: 19 },
+  { hour: 12, minute: 28 },
+  { hour: 12, minute: 29 },
+  { hour: 12, minute: 30 },
 ]
 
 export const roles: IAdministratorRole[] = [
@@ -17,4 +17,4 @@ export const NO_ACCESS = 'Нет доступа';
 export const USER_NOT_FOUND = 'Пользователь не найден';
 export const ERROR = 'Ошибка';
 
-export const multerPath = 'image/'
+export const multerPath = '../image/'

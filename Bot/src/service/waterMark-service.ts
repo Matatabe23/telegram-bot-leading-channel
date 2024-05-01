@@ -4,8 +4,7 @@ import fs from 'fs';
 export default async function addWatermark(inputImagePath: any) {
   try {
     const image = await Jimp.read(inputImagePath.path);
-    let watermark = await Jimp.read('src/image/waterMark.png');
-
+    let watermark = await Jimp.read('../image/waterMark.png');
     watermark = watermark.resize(watermark.bitmap.width / 1.5, watermark.bitmap.height / 1.5);
 
     const x = (image.bitmap.width - watermark.bitmap.width) / 2;

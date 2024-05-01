@@ -7,7 +7,7 @@
       <h1>Tg-bot</h1>
       <h3 @click="$router.push('/publishing-panel')">Публикация</h3>
       <h3 @click="$router.push('/publishing-panel')">Участники</h3>
-      <h3 @click="exit">Выйти</h3>
+      <h3 @click="exit()">Выйти</h3>
     </div>
   </div>
 </template>
@@ -47,6 +47,7 @@ export default defineComponent({
   position: fixed;
   left: -350px;
   transition: all 0.2s ease;
+  z-index: 999;
 
   &__panel {
     padding: 0 5vh;
