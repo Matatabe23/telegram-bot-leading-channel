@@ -20,7 +20,7 @@ class PostsController {
           return res.status(500).send('Server Error')
         }
 
-        const files = req.files
+        const files:any = req.files
 
         const waterMark = JSON.parse(req.body.waterMark)
         const instantPublication = JSON.parse(req.body.instantPublication)

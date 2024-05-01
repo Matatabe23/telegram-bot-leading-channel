@@ -71,9 +71,10 @@ export default defineComponent({
     async register() {
       try {
         this.loader = true;
-
+        
         await registration(this.name, this.password, this.confirmPassword);
-
+        
+        
         (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Успешная регистрация!', 10000);
 
         this.islogin = false

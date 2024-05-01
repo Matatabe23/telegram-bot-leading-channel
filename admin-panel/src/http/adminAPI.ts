@@ -3,7 +3,7 @@ import { jwtDecode } from "jwt-decode";
 
 // Функция для регистрации новых пользователей
 export const registration = async (name: string, password: string, confirmPassword: string) => {
-	const { data } = await $host.post('api/admin/registration', { name, password, confirmPassword })
+  const { data } = await $host.post('api/admin/registration', { name, password, confirmPassword })
 	localStorage.setItem('token', data.token)
 	return jwtDecode(data.token)
 }
