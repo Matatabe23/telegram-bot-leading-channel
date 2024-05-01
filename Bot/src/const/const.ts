@@ -1,7 +1,7 @@
 import {EAdministratorRole, IAdministratorRole} from '../type/types.js'
 
 export const publishTime = [
-  { hour: 15, minute: 38 },
+  { hour: 23, minute: 3 },
   { hour: 15, minute: 39 },
   { hour: 12, minute: 30 },
 ]
@@ -18,3 +18,5 @@ export const USER_NOT_FOUND = 'Пользователь не найден';
 export const ERROR = 'Ошибка';
 
 export const multerPath = 'src/image/'
+
+export const waterMark = '#QugorArts'

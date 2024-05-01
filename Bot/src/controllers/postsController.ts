@@ -3,8 +3,8 @@ import { dataBasePost, imageData } from '../models/models.js'
 import { instantPublicationPosts } from '../routerBot/instantPublicationPosts.js'
 import { multerPath } from '../const/const.js'
 import { uploadImageToS3 } from '../service/s3-service.js'
-import addWatermark  from '../service/waterMark-service.js'
-import { Request, Response } from 'express'; 
+import addWatermark from '../service/waterMark-service.js'
+import { Request, Response } from 'express';
 import { deleteImageFromS3 } from '../service/s3-service.js'
 
 const upload = multer({ dest: multerPath })
@@ -21,7 +21,7 @@ class PostsController {
           return res.status(500).send('Server Error')
         }
 
-        const files:any = req.files
+        const files: any = req.files
 
         const waterMark = JSON.parse(req.body.waterMark)
         const instantPublication = JSON.parse(req.body.instantPublication)
@@ -64,27 +64,17 @@ class PostsController {
     }
   }
 
-  async editing(req: Request, res: Response) {
-    try {
-
-      res.send()
-    } catch (error) {
-      console.error(error)
-      res.status(500).send('Server Error')
-    }
-  }
-
   async receiving(req: Request, res: Response) {
     try {
       const page = req.query.page ? parseInt(req.query.page.toString()) : 1;
-      const pageSize = req.query.pageSize ? parseInt(req.query.pageSize.toString()) : 10; 
-  
+      const pageSize = req.query.pageSize ? parseInt(req.query.pageSize.toString()) : 10;
+
       if (isNaN(page) || isNaN(pageSize)) {
         return res.status(400).send('Неверный формат параметров запроса');
       }
-  
+
       const offset = (page - 1) * pageSize;
-  
+
       const posts = await dataBasePost.findAll({
         include: [{
           model: imageData,
@@ -94,14 +84,14 @@ class PostsController {
         offset: offset
       });
       const totalCount = await dataBasePost.count();
-  
+
       res.send({ posts, totalCount });
     } catch (error) {
       console.error(error);
       res.status(500).send('Server Error');
     }
   }
-  
+
 
 
   async deletePost(req: Request, res: Response) {
@@ -111,11 +101,9 @@ class PostsController {
       if (!post) {
         return res.status(404).send('Пост не найден');
       }
-
       const images = await imageData.findAll({ where: { dataBasePostId: id } });
 
       for (const image of images) {
-        console.log(image)
         deleteImageFromS3(image.dataValues.image)
       }
 
@@ -129,7 +117,50 @@ class PostsController {
       res.status(500).send('Server Error');
     }
   }
-  
+
+  async publishInstantly(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const post = await dataBasePost.findByPk(id);
+      if (!post) {
+        return res.status(404).send('Пост не найден');
+      }
+      const images = await imageData.findAll({ where: { dataBasePostId: id } });
+
+      const path: string[] = []
+      for (const image of images) {
+        path.push(image.dataValues.image)
+      }
+
+      const result = await instantPublicationPosts(path, true)
+
+      await imageData.destroy({ where: { dataBasePostId: id } });
+
+      await post.destroy();
+
+      if (result) {
+        for (const image of images) {
+          await deleteImageFromS3(image.dataValues.image)
+        }
+      }
+
+      res.send('Пост успешно опубликован');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+    }
+  }
+
+  async editing(req: Request, res: Response) {
+    try {
+
+      res.send()
+    } catch (error) {
+      console.error(error)
+      res.status(500).send('Server Error')
+    }
+  }
+
 }
 
 export default new PostsController()

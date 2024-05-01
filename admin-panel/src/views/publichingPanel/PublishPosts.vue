@@ -13,7 +13,7 @@
             <button class="posts__editButton">Редактировать</button>
             <button class="posts__deleteButton" @click=deletePost(post.id)>Удалить</button>
             <button class="posts__openButton">Открыть</button>
-            <button class="posts__pushButton">Опубликовать</button>
+            <button class="posts__pushButton" @click=publishInstantly(post.id)>Опубликовать</button>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { IPublishPosts, post } from '@/types';
-import {deletePost} from '@/http/postsAPI'
+import { deletePost, publishInstantly } from '@/http/postsAPI'
 
 export default defineComponent({
   data(): IPublishPosts {
@@ -89,6 +89,16 @@ export default defineComponent({
     async deletePost(id: number) {
       await deletePost(id);
       this.getPosts();
+    },
+    async publishInstantly(id: number) {
+      try{
+        const result = await publishInstantly(id);
+        await (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(result, 10000);
+      this.getPosts();
+      } catch(e: any) {
+        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data, 10000);
+      }
+
     }
   },
   computed: {

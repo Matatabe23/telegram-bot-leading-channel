@@ -31,8 +31,6 @@ export function uploadImageToS3(imagePath: any) {
       fs.unlink(`${imagePath.destination}${imagePath.filename}`, (err) => {
         if (err) {
           console.error('Ошибка при удалении файла:', err);
-        } else {
-          console.log('Файл успешно удален:', imagePath.path);
         }
       });
     })

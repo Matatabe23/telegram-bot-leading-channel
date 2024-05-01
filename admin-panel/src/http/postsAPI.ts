@@ -21,3 +21,8 @@ export const deletePost = async (id: number) => {
   const { data } = await $autHost.delete(`api/posts/deletePost/${id}`);
   return data;
 }
+
+export const publishInstantly = async (id: number) => {
+  const { data } = await $autHost.post(`api/posts/publishInstantly/${id}`);
+  return data;
+}
