@@ -1,6 +1,6 @@
 import axios from 'axios'; 
 
-const url = 'http://localhost:5000/'
+const url = 'http://212.60.20.160:5000/'
 
 const $host = axios.create({
 	baseURL: url
