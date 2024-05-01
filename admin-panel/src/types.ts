@@ -32,16 +32,14 @@ export interface IPublish {
   instantPublication: boolean,
 }
 
-interface Post {
+export interface post {
   id: number;
   description: string;
   imageData: { id: number; image: string }[];
 }
 
 export interface IPublishPosts {
-  posts: Post[],
   loaderPosts: boolean,
   currentPage: number,
   postsPerPage: number,
-  totalCount: number
 }

@@ -84,6 +84,7 @@ export default defineComponent({
           this.images = [];
           this.imagePost = [];
           (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(result, 5000);
+          this.$emit('get-posts', 1, 3);
         }
       } catch (e: any) {
         (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);

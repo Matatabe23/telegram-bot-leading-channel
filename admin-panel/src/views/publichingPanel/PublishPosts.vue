@@ -42,26 +42,31 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { receiving } from '@/http/postsAPI';
-import { IPublishPosts } from '@/types';
+import { IPublishPosts, post } from '@/types';
 
 export default defineComponent({
   data(): IPublishPosts {
     return {
-      posts: [],
       loaderPosts: false,
       currentPage: 1,
       postsPerPage: 3,
-      totalCount: 0
     };
+  },
+  props: {
+    posts: {
+      type: Array as () => post[],
+      required: true
+    },
+    totalCount: {
+      type: Number,
+      required: true
+    },
   },
   methods: {
     async getPosts() {
       try {
         this.loaderPosts = true;
-        const posts = await receiving(this.currentPage, this.postsPerPage);
-        this.posts = posts.posts;
-        this.totalCount = posts.totalCount;
+        this.$emit('get-posts', this.currentPage, this.postsPerPage)
       } catch (e: any) {
         console.error(e);
       } finally {
