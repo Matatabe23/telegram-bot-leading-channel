@@ -20,12 +20,7 @@ class PostsController {
           return res.status(500).send('Server Error')
         }
 
-        let files: Express.Multer.File[] = [];
-        if (Array.isArray(req.files)) {
-          files = req.files;
-        } else if (req.files && typeof req.files === 'object') {
-          files = Object.values(req.files).reduce((acc: Express.Multer.File[], curr: Express.Multer.File[]) => acc.concat(curr), []);
-        }
+        const files = req.files
 
         const waterMark = JSON.parse(req.body.waterMark)
         const instantPublication = JSON.parse(req.body.instantPublication)

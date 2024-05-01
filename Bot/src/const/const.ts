@@ -1,8 +1,8 @@
 import {EAdministratorRole, IAdministratorRole} from '../type/types.js'
 
 export const publishTime = [
-  { hour: 12, minute: 28 },
-  { hour: 12, minute: 29 },
+  { hour: 15, minute: 38 },
+  { hour: 15, minute: 39 },
   { hour: 12, minute: 30 },
 ]
 
@@ -17,4 +17,4 @@ export const NO_ACCESS = 'Нет доступа';
 export const USER_NOT_FOUND = 'Пользователь не найден';
 export const ERROR = 'Ошибка';
 
-export const multerPath = '../image/'
+export const multerPath = 'src/image'
