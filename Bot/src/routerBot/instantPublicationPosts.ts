@@ -24,7 +24,7 @@ export async function instantPublicationPosts(files: any, stringArray?: boolean)
         });
       }
     }
-    console.log(media);
+    
     if (media.length > 10) {
       console.error('Слишком много медиафайлов');
       reject(new Error('Слишком много медиафайлов'));

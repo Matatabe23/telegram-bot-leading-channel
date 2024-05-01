@@ -87,15 +87,21 @@ export default defineComponent({
       this.getPosts();
     },
     async deletePost(id: number) {
-      await deletePost(id);
-      this.getPosts();
+      try {
+        this.loaderPosts = true
+        await deletePost(id);
+        this.getPosts();
+      } catch (e) {
+
+      }
     },
     async publishInstantly(id: number) {
-      try{
+      try {
+        this.loaderPosts = true
         const result = await publishInstantly(id);
         await (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(result, 10000);
-      this.getPosts();
-      } catch(e: any) {
+        this.getPosts();
+      } catch (e: any) {
         (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data, 10000);
       }
 

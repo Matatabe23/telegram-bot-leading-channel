@@ -1,7 +1,7 @@
 import {EAdministratorRole, IAdministratorRole} from '../type/types.js'
 
 export const publishTime = [
-  { hour: 23, minute: 3 },
+  { hour: 23, minute: 38 },
   { hour: 15, minute: 39 },
   { hour: 12, minute: 30 },
 ]
