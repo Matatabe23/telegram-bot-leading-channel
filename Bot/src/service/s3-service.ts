@@ -12,35 +12,38 @@ const s3ClientConfig: S3ClientConfig = {
 };
 const s3Client = new S3Client(s3ClientConfig);
 
-export function uploadImageToS3(imagePath: any) {
-  const imgStream = fs.createReadStream(imagePath.path);
+export function uploadImageToS3(imagePath: any): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const imgStream = fs.createReadStream(imagePath.path);
 
-  const fileName = `${S3_FOLDER_SAVED}/QugorArts_${Date.now()}.png`;
+    const fileName = `${S3_FOLDER_SAVED}/QugorArts_${Date.now()}.png`;
 
-  const params = {
-    Bucket: S3_BUCKET_NAME,
-    Key: fileName,
-    Body: imgStream,
-    ContentType: 'image/png',
-    ContentDisposition: 'inline'
-  };
+    const params = {
+      Bucket: S3_BUCKET_NAME,
+      Key: fileName,
+      Body: imgStream,
+      ContentType: 'image/png',
+      ContentDisposition: 'inline'
+    };
 
-  const uploadCommand = new PutObjectCommand(params);
-  s3Client.send(uploadCommand)
-    .then((data: PutObjectCommandOutput) => {
-      fs.unlink(`${imagePath.destination}${imagePath.filename}`, (err) => {
-        if (err) {
-          console.error('Ошибка при удалении файла:', err);
-        }
+    const uploadCommand = new PutObjectCommand(params);
+    s3Client.send(uploadCommand)
+      .then((data: PutObjectCommandOutput) => {
+        fs.unlink(`${imagePath.destination}${imagePath.filename}`, (err) => {
+          if (err) {
+            console.error('Ошибка при удалении файла:', err);
+          }
+        });
+        const imageUrl = `https://s3.timeweb.cloud/${params.Bucket}/${fileName}`;
+        resolve(imageUrl); // Возвращаем ссылку после успешной загрузки
+      })
+      .catch((err) => {
+        console.error("Ошибка загрузки изображения:", err);
+        reject(err); // Отклоняем обещание в случае ошибки
       });
-    })
-    .catch((err) => {
-      console.error("Ошибка загрузки изображения:", err);
-    });
-  
-
-    return `https://s3.timeweb.cloud/${params.Bucket}/${fileName}`
+  });
 }
+
 
 
 

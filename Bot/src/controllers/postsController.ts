@@ -24,19 +24,6 @@ class PostsController {
         const files: any = req.files
 
         const waterMark = JSON.parse(req.body.waterMark)
-        const instantPublication = JSON.parse(req.body.instantPublication)
-
-        if (instantPublication === true) {
-          if (waterMark === true) {
-            for (const file of files) {
-              await addWatermark(file)
-            }
-          }
-
-          await instantPublicationPosts(files)
-          res.send('Успешная моментальная публикация')
-          return
-        }
 
         const post = await dataBasePost.create()
         const postId = post.dataValues.id
@@ -57,6 +44,40 @@ class PostsController {
         }
 
         res.send('Успешное сохранение в базу данных!')
+      })
+    } catch (error) {
+      console.error(error)
+      res.status(500).send('Server Error')
+    }
+  }
+
+  async instantPublicationPosts(req: Request, res: Response) {
+    try {
+      upload.array('files[]')(req, res, async (err) => {
+        if (err instanceof multer.MulterError) {
+          console.error('Multer error:', err)
+          return res.status(500).send('Multer Error')
+        } else if (err) {
+          console.error('Error:', err)
+          return res.status(500).send('Server Error')
+        }
+
+        const files: any = req.files
+
+        const waterMark = JSON.parse(req.body.waterMark)
+
+        if (waterMark === true) {
+          for (const file of files) {
+            await addWatermark(file)
+          }
+
+          await instantPublicationPosts(files)
+          res.send('Успешная моментальная публикация')
+          return
+        }
+
+        await instantPublicationPosts(files);
+        res.send('Успешная моментальная публикация')
       })
     } catch (error) {
       console.error(error)

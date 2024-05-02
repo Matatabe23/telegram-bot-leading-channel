@@ -1,7 +1,7 @@
 import { dataBasePost, imageData } from '../models/models.js';
 import { bot } from '../routerBot/index.js';
 import { deleteImageFromS3 } from '../service/s3-service.js';
-import { CHAT_ID_DEV } from '../const/constENV.js';
+import { CHAT_ID } from '../const/constENV.js';
 
 export default async function sendMessageAtScheduledTime() {
   const postWithImages: any = await dataBasePost.findOne({
@@ -27,8 +27,8 @@ export default async function sendMessageAtScheduledTime() {
     return;
   }
 
-  if (CHAT_ID_DEV) {
-    bot.sendMediaGroup(CHAT_ID_DEV, media)
+  if (CHAT_ID) {
+    bot.sendMediaGroup(CHAT_ID, media)
       .then(async () => {
         media.map(async (item: any) => {
           await imageData.destroy({

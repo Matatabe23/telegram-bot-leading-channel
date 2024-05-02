@@ -37,7 +37,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { publication } from '@/http/postsAPI';
+import { publication, instantPublicationPosts } from '@/http/postsAPI';
 import { IPublish } from '@/types';
 
 export default defineComponent({
@@ -79,7 +79,13 @@ export default defineComponent({
           (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Не более 10 медиафайлов!', 10000);
           return
         }
-        const result = await publication(this.imagePost, this.waterMark, this.instantPublication);
+        let result
+        if (this.instantPublication) {
+          result = await instantPublicationPosts(this.imagePost, this.waterMark);
+        } else {
+          result = await publication(this.imagePost, this.waterMark);
+        }
+
         if (result) {
           this.images = [];
           this.imagePost = [];
