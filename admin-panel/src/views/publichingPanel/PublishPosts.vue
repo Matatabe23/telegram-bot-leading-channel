@@ -10,10 +10,9 @@
           <h2 class="posts__postTitle">id: {{ post.id }}</h2>
           <p class="posts__postDescription">{{ post.description }}</p>
           <div class="posts__controle-buttons">
-            <button class="posts__editButton">Редактировать</button>
-            <button class="posts__deleteButton" @click=deletePost(post.id)>Удалить</button>
-            <button class="posts__openButton">Открыть</button>
-            <button class="posts__pushButton" @click=publishInstantly(post.id)>Опубликовать</button>
+            <MainButton class="posts__deleteButton" @click=deletePost(post.id)>Удалить</MainButton>
+            <MainButton class="posts__openButton">Открыть</MainButton>
+            <MainButton class="posts__pushButton" @click=publishInstantly(post.id)>Опубликовать</MainButton>
           </div>
         </div>
       </div>
@@ -34,7 +33,7 @@
     </div>
 
 
-    <Loader v-if="loaderPosts" class="posts__loaderPosts" />
+    <Loader v-if="loaderPosts" overlay="false" class="posts__loaderPosts" />
 
     <popup-message ref="popup"></popup-message>
   </div>
@@ -188,27 +187,6 @@ export default defineComponent({
   &__controle-buttons {
     display: flex;
     gap: 10px;
-  }
-
-  &__editButton,
-  &__deleteButton,
-  &__openButton,
-  &__pushButton {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-
-  &__editButton:hover,
-  &__deleteButton:hover,
-  &__openButton:hover,
-  &__pushButton:hover {
-    background-color: #0056b3;
   }
 
   &__loaderPosts {

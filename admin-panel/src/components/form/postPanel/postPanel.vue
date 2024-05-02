@@ -1,6 +1,6 @@
 <template>
   <div class="postPanel">
-
+    
   </div>
 </template>
 
@@ -18,8 +18,13 @@ export default defineComponent({
 
 <style lang="scss">
 .postPanel {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   background-color: rgb(100, 100, 100);
-  width: 500px;
-  min-height: 200px;
+  width: 80%;
+  min-height: 80vh;
+  border-radius: 15px;
 }
 </style>

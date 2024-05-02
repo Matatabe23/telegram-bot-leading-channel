@@ -61,9 +61,9 @@ body {
   /* Цвет текста */
   --border-color: #ddd;
   /* Цвет границ */
-  --button-color: #3498db;
+  --button-color: #007bff;
   /* Цвет кнопок */
-  --button-hover-color: #2980b9;
+  --button-hover-color: #0056b3;
   /* Цвет кнопок при наведении */
   --button-text-color: #fff;
   /* Цвет текста на кнопках */

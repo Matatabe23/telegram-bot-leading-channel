@@ -3,7 +3,8 @@
     <publish @get-posts="getPosts"/>
     <PublishPosts :posts="posts" :totalCount="totalCount" @get-posts="getPosts"/>
 
-    <popup-message ref="popup"></popup-message>
+    <postPanel v-if="postPanel"/>
+    <popup-message ref="popup"/>
   </div>
 </template>
 
@@ -13,17 +14,20 @@ import publish from '@/views/publichingPanel/Publish.vue'
 import PublishPosts from '@/views/publichingPanel/PublishPosts.vue'
 import { receiving } from '@/http/postsAPI';
 import { post } from '@/types';
+import postPanel from '@/components/form/postPanel/postPanel.vue'
 
 export default defineComponent({
   data() {
     return {
       posts: [] as post[],
-      totalCount: 0 as number
+      totalCount: 0 as number,
+      postPanel: false
     };
   },
   components: {
     publish,
-    PublishPosts
+    PublishPosts,
+    postPanel
   },
   methods: {
     async getPosts(currentPage: number, postsPerPage: number) {

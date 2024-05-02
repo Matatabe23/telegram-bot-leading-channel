@@ -1,18 +1,25 @@
 <template>
-  <div class="loading-overlay">
+  <div class="loading-overlay" :class="{'loading-overlay-none': overlay}">
     <div class="loading-spinner"></div>
   </div>
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'Loader',
-};
+  props: {
+    overlay: {
+      type: Boolean
+    }
+  }
+});
 </script>
 
 <style scoped>
 .loading-overlay {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
@@ -21,12 +28,17 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 999;
+}
+
+.loading-overlay-none{
+  background-color: rgba(0, 0, 0, 0);;
 }
 
 .loading-spinner {
   border: 4px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top: 4px solid #ffffff;
+  border-top: 4px solid #007bff;
   width: 40px;
   height: 40px;
   animation: spin 1s linear infinite;
