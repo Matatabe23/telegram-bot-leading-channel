@@ -1,10 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { IAdminDto } from '../type/types.js';
+import { SECRET_KEY_ACCESS } from '../const/constENV.js';
 
 class TokenService {
   generateToken(payload: IAdminDto) {
-    if (process.env.SECRET_KEY_ACCESS) {
-      const accessToken = jwt.sign(payload, process.env.SECRET_KEY_ACCESS, { expiresIn: '1d' });
+    if (SECRET_KEY_ACCESS) {
+      const accessToken = jwt.sign(payload, SECRET_KEY_ACCESS, { expiresIn: '1d' });
       return accessToken;
     }
   }

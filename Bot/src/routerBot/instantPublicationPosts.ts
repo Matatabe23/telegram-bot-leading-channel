@@ -1,6 +1,7 @@
 import { bot } from './index.js';
 import fs from 'fs';
 import { waterMark } from '../const/const.js';
+import { CHAT_ID_DEV } from '../const/constENV.js';
 
 export async function instantPublicationPosts(files: any, stringArray?: boolean) {
   return new Promise((resolve, reject) => {
@@ -31,7 +32,7 @@ export async function instantPublicationPosts(files: any, stringArray?: boolean)
       return;
     }
 
-    bot.sendMediaGroup(process.env.CHAT_ID_DEV, media)
+    bot.sendMediaGroup(CHAT_ID_DEV as string, media)
       .then(() => {
         resolve(true);
       })

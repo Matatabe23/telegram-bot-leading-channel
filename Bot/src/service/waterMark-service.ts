@@ -20,8 +20,6 @@ export default async function addWatermark(inputImagePath: any) {
     fs.unlink(`${inputImagePath.destination}${inputImagePath.filename}`, (err) => {
       if (err) {
         console.error('Ошибка при удалении файла:', err);
-      } else {
-        console.log('Файл успешно удален:', inputImagePath.path);
       }
     });
     

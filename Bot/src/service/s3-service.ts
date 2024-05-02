@@ -1,12 +1,13 @@
 import { S3Client, S3ClientConfig, PutObjectCommand, DeleteObjectCommand, PutObjectCommandOutput } from "@aws-sdk/client-s3";
 import fs from 'fs';
+import { S3_BUCKET_NAME, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_FOLDER_SAVED } from "../const/constENV.js";
 
 const s3ClientConfig: S3ClientConfig = {
   region: 'us-east-1',
   endpoint: 'https://s3.timeweb.cloud',
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || ''
+    accessKeyId: S3_ACCESS_KEY_ID || '',
+    secretAccessKey: S3_SECRET_ACCESS_KEY || ''
   }
 };
 const s3Client = new S3Client(s3ClientConfig);
@@ -14,10 +15,10 @@ const s3Client = new S3Client(s3ClientConfig);
 export function uploadImageToS3(imagePath: any) {
   const imgStream = fs.createReadStream(imagePath.path);
 
-  const fileName = `${process.env.S3_FOLDER_SAVED}/QugorArts_${Date.now()}.png`;
+  const fileName = `${S3_FOLDER_SAVED}/QugorArts_${Date.now()}.png`;
 
   const params = {
-    Bucket: process.env.S3_BUCKET_NAME,
+    Bucket: S3_BUCKET_NAME,
     Key: fileName,
     Body: imgStream,
     ContentType: 'image/png',
@@ -27,7 +28,6 @@ export function uploadImageToS3(imagePath: any) {
   const uploadCommand = new PutObjectCommand(params);
   s3Client.send(uploadCommand)
     .then((data: PutObjectCommandOutput) => {
-      console.log(data)
       fs.unlink(`${imagePath.destination}${imagePath.filename}`, (err) => {
         if (err) {
           console.error('Ошибка при удалении файла:', err);
@@ -49,8 +49,8 @@ export async function deleteImageFromS3(imageUrl: string) {
   const imageKey = urlParts[urlParts.length - 1];
 
   const params = new DeleteObjectCommand({
-    Bucket: process.env.S3_BUCKET_NAME,
-    Key: `${process.env.S3_FOLDER_SAVED}/${imageKey}`
+    Bucket: S3_BUCKET_NAME,
+    Key: `${S3_FOLDER_SAVED}/${imageKey}`
   });
 
   try {
