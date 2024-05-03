@@ -172,16 +172,25 @@ class PostsController {
     }
   }
 
-  async editing(req: Request, res: Response) {
+  async receivingPost(req: Request, res: Response) {
     try {
+      const { id } = req.params;
+      console.log(id)
+      const post = await dataBasePost.findByPk(id);
+      if (!post) {
+        return res.status(404).send('Пост не найден');
+      }
+      const images = await imageData.findAll({ where: { dataBasePostId: id } });
+      const imageList = images.map((item: any) => {
+        return item.dataValues.image
+      })
 
-      res.send()
+      res.send(imageList);
     } catch (error) {
-      console.error(error)
-      res.status(500).send('Server Error')
+      console.error(error);
+      res.status(500).send('Server Error');
     }
   }
-
 }
 
 export default new PostsController()

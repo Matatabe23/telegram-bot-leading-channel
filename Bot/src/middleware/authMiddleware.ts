@@ -13,7 +13,7 @@ export default function (req: any, res: any, next: any) {
     }
     if (SECRET_KEY_ACCESS) {
       const decoded = jwt.verify(token, SECRET_KEY_ACCESS);
-      req.body = decoded;
+      req.admin = decoded;
       next();
     }
   } catch (e) {

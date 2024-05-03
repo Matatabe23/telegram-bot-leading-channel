@@ -1,10 +1,11 @@
 <template>
   <div class="publishing-panel">
     <publish @get-posts="getPosts"/>
-    <PublishPosts :posts="posts" :totalCount="totalCount" @get-posts="getPosts"/>
+    <PublishPosts :posts="posts" :totalCount="totalCount" @get-posts="getPosts" @post-panel="getPostPanel"/>
 
-    <postPanel v-if="postPanel"/>
+    <postPanel v-if="postPanel" :images="images" @close="closePostPanel"/>
     <popup-message ref="popup"/>
+    <div class="publishing-panel__overplay" v-if="overlay" @click="closePostPanel"/>
   </div>
 </template>
 
@@ -15,13 +16,16 @@ import PublishPosts from '@/views/publichingPanel/PublishPosts.vue'
 import { receiving } from '@/http/postsAPI';
 import { post } from '@/types';
 import postPanel from '@/components/form/postPanel/postPanel.vue'
+import { receivingPost } from '@/http/postsAPI';
 
 export default defineComponent({
   data() {
     return {
       posts: [] as post[],
       totalCount: 0 as number,
-      postPanel: false
+      postPanel: false as boolean,
+      images: [] as string[],
+      overlay: false as boolean
     };
   },
   components: {
@@ -39,6 +43,15 @@ export default defineComponent({
         console.error(e);
       }
     },
+    async getPostPanel(value: number){
+      this.postPanel = !this.postPanel;
+      this.overlay = !this.overlay;
+      this.images = await receivingPost(value);
+    },
+    closePostPanel(){
+      this.postPanel = !this.postPanel;
+      this.overlay = !this.overlay;
+    }
   }
 })
 </script>
@@ -50,5 +63,15 @@ export default defineComponent({
   align-items: center;
   width: 100%;
   margin: 30px 0 ;
+
+  &__overplay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 500;
+  }
 }
 </style>

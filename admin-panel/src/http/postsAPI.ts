@@ -35,3 +35,8 @@ export const publishInstantly = async (id: number) => {
   const { data } = await $autHost.post(`api/posts/publishInstantly/${id}`);
   return data;
 }
+
+export const receivingPost = async (id: number) => {
+  const { data } = await $autHost.get(`api/posts/receivingPost/${id}`);
+  return data;
+}

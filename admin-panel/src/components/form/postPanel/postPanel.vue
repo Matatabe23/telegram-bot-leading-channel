@@ -1,6 +1,11 @@
 <template>
-  <div class="postPanel">
-    
+  <div class="post-panel">
+    <div v-for="(photo, index) in images" :key="index">
+      <div class="post-panel__close" @click="$emit('close')">✖</div>
+      <img :src="photo" alt="Photo" class="post-panel__image">
+    </div>
+
+
   </div>
 </template>
 
@@ -8,23 +13,50 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  data() {
-    return {
-
+  props: {
+    images: {
+      type: Array as () => Array<string>,
+      required: true,
+      default: () => []
     }
-  }
+  },
 })
 </script>
 
 <style lang="scss">
-.postPanel {
+.post-panel {
   position: fixed;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   background-color: rgb(100, 100, 100);
   width: 80%;
-  min-height: 80vh;
+  height: 80vh;
   border-radius: 15px;
+  z-index: 999;
+  overflow-y: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  overflow-y: auto;
+
+  &__image {
+    height: 40vh;
+    width: 25vh;
+    object-fit: contain;
+    position: relative;
+  }
+
+  &__close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 10px 20px 0 0;
+    cursor: pointer;
+    z-index: 300;
+  }
 }
 </style>

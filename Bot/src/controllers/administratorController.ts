@@ -58,7 +58,7 @@ class AdministratorController {
 
 
   async checkDataWeb(req: Request, res: Response) {
-    const id = req.body.id;
+    const id = req.admin.id;
     const admin = await administrators.findOne({ where: { id } });
     if (!admin) return
     const resultDto = new adminDto(admin)

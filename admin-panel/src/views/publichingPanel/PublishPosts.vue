@@ -11,7 +11,7 @@
           <p class="posts__postDescription">{{ post.description }}</p>
           <div class="posts__controle-buttons">
             <MainButton class="posts__deleteButton" @click=deletePost(post.id)>Удалить</MainButton>
-            <MainButton class="posts__openButton">Открыть</MainButton>
+            <MainButton class="posts__openButton" @click="$emit('post-panel', post.id)">Открыть</MainButton>
             <MainButton class="posts__pushButton" @click=publishInstantly(post.id)>Опубликовать</MainButton>
           </div>
         </div>

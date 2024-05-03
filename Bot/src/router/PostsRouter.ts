@@ -8,6 +8,6 @@ router.post('/instantPublicationPosts', authMiddleware, postsController.instantP
 router.get('/receiving', authMiddleware, postsController.receiving)
 router.delete('/deletePost/:id', authMiddleware, postsController.deletePost)
 router.post('/publishInstantly/:id', authMiddleware, postsController.publishInstantly)
-router.put('/editing', authMiddleware, postsController.editing)
+router.get('/receivingPost/:id', authMiddleware, postsController.receivingPost)
 
 export default router
