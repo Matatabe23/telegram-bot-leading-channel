@@ -1,0 +1,23 @@
+version: '3.1'
+
+services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: SaoTop123
+    ports:
+      - 3306:3306
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 3500:80
+    environment:
+      - PMA_ARBITRARY=1
+
+  bot:
+    build: ./bot
+    ports:
+      - 5000:5000

@@ -4,12 +4,8 @@ export interface authInfo {
 }
 
 export interface IMainPages {
-  islogin: boolean,
   loader: boolean,
   auth: authInfo,
-  name: string,
-  password: string,
-  confirmPassword: string,
 }
 
 export interface adminData {

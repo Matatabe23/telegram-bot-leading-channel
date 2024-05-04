@@ -1,21 +1,11 @@
 <template>
   <div class="main">
 
-    <div v-if="!islogin" class="main__authorization">
+    <div class="main__authorization">
       <h1>Авторизация</h1>
       <input type="text" v-model="auth.name" placeholder="Введите ваше имя пользователя" />
       <input type="password" v-model="auth.password" placeholder="Введите пароль" />
       <MainButton class="main__main-button" @click="login">Авторизоваться</MainButton>
-      <MainButton class="main__main-button" @click="toggleRegistration">Регистрация</MainButton>
-    </div>
-
-    <div v-if="islogin" class="main__registration">
-      <h1>Регистрация</h1>
-      <input type="text" v-model="name" placeholder="Введите ваше имя пользователя">
-      <input type="password" v-model="password" placeholder="Введите пароль" />
-      <input type="password" v-model="confirmPassword" placeholder="Повторите пароль" />
-      <MainButton class="main__main-button" @click="register">Зарегистрироваться</MainButton>
-      <MainButton class="main__main-button" @click="toggleRegistration">Отмена</MainButton>
     </div>
 
     <Loader v-if="loader" />
@@ -28,30 +18,23 @@
 import { defineComponent } from 'vue';
 import { IMainPages, adminData } from '@/types'
 import { mapActions } from 'vuex';
-import { registration, login } from '@/http/adminAPI'
+import { login } from '@/http/adminAPI'
 
 export default defineComponent({
   data(): IMainPages {
     return {
-      islogin: false,
       loader: false,
       auth: {
         name: "",
         password: ""
       },
-      name: "",
-      password: "",
-      confirmPassword: "",
     }
   },
   methods: {
     ...mapActions({
       storeAdminData: 'storeAdminData'
     }),
-
-    toggleRegistration() {
-      this.islogin = !this.islogin
-    },
+    
     async login() {
       try {
         this.loader = true;
@@ -67,26 +50,7 @@ export default defineComponent({
         this.loader = false;
       }
 
-    },
-    async register() {
-      try {
-        this.loader = true;
-        
-        await registration(this.name, this.password, this.confirmPassword);
-        
-        
-        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Успешная регистрация!', 10000);
-
-        this.islogin = false
-        this.name = ''
-        this.password = '',
-          this.confirmPassword = ''
-      } catch (e: any) {
-        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);
-      } finally {
-        this.loader = false;
-      }
-    },
+    }
   },
 });
 </script>

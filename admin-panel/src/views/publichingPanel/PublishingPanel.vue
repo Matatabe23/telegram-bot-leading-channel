@@ -51,6 +51,7 @@ export default defineComponent({
     closePostPanel(){
       this.postPanel = !this.postPanel;
       this.overlay = !this.overlay;
+      this.images = []
     }
   }
 })
