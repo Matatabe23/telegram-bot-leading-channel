@@ -7,6 +7,7 @@
       <h1>Tg-bot</h1>
       <h3 @click="$router.push('/publishing-panel')">Публикация</h3>
       <h3 @click="$router.push('/publishing-panel')">Участники</h3>
+      <h3 @click="$router.push('/settings')">Настройки</h3>
       <h3 @click="exit()">Выйти</h3>
     </div>
   </div>
