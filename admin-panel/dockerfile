@@ -1,29 +1,12 @@
-# Используем базовый образ с Node.js
-FROM node:alpine AS build
-
-# Устанавливаем рабочую директорию
+FROM node:alpine as build
 WORKDIR /app
-
-# Копируем зависимости
-COPY package*.json ./
-
-# Устанавливаем зависимости
-RUN npm install
-
-# Копируем файлы проекта
 COPY . .
-
-# Собираем приложение
+RUN npm install
 RUN npm run build
 
-# Отдельный этап, чтобы уменьшить размер образа
-FROM nginx:alpine
-
-# Копируем собранные файлы Vue.js приложения в образ Nginx
+# production environment
+FROM nginx:stable-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
-
-# Порт, который будет использоваться контейнером
+COPY --from=build /app/nginx.conf /etc/nginx/sites-enabled/default
 EXPOSE 80
-
-# Команда запуска nginx внутри контейнера
 CMD ["nginx", "-g", "daemon off;"]
