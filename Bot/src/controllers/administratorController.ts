@@ -29,7 +29,7 @@ class AdministratorController {
 
 
 
-  async checkDataWeb(req: Request, res: Response) {
+  async checkDataWeb(req: any, res: Response) {
     const id = req.admin.id;
     const admin = await administrators.findOne({ where: { id } });
     if (!admin) return
