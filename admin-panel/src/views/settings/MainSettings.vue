@@ -1,12 +1,12 @@
 <template>
-  <div class="main">
-    
+  <div class="main-settings">
+    <addingPublicationTimeSettings/>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { addingPublicationTime } from '@/http/settingsAPI'
+import addingPublicationTimeSettings from '@/components/form/settingsPanel/addingPublicationTimeSettings.vue'
 
 export default defineComponent({
   data() {
@@ -14,9 +14,14 @@ export default defineComponent({
 
     }
   },
+  components:{
+    addingPublicationTimeSettings
+  }
 })
 </script>
 
 <style lang="scss">
-
+.main-settings{
+  width: 100%;
+}
 </style>

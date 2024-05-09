@@ -24,7 +24,13 @@ const imageData = db.define('imageData', {
   image: { type: DataTypes.STRING },
 })
 
+const regularPublicationTime = db.define('regularPublicationTime', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  hour: {type: DataTypes.STRING},
+  minute: {type: DataTypes.STRING}
+})
+
 dataBasePost.hasMany(imageData);
 imageData.belongsTo(dataBasePost);
 
-export { administrators, dataBasePost, imageData }
+export { administrators, dataBasePost, imageData, regularPublicationTime }
