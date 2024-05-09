@@ -9,9 +9,14 @@ services:
       MYSQL_DATABASE: qugor-arts
     ports:
       - 3306:3306
+    command: --init-file /data/application/init.sql
+    volumes:
+        - ./init.sql:/data/application/init.sql
 
   phpmyadmin:
     image: phpmyadmin
+    depends_on:
+      - db
     restart: always
     ports:
       - 3500:80
@@ -27,5 +32,7 @@ services:
 
   admin-panel:
     build: ./admin-panel
+    depends_on:
+      - bot
     ports:
       - 80:80
