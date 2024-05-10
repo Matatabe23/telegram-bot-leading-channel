@@ -39,3 +39,17 @@ export interface IPublishPosts {
   currentPage: number,
   postsPerPage: number,
 }
+
+export interface IGetListRegularPublicationTimes{
+  id: number,
+  hour: string,
+  minute: string,
+  createdAt: string,
+  updatedAt: string
+}
+
+export interface IAddingPublicationTimeSettings{
+  hour: string,
+  minute: string,
+  listPublicationTimes: IGetListRegularPublicationTimes[]
+}

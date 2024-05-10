@@ -4,13 +4,25 @@
       <h3>Указать время постоянной публикации</h3>
       <div class="adding-publication-time-settings__hour">
         <label for="hourInput">Часы:</label>
-        <input id="hourInput" v-model="hour" type="string" min="0" max="24">
+        <input id="hourInput" v-model="hour" type="string" min="0" max="24" placeholder="От 0 до 24">
       </div>
       <div class="adding-publication-time-settings__minute">
         <label for="minuteInput">Минуты:</label>
-        <input id="minuteInput" v-model="minute" type="string" min="0" max="59">
+        <input id="minuteInput" v-model="minute" type="string" min="0" max="59" placeholder="От 0 до 59">
       </div>
       <MainButton @click="saveTime">Сохранить</MainButton>
+      <h3 v-if="listPublicationTimes.length">Время регулярной публикации</h3>
+      <div class="adding-publication-time-settings__list-time" v-for="listPublicationTime in listPublicationTimes">
+        <div>
+          Часы:
+          {{ listPublicationTime.hour }}
+        </div>
+        <div>
+          Минуты:
+          {{ listPublicationTime.minute }}
+        </div>
+        <MainButton @click="deleteTime(listPublicationTime.id)">Удалить</MainButton>
+      </div>
     </div>
 
     <popup-message ref="popup"></popup-message>
@@ -19,13 +31,15 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { addingPublicationTime } from '@/http/settingsAPI'
+import { addingPublicationTime, getListRegularPublicationTimes, deleteItemPublicationTimes } from '@/http/settingsAPI'
+import { IAddingPublicationTimeSettings } from '@/types'
 
 export default defineComponent({
-  data() {
+  data(): IAddingPublicationTimeSettings {
     return {
       hour: '',
       minute: '',
+      listPublicationTimes: []
     }
   },
   methods: {
@@ -39,6 +53,7 @@ export default defineComponent({
         const result = await addingPublicationTime(this.hour, this.minute);
 
         if (result) {
+          this.getList();
           (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Успешное добавление!', 5000);
           this.hour = ''
           this.minute = ''
@@ -47,13 +62,24 @@ export default defineComponent({
         (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data, 5000);
       }
     },
+    async getList() {
+      this.listPublicationTimes = await getListRegularPublicationTimes()
+    },
+    async deleteTime(id: number) {
+      await deleteItemPublicationTimes(id);
+      await this.getList();
+    }
   },
+  mounted() {
+    this.getList()
+  }
 })
 </script>
 
 <style lang="scss">
 .adding-publication-time-settings {
   display: flex;
+  text-align: center;
 
   &__save-time {
     background-color: rgb(100, 100, 100);
@@ -64,6 +90,18 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     border-radius: 10px;
+    border-bottom: 3px solid gray;
+    width: 450px;
+  }
+
+  &__list-time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    border: 3px solid gray;
+    border-radius: 5px;
+    padding: 10px;
   }
 
   &__hour,
