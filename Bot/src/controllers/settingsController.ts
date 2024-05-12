@@ -1,5 +1,6 @@
 import { regularPublicationTime } from '../models/models.js';
 import { Request, Response } from 'express';
+import { scheduleFunctionExecution } from '../service/regularPublicationBot-service.js'
 
 
 class AdministratorController {
@@ -12,11 +13,12 @@ class AdministratorController {
       return res.status(404).send('Не корректные данные')
     }
 
-
     await regularPublicationTime.create({
       hour: hour,
       minute: minute
     });
+
+    scheduleFunctionExecution();
 
     return res.json('Успешное добавление!');
   }
@@ -35,6 +37,7 @@ class AdministratorController {
     }
   
     await regularPublicationTime.destroy({ where: { id } });
+    scheduleFunctionExecution();
   
     res.json('Успешное удаление');
   }
