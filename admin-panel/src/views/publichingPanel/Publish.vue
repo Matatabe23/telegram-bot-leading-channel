@@ -15,6 +15,12 @@
           </label>
           <input id="file-upload" type="file" multiple @change="handleFileUpload">
         </div>
+        <div>
+          <input type="file" id="file-upload" ref="folderInput" webkitdirectory @change="handleFolderSelection">
+          <label @click="selectFolder" class="publishing-panel__custom-file-upload">
+            <i class="fas fa-upload"></i> Выбрать папку
+          </label>
+        </div>
 
         <MainButton @click="isSettingsPanelOpen = !isSettingsPanelOpen">Настройки</MainButton>
         <MainButton @click="publication">Опубликовать</MainButton>
@@ -108,6 +114,39 @@ export default defineComponent({
         this.instantPublication = JSON.parse(instantPublication);
       }
     },
+    selectFolder() {
+      (this.$refs.folderInput as HTMLInputElement).click();
+    },
+    async handleFolderSelection(event: any) {
+      const files = event.target.files;
+      if (files.length === 0) return;
+
+      const groupedFiles: any = {};
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const match = file.webkitRelativePath.match(/\/(\d+)\//);
+        const number = match ? parseInt(match[1]) : null;
+
+
+        if (number !== null) {
+          if (!groupedFiles[number]) {
+            groupedFiles[number] = [];
+          }
+          groupedFiles[number].push(file);
+        }
+      }
+
+      const folderContent = Object.values(groupedFiles);
+
+      for (let i = 0; i < folderContent.length; i++) {
+        console.log(folderContent[i]);
+        const file = folderContent[i] as FileList;
+        await publication(file, this.waterMark);
+      }
+      this.$emit('get-posts', 1, 3);
+    },
+
   },
   watch: {
     waterMark() {
