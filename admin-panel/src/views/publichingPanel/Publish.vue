@@ -18,7 +18,7 @@
         <div>
           <input type="file" id="file-upload" ref="folderInput" webkitdirectory @change="handleFolderSelection">
           <label @click="selectFolder" class="publishing-panel__custom-file-upload">
-            <i class="fas fa-upload"></i> Выбрать папку
+            <i class="fas fa-upload"></i> Загрузить несколько папок
           </label>
         </div>
 
@@ -37,7 +37,9 @@
     <div class="publishing-panel__overlay" v-if="isSettingsPanelOpen"
       @click="isSettingsPanelOpen = !isSettingsPanelOpen" />
     <Loader v-if="loader" />
+
     <popup-message ref="popup"></popup-message>
+    <ProcentLoader :overlay="processLoader.overlay" :total="processLoader.total" :loaded="processLoader.loaded" />
   </div>
 </template>
 
@@ -55,6 +57,12 @@ export default defineComponent({
       imagePost: [],
       waterMark: false,
       instantPublication: false,
+
+      processLoader: {
+        overlay: false,
+        total: 1,
+        loaded: 0,
+      }
     };
   },
   methods: {
@@ -118,33 +126,49 @@ export default defineComponent({
       (this.$refs.folderInput as HTMLInputElement).click();
     },
     async handleFolderSelection(event: any) {
-      const files = event.target.files;
-      if (files.length === 0) return;
+      try {
+        const files = event.target.files;
+        if (files.length === 0) return;
 
-      const groupedFiles: any = {};
+        const groupedFiles: any = {};
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const match = file.webkitRelativePath.match(/\/(\d+)\//);
-        const number = match ? parseInt(match[1]) : null;
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const match = file.webkitRelativePath.match(/\/(\d+)\//);
+          const number = match ? parseInt(match[1]) : null;
 
-
-        if (number !== null) {
-          if (!groupedFiles[number]) {
-            groupedFiles[number] = [];
+          if (!number) {
+            (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Ошибка в работе с файлами', 5000);
+            return
           }
-          groupedFiles[number].push(file);
+
+
+          if (number !== null) {
+            if (!groupedFiles[number]) {
+              groupedFiles[number] = [];
+            }
+            groupedFiles[number].push(file);
+          }
         }
-      }
 
-      const folderContent = Object.values(groupedFiles);
+        const folderContent = Object.values(groupedFiles);
 
-      for (let i = 0; i < folderContent.length; i++) {
-        console.log(folderContent[i]);
-        const file = folderContent[i] as FileList;
-        await publication(file, this.waterMark);
+        this.processLoader.overlay = true
+        this.processLoader.total = folderContent.length
+
+        for (let i = 0; i < folderContent.length; i++) {
+          const file = folderContent[i] as FileList;
+          await publication(file, this.waterMark);
+          this.processLoader.loaded += 1
+        }
+
+        this.$emit('get-posts', 1, 3);
+        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Успешная публикация', 5000);
+      } catch (e: any) {
+        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 5000);
+      } finally {
+        this.processLoader.overlay = false
       }
-      this.$emit('get-posts', 1, 3);
     },
 
   },

@@ -26,6 +26,11 @@ export interface IPublish {
   imagePost: any,
   waterMark: boolean,
   instantPublication: boolean,
+  processLoader:{
+    overlay: boolean,
+    total: number,
+    loaded: number
+  }
 }
 
 export interface post {
