@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: SaoTop123
-      MYSQL_DATABASE: qugor-arts
+      MYSQL_DATABASE: qugor_arts
     ports:
       - 3306:3306
     command: --init-file /data/application/init.sql
