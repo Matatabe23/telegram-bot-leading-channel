@@ -87,6 +87,9 @@ export default defineComponent({
     },
     async deletePost(id: number) {
       try {
+        if (!confirm('Вы уверены, что хотите удалить пост?')) {
+          return;
+        }
         this.loaderPosts = true
         await deletePost(id);
         this.getPosts();
@@ -96,6 +99,9 @@ export default defineComponent({
     },
     async publishInstantly(id: number) {
       try {
+        if (!confirm('Вы уверены, что хотите опубликовать пост?')) {
+          return;
+        }
         this.loaderPosts = true
         const result = await publishInstantly(id);
         await (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(result, 10000);
