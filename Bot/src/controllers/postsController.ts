@@ -6,6 +6,7 @@ import { uploadImageToS3 } from '../service/s3-service.js'
 import addWatermark from '../service/waterMark-service.js'
 import { Request, Response } from 'express';
 import { deleteImageFromS3 } from '../service/s3-service.js'
+import { S3_BUCKET_NAME, S3_PATH } from "../const/constENV.js";
 
 const upload = multer({ dest: multerPath })
 
@@ -89,13 +90,13 @@ class PostsController {
     try {
       const page = req.query.page ? parseInt(req.query.page.toString()) : 1;
       const pageSize = req.query.pageSize ? parseInt(req.query.pageSize.toString()) : 10;
-
+  
       if (isNaN(page) || isNaN(pageSize)) {
         return res.status(400).send('Неверный формат параметров запроса');
       }
-
+  
       const offset = (page - 1) * pageSize;
-
+  
       const posts = await dataBasePost.findAll({
         include: [{
           model: imageData,
@@ -105,13 +106,22 @@ class PostsController {
         offset: offset
       });
       const totalCount = await dataBasePost.count();
-
-      res.send({ posts, totalCount });
+  
+      const updatedPosts = posts.map(post => {
+        post.dataValues.imageData = post.dataValues.imageData.map(img => {
+          img.image = `${S3_PATH}${S3_BUCKET_NAME}/${img.dataValues.image}`;
+          return img;
+        });
+        return post;
+      });
+  
+      res.send({ posts: updatedPosts, totalCount });
     } catch (error) {
       console.error(error);
       res.status(500).send('Server Error');
     }
   }
+  
 
 
 
@@ -123,9 +133,12 @@ class PostsController {
         return res.status(404).send('Пост не найден');
       }
       const images = await imageData.findAll({ where: { dataBasePostId: id } });
+      const imageList = images.map((item) => {
+        return `${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`;
+      });
 
-      for (const image of images) {
-        deleteImageFromS3(image.dataValues.image)
+      for (const image of imageList) {
+        deleteImageFromS3(image)
       }
 
       await imageData.destroy({ where: { dataBasePostId: id } });
@@ -147,10 +160,13 @@ class PostsController {
         return res.status(404).send('Пост не найден');
       }
       const images = await imageData.findAll({ where: { dataBasePostId: id } });
+      const imageList = images.map((item) => {
+        return `${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`;
+      });
 
       const path: string[] = []
-      for (const image of images) {
-        path.push(image.dataValues.image)
+      for (const image of imageList) {
+        path.push(image)
       }
 
       const result = await instantPublicationPosts(path, true)
@@ -160,8 +176,8 @@ class PostsController {
       await post.destroy();
 
       if (result) {
-        for (const image of images) {
-          await deleteImageFromS3(image.dataValues.image)
+        for (const image of imageList) {
+          await deleteImageFromS3(image)
         }
       }
 
@@ -175,15 +191,14 @@ class PostsController {
   async receivingPost(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      console.log(id)
       const post = await dataBasePost.findByPk(id);
       if (!post) {
         return res.status(404).send('Пост не найден');
       }
       const images = await imageData.findAll({ where: { dataBasePostId: id } });
-      const imageList = images.map((item: any) => {
-        return item.dataValues.image
-      })
+      const imageList = images.map((item) => {
+        return `${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`;
+      });
 
       res.send(imageList);
     } catch (error) {

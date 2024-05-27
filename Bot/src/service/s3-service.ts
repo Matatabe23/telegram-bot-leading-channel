@@ -34,9 +34,7 @@ export function uploadImageToS3(imagePath: any): Promise<string> {
             console.error('Ошибка при удалении файла:', err);
           }
         });
-        const imageUrl = `${S3_PATH}${params.Bucket}/${fileName}`;
-        console.log(imageUrl)
-        resolve(imageUrl);
+        resolve(fileName);
       })
       .catch((err) => {
         console.error("Ошибка загрузки изображения:", err);
@@ -122,6 +120,7 @@ async function deleteAllObjectsFromS3() {
     const objects = await s3Client.send(listObjectsCommand);
 
     // Удалить каждый объект
+    console.log(objects.Contents)
     if (objects.Contents) {
       for (const object of objects.Contents) {
         const deleteObjectCommand = new DeleteObjectCommand({
@@ -136,3 +135,5 @@ async function deleteAllObjectsFromS3() {
     console.error("Error deleting objects from S3 bucket:", err);
   }
 }
+
+// deleteAllObjectsFromS3()

@@ -1,7 +1,7 @@
 import axios from 'axios'; 
 
-// const url = 'http://83.222.9.168:5000/'
-const url = 'http://localhost:5000/'
+const url = 'http://77.222.42.148:5000/'
+// const url = 'http://localhost:5000/'
 
 const $host = axios.create({
 	baseURL: url
