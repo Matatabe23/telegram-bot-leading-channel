@@ -1,5 +1,3 @@
-import { Model } from 'sequelize';
-
 export interface IPublishTime {
   hour: number,
   minute: number

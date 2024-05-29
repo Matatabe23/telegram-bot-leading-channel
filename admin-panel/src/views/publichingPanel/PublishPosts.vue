@@ -93,7 +93,8 @@ export default defineComponent({
           return;
         }
         this.loaderPosts = true
-        await deletePost(id);
+        const result = await deletePost(id);
+        toast.success(result)
         this.getPosts();
       } catch (e) {
 

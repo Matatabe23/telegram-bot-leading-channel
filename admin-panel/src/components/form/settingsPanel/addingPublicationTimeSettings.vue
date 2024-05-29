@@ -69,7 +69,8 @@ export default defineComponent({
       this.listPublicationTimes = await getListRegularPublicationTimes()
     },
     async deleteTime(id: number) {
-      await deleteItemPublicationTimes(id);
+      const result = await deleteItemPublicationTimes(id);
+      toast.success(result);
       await this.getList();
     }
   },

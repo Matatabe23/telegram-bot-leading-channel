@@ -1,13 +1,13 @@
 <template>
   <div class="tree-panel" :class="{ 'open-panel': isOpen }">
-    <div class="tree-panel__menu-icon" @click="isOpen = !isOpen" :class="{ 'opem-menu-icon': isOpen }">
+    <div class="tree-panel__menu-icon" @click="togglePanel" :class="{ 'opem-menu-icon': isOpen }">
       <img src="@/assets/image/menu.png" alt="">
     </div>
     <div class="tree-panel__panel">
       <h1>Tg-bot</h1>
-      <h3 @click="$router.push('/publishing-panel')">Публикация</h3>
-      <h3 @click="$router.push('/publishing-panel')">Участники</h3>
-      <h3 @click="$router.push('/settings')">Настройки</h3>
+      <h3 @click="navigateTo('/publishing-panel')">Публикация</h3>
+      <h3 @click="navigateTo('/participants')">Участники</h3>
+      <h3 @click="navigateTo('/settings')">Настройки</h3>
       <h3 @click="exit()">Выйти</h3>
     </div>
   </div>
@@ -29,11 +29,21 @@ export default defineComponent({
       setExitAuth: 'setExitAuth'
     }),
 
+    togglePanel() {
+      this.isOpen = !this.isOpen;
+    },
+
+    async navigateTo(route: string) {
+      this.isOpen = false;
+      await this.$router.push(route);
+    },
+
     async exit() {
       await localStorage.removeItem('admin');
       await localStorage.removeItem('token');
-      await this.setExitAuth()
-      await this.$router.push('/')
+      await this.setExitAuth();
+      this.isOpen = false;
+      await this.$router.push('/');
     }
   }
 });
