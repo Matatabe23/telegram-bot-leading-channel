@@ -38,7 +38,6 @@
       @click="isSettingsPanelOpen = !isSettingsPanelOpen" />
     <Loader v-if="loader" />
 
-    <popup-message ref="popup"></popup-message>
     <ProcentLoader :overlay="processLoader.overlay" :total="processLoader.total" :loaded="processLoader.loaded" />
   </div>
 </template>
@@ -47,6 +46,10 @@
 import { defineComponent } from 'vue';
 import { publication, instantPublicationPosts } from '@/http/postsAPI';
 import { IPublish } from '@/types';
+import { useToast } from 'vue-toastification';
+
+
+const toast = useToast()
 
 export default defineComponent({
   data(): IPublish {
@@ -83,14 +86,14 @@ export default defineComponent({
     async publication() {
       try {
         if (!this.imagePost.length) {
-          (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Некорректные данные', 5000);
+          toast.error('Некорректные данные')
           return
         }
 
         this.loader = true;
 
         if (this.imagePost.length > 10) {
-          (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Не более 10 медиафайлов!', 10000);
+          toast.error('Не более 10 медиафайлов!')
           return
         }
         let result
@@ -103,11 +106,11 @@ export default defineComponent({
         if (result) {
           this.images = [];
           this.imagePost = [];
-          (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(result, 5000);
+          toast.success(result)
           this.$emit('get-posts', 1, 3);
         }
       } catch (e: any) {
-        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);
+        toast.error(e.response.data.message)
       } finally {
         this.loader = false;
       }
@@ -138,7 +141,7 @@ export default defineComponent({
           const number = match ? parseInt(match[1]) : null;
 
           if (!number) {
-            (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Ошибка в работе с файлами', 5000);
+            toast.error('Ошибка в работе с файлами')
             return
           }
 
@@ -163,9 +166,9 @@ export default defineComponent({
         }
 
         this.$emit('get-posts', 1, 3);
-        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Успешная публикация', 5000);
+        toast.success('Успешная публикация')
       } catch (e: any) {
-        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 5000);
+        toast.error(e.response.data.message)
       } finally {
         this.processLoader.overlay = false
       }

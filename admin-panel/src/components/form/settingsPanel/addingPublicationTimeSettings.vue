@@ -25,7 +25,6 @@
       </div>
     </div>
 
-    <popup-message ref="popup"></popup-message>
   </div>
 </template>
 
@@ -33,6 +32,10 @@
 import { defineComponent } from 'vue';
 import { addingPublicationTime, getListRegularPublicationTimes, deleteItemPublicationTimes } from '@/http/settingsAPI'
 import { IAddingPublicationTimeSettings } from '@/types'
+import { useToast } from 'vue-toastification';
+
+
+const toast = useToast()
 
 export default defineComponent({
   data(): IAddingPublicationTimeSettings {
@@ -46,7 +49,7 @@ export default defineComponent({
     async saveTime() {
       try {
         if (this.hour === '' || this.minute === '') {
-          (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Заполните поля', 5000);
+          toast.error('Заполните поля')
           return
         }
 
@@ -54,12 +57,12 @@ export default defineComponent({
 
         if (result) {
           this.getList();
-          (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage('Успешное добавление!', 5000);
+          toast.success('Успешное добавление!')
           this.hour = ''
           this.minute = ''
         }
       } catch (e: any) {
-        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data, 5000);
+        toast.error(e.response.data)
       }
     },
     async getList() {

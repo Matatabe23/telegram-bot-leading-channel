@@ -4,7 +4,6 @@
     <PublishPosts :posts="posts" :totalCount="totalCount" @get-posts="getPosts" @post-panel="getPostPanel"/>
 
     <postPanel v-if="postPanel" :images="images" @close="closePostPanel"/>
-    <popup-message ref="popup"/>
     <div class="publishing-panel__overplay" v-if="overlay" @click="closePostPanel"/>
   </div>
 </template>

@@ -2,6 +2,7 @@ import { dataBasePost, imageData } from '../models/models.js';
 import { bot } from '../routerBot/index.js';
 import { deleteImageFromS3 } from '../service/s3-service.js';
 import { CHAT_ID } from '../const/constENV.js';
+import { S3_BUCKET_NAME, S3_PATH } from "../const/constENV.js";
 
 export default async function sendMessageAtScheduledTime() {
   const postWithImages: any = await dataBasePost.findOne({
@@ -14,7 +15,7 @@ export default async function sendMessageAtScheduledTime() {
   const media = postWithImages.imageData.map((item: any) => {
     return {
       type: 'photo',
-      media: item.image,
+      media: `${S3_PATH}${S3_BUCKET_NAME}/${item.image}`,
       id: item.id,
       caption: '#QugorArts'
     };

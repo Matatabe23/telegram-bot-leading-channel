@@ -10,7 +10,6 @@
 
     <Loader v-if="loader" />
 
-    <popup-message ref="popup"></popup-message>
   </div>
 </template>
 
@@ -19,6 +18,10 @@ import { defineComponent } from 'vue';
 import { IMainPages, adminData } from '@/types'
 import { mapActions } from 'vuex';
 import { login } from '@/http/adminAPI'
+import { useToast } from 'vue-toastification';
+
+
+const toast = useToast()
 
 export default defineComponent({
   data(): IMainPages {
@@ -45,7 +48,7 @@ export default defineComponent({
 
         this.$router.push('/publishing-panel');
       } catch (e: any) {
-        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data.message, 10000);
+        toast.error(e.response.data.message)
       } finally {
         this.loader = false;
       }

@@ -34,8 +34,6 @@
 
 
     <Loader v-if="loaderPosts" overlay="false" class="posts__loaderPosts" />
-
-    <popup-message ref="popup"></popup-message>
   </div>
 </template>
 
@@ -43,6 +41,10 @@
 import { defineComponent } from 'vue';
 import { IPublishPosts, post } from '@/types';
 import { deletePost, publishInstantly } from '@/http/postsAPI'
+import { useToast } from 'vue-toastification';
+
+
+const toast = useToast()
 
 export default defineComponent({
   data(): IPublishPosts {
@@ -104,10 +106,10 @@ export default defineComponent({
         }
         this.loaderPosts = true
         const result = await publishInstantly(id);
-        await (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(result, 10000);
+        toast.success(result);
         this.getPosts();
       } catch (e: any) {
-        (this.$refs.popup as { showMessage: (message: string, duration: number) => void }).showMessage(e.response.data, 10000);
+        toast.error(e.response.data);
       }
 
     }
