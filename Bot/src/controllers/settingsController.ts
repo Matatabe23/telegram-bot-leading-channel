@@ -2,25 +2,23 @@ import { regularPublicationTime } from '../models/models.js';
 import { Request, Response } from 'express';
 import { scheduleFunctionExecution } from '../service/regularPublicationBot-service.js'
 
+import { addingPublicationTime } from '../service/settingsService/addingPublicationTime/addingPublicationTime.js'
+import { deleteItemPublicationTimes } from '../service/settingsService/deleteItemPublicationTimes/deleteItemPublicationTimes.js'
+
 
 class AdministratorController {
   async addingPublicationTime(req: Request, res: Response) {
-    const { hour, minute } = req.body
-    if (hour === '' || isNaN(Number(hour)) || Number(hour) < 0 || Number(hour) > 24) {
-      return res.status(404).send('Не корректные данные')
+    try {
+      const { hour, minute } = req.body
+
+      const result = await addingPublicationTime(hour, minute)
+
+
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
     }
-    if (minute === '' || isNaN(Number(minute)) || Number(minute) < 0 || Number(minute) > 59) {
-      return res.status(404).send('Не корректные данные')
-    }
-
-    await regularPublicationTime.create({
-      hour: hour,
-      minute: minute
-    });
-
-    scheduleFunctionExecution();
-
-    return res.json('Успешное добавление!');
   }
 
   async getListRegularPublicationTimes(req: Request, res: Response) {
@@ -30,18 +28,17 @@ class AdministratorController {
   }
 
   async deleteItemPublicationTimes(req: Request, res: Response) {
-    const { id } = req.params;
-    const times = await regularPublicationTime.findByPk(id);
-    if (!times) {
-      return res.status(404).send('Пост не найден');
+    try {
+      const { id } = req.params;
+
+      const result = await deleteItemPublicationTimes(id)
+      res.json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
     }
-  
-    await regularPublicationTime.destroy({ where: { id } });
-    scheduleFunctionExecution();
-  
-    res.json('Успешное удаление');
   }
-  
+
 
 }
 
