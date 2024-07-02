@@ -33,10 +33,31 @@ export interface IPublish {
   }
 }
 
-export interface post {
-  id: number;
-  description: string;
-  imageData: { id: number; image: string }[];
+export interface IPosts{
+    createdAt: string,
+    updatedAt: string,
+    id: string,
+    imageData: {
+      createdAt: string,
+      dataBasePostId: string,
+      id: string,
+      image: string,
+      updatedAt: string
+    }
+}
+
+export interface IPublishTime{
+  createdAt: string,
+  hour: string,
+  id: number,
+  minute: string,
+  updatedAt: string
+}
+
+export interface IPostsList {
+  posts: IPosts[],
+  publishTime: IPublishTime,
+  totalCount: number
 }
 
 export interface IPublishPosts {
@@ -57,4 +78,11 @@ export interface IAddingPublicationTimeSettings{
   hour: string,
   minute: string,
   listPublicationTimes: IGetListRegularPublicationTimes[]
+}
+
+export interface IStoreState {
+  isLoader: boolean,
+  postsList: IPosts | null,
+  totalCount: number,
+  publishTime: IPublishTime | null
 }

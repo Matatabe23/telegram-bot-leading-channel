@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { IPublishPosts, post } from '@/types';
+import { IPublishPosts, IPostsList } from '@/types';
 import { deletePost, publishInstantly } from '@/http/postsAPI'
 import { useToast } from 'vue-toastification';
 
@@ -65,7 +65,7 @@ export default defineComponent({
   },
   props: {
     posts: {
-      type: Array as () => post[],
+      type: Array as () => IPostsList[],
       required: true
     },
     totalCount: {

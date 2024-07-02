@@ -1,61 +1,54 @@
 <template>
   <div class="publishing-panel">
-    <publish @get-posts="getPosts"/>
-    <PublishPosts :posts="posts" :totalCount="totalCount" :publishTime="publishTime" @get-posts="getPosts" @post-panel="getPostPanel" />
+    <publish @get-posts="getPosts" />
+    <PublishPosts :posts="state.posts" :totalCount="state.totalCount" :publishTime="state.publishTime"
+      @get-posts="getPosts" @post-panel="getPostPanel" />
 
-    <postPanel v-if="postPanel" :images="images" @close="closePostPanel"/>
-    <div class="publishing-panel__overplay" v-if="overlay" @click="closePostPanel"/>
+    <postPanel v-if="state.postPanel" :images="state.images" @close="closePostPanel" />
+    <div class="publishing-panel__overplay" v-if="state.overlay" @click="closePostPanel" />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { defineComponent, reactive } from 'vue';
 import publish from '@/views/publichingPanel/Publish.vue'
 import PublishPosts from '@/views/publichingPanel/PublishPosts.vue'
 import { receiving } from '@/http/postsAPI';
-import { post } from '@/types';
+import { IPostsList } from '@/types';
 import postPanel from '@/components/form/postPanel/postPanel.vue'
 import { receivingPost } from '@/http/postsAPI';
 
-export default defineComponent({
-  data() {
-    return {
-      posts: [] as post[],
-      totalCount: 0 as number,
-      postPanel: false as boolean,
-      images: [] as string[],
-      overlay: false as boolean,
-      publishTime: [] as { hour: string, minute: string }[]
-    };
-  },
-  components: {
-    publish,
-    PublishPosts,
-    postPanel
-  },
-  methods: {
-    async getPosts(currentPage: number, postsPerPage: number) {
-      try {
-        const posts = await receiving(currentPage, postsPerPage);
-        this.posts = posts.posts;
-        this.totalCount = posts.totalCount;
-        this.publishTime = posts.publishTime;
-      } catch (e: any) {
-        console.error(e);
-      }
-    },
-    async getPostPanel(value: number){
-      this.postPanel = !this.postPanel;
-      this.overlay = !this.overlay;
-      this.images = await receivingPost(value);
-    },
-    closePostPanel(){
-      this.postPanel = !this.postPanel;
-      this.overlay = !this.overlay;
-      this.images = []
-    }
-  }
+const state = reactive({
+  posts: [] as IPostsList[],
+  totalCount: 0 as number,
+  postPanel: false as boolean,
+  images: [] as string[],
+  overlay: false as boolean,
+  publishTime: [] as { hour: string, minute: string }[]
 })
+
+const getPosts = async (currentPage: number, postsPerPage: number) => {
+  try {
+    const posts = await receiving(currentPage, postsPerPage);
+    state.posts = posts.posts;
+    state.totalCount = posts.totalCount;
+    state.publishTime = posts.publishTime;
+  } catch (e: any) {
+    console.error(e);
+  }
+}
+
+const getPostPanel = async (value: number) => {
+  state.postPanel = !state.postPanel;
+  state.overlay = !state.overlay;
+  state.images = await receivingPost(value);
+}
+
+const closePostPanel = () => {
+  state.postPanel = !state.postPanel;
+  state.overlay = !state.overlay;
+  state.images = []
+}
 </script>
 
 <style lang="scss">
@@ -64,7 +57,7 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin: 30px 0 ;
+  margin: 30px 0;
 
   &__overplay {
     position: fixed;
