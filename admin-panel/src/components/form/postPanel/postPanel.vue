@@ -34,7 +34,7 @@ export default defineComponent({
   height: 80vh;
   border-radius: 15px;
   z-index: 999;
-  overflow-y: hidden;
+  
 
   display: flex;
   align-items: center;
@@ -44,8 +44,8 @@ export default defineComponent({
   overflow-y: auto;
 
   &__image {
-    height: 40vh;
-    width: 25vh;
+    height: 70vh;
+    width: 45vh;
     object-fit: contain;
     position: relative;
   }

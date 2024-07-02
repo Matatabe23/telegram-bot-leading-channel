@@ -1,5 +1,15 @@
 <template>
   <div class="posts">
+    <div class="posts__header"  v-if="totalCount">
+      <div class="posts__info">
+      <div>Всего постов: {{ totalCount }}</div>
+      <div v-if="lastPublishDate">Крайняя дата публикации: {{ lastPublishDate }}</div>
+    </div>
+    <div class="posts__download">
+      <MainButton class="posts__deleteButton" @click="downloadSqlDataBases">Скачать базу данных SQL</MainButton>
+    </div>
+    </div>
+
 
     <div class="posts__post" v-for="post in posts" :key="post.id">
       <div class="posts__postContent">
@@ -20,8 +30,7 @@
 
 
     <div class="posts__pagination" v-if="posts.length">
-      <button @click="setPage(1)" :disabled="currentPage === 1">
-        <<</button>
+      <button @click="setPage(1)" :disabled="currentPage === 1"><<</button>
           <button v-for="pageNumber in visiblePages" :key="pageNumber" @click="setPage(pageNumber)"
             :class="{ 'active': pageNumber === currentPage }">{{ pageNumber }}</button>
           <button @click="setPage(lastPage)" :disabled="currentPage === lastPage">>></button>
@@ -63,6 +72,10 @@ export default defineComponent({
       type: Number,
       required: true
     },
+    publishTime: {
+      type: Array as () => { hour: string, minute: string }[],
+      required: true
+    }
   },
   methods: {
     async getPosts() {
@@ -113,6 +126,9 @@ export default defineComponent({
         toast.error(e.response.data);
       }
 
+    },
+    async downloadSqlDataBases(){
+      toast.error('Кнопка пока не работает')
     }
   },
   computed: {
@@ -138,6 +154,18 @@ export default defineComponent({
 
       return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
     },
+    lastPublishDate(): string {
+      if (!this.publishTime.length) return '';
+      
+      const postsPerDay = this.publishTime.length;
+      const totalDays = Math.ceil(this.totalCount / postsPerDay);
+      
+      const startDate = new Date();
+      const lastPostDate = new Date(startDate);
+      lastPostDate.setDate(startDate.getDate() + totalDays);
+      
+      return lastPostDate.toLocaleDateString();
+    }
   },
   mounted() {
     this.getPosts();
@@ -151,6 +179,20 @@ export default defineComponent({
   position: relative;
   min-width: 500px;
   min-height: 500px;
+
+
+  &__header{
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__info{
+    margin-bottom: 10px;
+  }
+
+  &__download{
+    margin-left: auto;
+  }
 
   &__post {
     border: 1px solid #ccc;

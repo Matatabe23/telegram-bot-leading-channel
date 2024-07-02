@@ -1,4 +1,4 @@
-import { dataBasePost, imageData } from '../../../models/models.js';
+import { dataBasePost, imageData, regularPublicationTime } from '../../../models/models.js';
 import { S3_BUCKET_NAME, S3_PATH } from "../../../const/constENV.js";
 
 export async function receiving(page: number, pageSize: number) {
@@ -25,6 +25,7 @@ export async function receiving(page: number, pageSize: number) {
     });
     return post;
   });
+  const list = await regularPublicationTime.findAll()
 
-  return { posts: updatedPosts, totalCount };
+  return { posts: updatedPosts, totalCount, publishTime: list };
 }

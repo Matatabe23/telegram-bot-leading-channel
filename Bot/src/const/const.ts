@@ -1,11 +1,5 @@
 import {EAdministratorRole, IAdministratorRole} from '../type/types.js'
 
-export const publishTime = [
-  { hour: 14, minute: 1 },
-  { hour: 14, minute: 3 },
-  { hour: 14, minute: 4 },
-]
-
 export const roles: IAdministratorRole[] = [
   { id: 1, nameRole: EAdministratorRole.DEVELOPER, publisherPanelAccess: true, usersPanelAccess: true, AdminslistAccess: true, ChangeInfo: [EAdministratorRole.DEVELOPER, EAdministratorRole.ADMIN, EAdministratorRole.MODERATOR], },
   { id: 3, nameRole: EAdministratorRole.ADMIN, publisherPanelAccess: true, usersPanelAccess: true, AdminslistAccess: false, ChangeInfo: [EAdministratorRole.MODERATOR], },

@@ -6,7 +6,6 @@
     <div class="tree-panel__panel">
       <h1>Tg-bot</h1>
       <h3 @click="navigateTo('/publishing-panel')">Публикация</h3>
-      <h3 @click="navigateTo('/participants')">Участники</h3>
       <h3 @click="navigateTo('/settings')">Настройки</h3>
       <h3 @click="exit()">Выйти</h3>
     </div>

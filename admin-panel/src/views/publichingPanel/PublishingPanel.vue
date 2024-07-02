@@ -1,7 +1,7 @@
 <template>
   <div class="publishing-panel">
     <publish @get-posts="getPosts"/>
-    <PublishPosts :posts="posts" :totalCount="totalCount" @get-posts="getPosts" @post-panel="getPostPanel"/>
+    <PublishPosts :posts="posts" :totalCount="totalCount" :publishTime="publishTime" @get-posts="getPosts" @post-panel="getPostPanel" />
 
     <postPanel v-if="postPanel" :images="images" @close="closePostPanel"/>
     <div class="publishing-panel__overplay" v-if="overlay" @click="closePostPanel"/>
@@ -24,7 +24,8 @@ export default defineComponent({
       totalCount: 0 as number,
       postPanel: false as boolean,
       images: [] as string[],
-      overlay: false as boolean
+      overlay: false as boolean,
+      publishTime: [] as { hour: string, minute: string }[]
     };
   },
   components: {
@@ -38,6 +39,7 @@ export default defineComponent({
         const posts = await receiving(currentPage, postsPerPage);
         this.posts = posts.posts;
         this.totalCount = posts.totalCount;
+        this.publishTime = posts.publishTime;
       } catch (e: any) {
         console.error(e);
       }

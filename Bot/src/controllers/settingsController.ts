@@ -1,10 +1,8 @@
 import { regularPublicationTime } from '../models/models.js';
 import { Request, Response } from 'express';
-import { scheduleFunctionExecution } from '../service/regularPublicationBot-service.js'
 
 import { addingPublicationTime } from '../service/settingsService/addingPublicationTime/addingPublicationTime.js'
 import { deleteItemPublicationTimes } from '../service/settingsService/deleteItemPublicationTimes/deleteItemPublicationTimes.js'
-
 
 class AdministratorController {
   async addingPublicationTime(req: Request, res: Response) {
@@ -12,7 +10,6 @@ class AdministratorController {
       const { hour, minute } = req.body
 
       const result = await addingPublicationTime(hour, minute)
-
 
       res.json(result);
     } catch (error) {
