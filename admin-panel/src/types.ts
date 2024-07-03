@@ -26,27 +26,29 @@ export interface IPublish {
   imagePost: any,
   waterMark: boolean,
   instantPublication: boolean,
-  processLoader:{
+  processLoader: {
     overlay: boolean,
     total: number,
     loaded: number
   }
 }
 
-export interface IPosts{
-    createdAt: string,
-    updatedAt: string,
-    id: string,
-    imageData: {
-      createdAt: string,
-      dataBasePostId: string,
-      id: string,
-      image: string,
-      updatedAt: string
-    }
+export interface IImageData {
+  createdAt: string,
+  dataBasePostId: string,
+  id: number,
+  image: string,
+  updatedAt: string
 }
 
-export interface IPublishTime{
+export interface IPosts {
+  createdAt: string,
+  updatedAt: string,
+  id: number,
+  imageData: IImageData[]
+}
+
+export interface IPublishTime {
   createdAt: string,
   hour: string,
   id: number,
@@ -66,7 +68,7 @@ export interface IPublishPosts {
   postsPerPage: number,
 }
 
-export interface IGetListRegularPublicationTimes{
+export interface IGetListRegularPublicationTimes {
   id: number,
   hour: string,
   minute: string,
@@ -74,7 +76,7 @@ export interface IGetListRegularPublicationTimes{
   updatedAt: string
 }
 
-export interface IAddingPublicationTimeSettings{
+export interface IAddingPublicationTimeSettings {
   hour: string,
   minute: string,
   listPublicationTimes: IGetListRegularPublicationTimes[]
@@ -82,7 +84,11 @@ export interface IAddingPublicationTimeSettings{
 
 export interface IStoreState {
   isLoader: boolean,
-  postsList: IPosts | null,
+  postsList: IPosts[],
   totalCount: number,
-  publishTime: IPublishTime | null
+  publishTime: IPublishTime[],
+  form: {
+    currentPage: number,
+    postsPerPage: number
+  }
 }

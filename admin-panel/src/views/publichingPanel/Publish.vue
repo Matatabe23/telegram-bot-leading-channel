@@ -2,7 +2,7 @@
   <div class="publishing-panel">
     <div class="publishing-panel__image">
       <div class="publishing-panel__image-form">
-        <div v-for="(photo, index) in images" :key="index">
+        <div v-for="(photo, index) in state.images" :key="index">
           <img :src="photo" alt="Photo" class="publishing-panel__form">
         </div>
       </div>
@@ -22,170 +22,176 @@
           </label>
         </div>
 
-        <MainButton @click="isSettingsPanelOpen = !isSettingsPanelOpen">Настройки</MainButton>
-        <MainButton @click="publication">Опубликовать</MainButton>
+        <MainButton @click="state.isSettingsPanelOpen = !state.isSettingsPanelOpen">Настройки</MainButton>
+        <MainButton @click="publicationPost">Опубликовать</MainButton>
 
       </div>
     </div>
 
-    <div class="publishing-panel__settings-panel" v-if="isSettingsPanelOpen">
-      <div class="publishing-panel__close" @click="isSettingsPanelOpen = !isSettingsPanelOpen">✖</div>
-      <MainCheckBox label="Водяной знак" height="20px" v-model="waterMark" />
-      <MainCheckBox label="Опубликовать сразу" height="20px" v-model="instantPublication" />
+    <div class="publishing-panel__settings-panel" v-if="state.isSettingsPanelOpen">
+      <div class="publishing-panel__close" @click="state.isSettingsPanelOpen = !state.isSettingsPanelOpen">✖</div>
+      <MainCheckBox label="Водяной знак" height="20px" v-model="state.waterMark" />
+      <MainCheckBox label="Опубликовать сразу" height="20px" v-model="state.instantPublication" />
     </div>
 
-    <div class="publishing-panel__overlay" v-if="isSettingsPanelOpen"
-      @click="isSettingsPanelOpen = !isSettingsPanelOpen" />
-    <Loader v-if="loader" />
+    <div class="publishing-panel__overlay" v-if="state.isSettingsPanelOpen"
+      @click="state.isSettingsPanelOpen = !state.isSettingsPanelOpen" />
+    <Loader v-if="state.loader" />
 
-    <ProcentLoader :overlay="processLoader.overlay" :total="processLoader.total" :loaded="processLoader.loaded" />
+    <ProcentLoader :overlay="state.processLoader.overlay" :total="state.processLoader.total"
+      :loaded="state.processLoader.loaded" />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { defineComponent, onMounted, reactive, ref, watch } from 'vue';
 import { publication, instantPublicationPosts } from '@/http/postsAPI';
 import { IPublish } from '@/types';
 import { useToast } from 'vue-toastification';
+import { usePosts } from '@/store/usePosts';
+import { storeToRefs } from 'pinia';
 
 
 const toast = useToast()
+const editorStore = usePosts();
+const { postsList, totalCount, publishTime, isLoader, form } = storeToRefs(editorStore);
 
-export default defineComponent({
-  data(): IPublish {
-    return {
-      loader: false,
-      isSettingsPanelOpen: false,
-      images: [],
-      imagePost: [],
-      waterMark: false,
-      instantPublication: false,
+const folderInput = ref('')
 
-      processLoader: {
-        overlay: false,
-        total: 1,
-        loaded: 0,
+const state: IPublish = reactive({
+  loader: false,
+  isSettingsPanelOpen: false,
+  images: [],
+  imagePost: [],
+  waterMark: false,
+  instantPublication: false,
+
+  processLoader: {
+    overlay: false,
+    total: 1,
+    loaded: 0,
+  }
+})
+
+const handleFileUpload = async (event: any) => {
+  const files = event.target.files;
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        state.images.push(reader.result);
       }
     };
-  },
-  methods: {
-    async handleFileUpload(event: any) {
-      const files = event.target.files;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === 'string') {
-            this.images.push(reader.result);
-          }
-        };
-        this.imagePost.push(file)
-        reader.readAsDataURL(file);
+    state.imagePost.push(file)
+    reader.readAsDataURL(file);
+  }
+}
+
+const publicationPost = async () => {
+  try {
+    if (!state.imagePost.length) {
+      toast.error('Некорректные данные')
+      return
+    }
+
+    state.loader = true;
+
+    if (state.imagePost.length > 10) {
+      toast.error('Не более 10 медиафайлов!')
+      return
+    }
+    let result
+    if (state.instantPublication) {
+      result = await instantPublicationPosts(state.imagePost, state.waterMark);
+    } else {
+      result = await publication(state.imagePost, state.waterMark);
+    }
+
+    if (result) {
+      state.images = [];
+      state.imagePost = [];
+      toast.success(result)
+    }
+    editorStore.getPosts()
+  } catch (e: any) {
+    toast.error(e.response.data.message)
+  } finally {
+    state.loader = false;
+  }
+}
+
+const getSettings = async () => {
+  const waterMarkString = localStorage.getItem('waterMark');
+  const instantPublication = localStorage.getItem('instantPublication');
+  if (waterMarkString !== null) {
+    state.waterMark = JSON.parse(waterMarkString);
+  }
+  if (instantPublication !== null) {
+    state.instantPublication = JSON.parse(instantPublication);
+  }
+}
+
+const selectFolder = () => {
+  folderInput.value.click()
+}
+
+const handleFolderSelection = async (event: any) => {
+  try {
+    const files = event.target.files;
+    if (files.length === 0) return;
+
+    const groupedFiles: any = {};
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const match = file.webkitRelativePath.match(/\/(\d+)\//);
+      const number = match ? parseInt(match[1]) : null;
+
+      if (!number) {
+        toast.error('Ошибка в работе с файлами')
+        return
       }
-    },
-    async publication() {
-      try {
-        if (!this.imagePost.length) {
-          toast.error('Некорректные данные')
-          return
-        }
 
-        this.loader = true;
 
-        if (this.imagePost.length > 10) {
-          toast.error('Не более 10 медиафайлов!')
-          return
+      if (number !== null) {
+        if (!groupedFiles[number]) {
+          groupedFiles[number] = [];
         }
-        let result
-        if (this.instantPublication) {
-          result = await instantPublicationPosts(this.imagePost, this.waterMark);
-        } else {
-          result = await publication(this.imagePost, this.waterMark);
-        }
-
-        if (result) {
-          this.images = [];
-          this.imagePost = [];
-          toast.success(result)
-          this.$emit('get-posts', 1, 3);
-        }
-      } catch (e: any) {
-        toast.error(e.response.data.message)
-      } finally {
-        this.loader = false;
+        groupedFiles[number].push(file);
       }
-    },
-    async getSettings() {
-      const waterMarkString = localStorage.getItem('waterMark');
-      const instantPublication = localStorage.getItem('instantPublication');
-      if (waterMarkString !== null) {
-        this.waterMark = JSON.parse(waterMarkString);
-      }
-      if (instantPublication !== null) {
-        this.instantPublication = JSON.parse(instantPublication);
-      }
-    },
-    selectFolder() {
-      (this.$refs.folderInput as HTMLInputElement).click();
-    },
-    async handleFolderSelection(event: any) {
-      try {
-        const files = event.target.files;
-        if (files.length === 0) return;
+    }
 
-        const groupedFiles: any = {};
+    const folderContent = Object.values(groupedFiles);
 
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const match = file.webkitRelativePath.match(/\/(\d+)\//);
-          const number = match ? parseInt(match[1]) : null;
+    state.processLoader.overlay = true
+    state.processLoader.total = folderContent.length
 
-          if (!number) {
-            toast.error('Ошибка в работе с файлами')
-            return
-          }
+    for (let i = 0; i < folderContent.length; i++) {
+      const file = folderContent[i] as FileList;
+      await publication(file, state.waterMark);
+      state.processLoader.loaded += 1
+    }
 
+    editorStore.getPosts()
+    toast.success('Успешная публикация')
+  } catch (e: any) {
+    toast.error(e.response.data.message)
+  } finally {
+    state.processLoader.overlay = false
+  }
+}
 
-          if (number !== null) {
-            if (!groupedFiles[number]) {
-              groupedFiles[number] = [];
-            }
-            groupedFiles[number].push(file);
-          }
-        }
+watch(() => state.waterMark, (value) => {
+  localStorage.setItem('waterMark', JSON.stringify(value))
+})
 
-        const folderContent = Object.values(groupedFiles);
+watch(() => state.instantPublication, (value) => {
+  localStorage.setItem('instantPublication', JSON.stringify(value))
+})
 
-        this.processLoader.overlay = true
-        this.processLoader.total = folderContent.length
-
-        for (let i = 0; i < folderContent.length; i++) {
-          const file = folderContent[i] as FileList;
-          await publication(file, this.waterMark);
-          this.processLoader.loaded += 1
-        }
-
-        this.$emit('get-posts', 1, 3);
-        toast.success('Успешная публикация')
-      } catch (e: any) {
-        toast.error(e.response.data.message)
-      } finally {
-        this.processLoader.overlay = false
-      }
-    },
-
-  },
-  watch: {
-    waterMark() {
-      localStorage.setItem('waterMark', JSON.stringify(this.waterMark))
-    },
-    instantPublication() {
-      localStorage.setItem('instantPublication', JSON.stringify(this.instantPublication))
-    },
-  },
-  mounted() {
-    this.getSettings()
-  },
+onMounted(() => {
+  getSettings()
 })
 </script>
 

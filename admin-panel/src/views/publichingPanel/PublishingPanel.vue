@@ -1,8 +1,7 @@
 <template>
   <div class="publishing-panel">
-    <publish @get-posts="getPosts" />
-    <PublishPosts :posts="state.posts" :totalCount="state.totalCount" :publishTime="state.publishTime"
-      @get-posts="getPosts" @post-panel="getPostPanel" />
+    <publish />
+    <PublishPosts @post-panel="openPostPanel" />
 
     <postPanel v-if="state.postPanel" :images="state.images" @close="closePostPanel" />
     <div class="publishing-panel__overplay" v-if="state.overlay" @click="closePostPanel" />
@@ -10,35 +9,19 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, reactive } from 'vue';
+import { reactive } from 'vue';
 import publish from '@/views/publichingPanel/Publish.vue'
 import PublishPosts from '@/views/publichingPanel/PublishPosts.vue'
-import { receiving } from '@/http/postsAPI';
-import { IPostsList } from '@/types';
 import postPanel from '@/components/form/postPanel/postPanel.vue'
 import { receivingPost } from '@/http/postsAPI';
 
 const state = reactive({
-  posts: [] as IPostsList[],
-  totalCount: 0 as number,
   postPanel: false as boolean,
   images: [] as string[],
   overlay: false as boolean,
-  publishTime: [] as { hour: string, minute: string }[]
 })
 
-const getPosts = async (currentPage: number, postsPerPage: number) => {
-  try {
-    const posts = await receiving(currentPage, postsPerPage);
-    state.posts = posts.posts;
-    state.totalCount = posts.totalCount;
-    state.publishTime = posts.publishTime;
-  } catch (e: any) {
-    console.error(e);
-  }
-}
-
-const getPostPanel = async (value: number) => {
+const openPostPanel = async (value: number) => {
   state.postPanel = !state.postPanel;
   state.overlay = !state.overlay;
   state.images = await receivingPost(value);
