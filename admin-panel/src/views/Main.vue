@@ -8,8 +8,6 @@
       <MainButton class="main__main-button" @click="setlogin">Авторизоваться</MainButton>
     </div>
 
-    <Loader v-if="state.loader" />
-
   </div>
 </template>
 
@@ -20,13 +18,14 @@ import { login } from '@/http/adminAPI'
 import { useToast } from 'vue-toastification';
 import { useAuth } from '@/store/useAuth';
 import { useRouter } from 'vue-router';
+import { usePosts } from '@/store/usePosts';
 
 const toast = useToast()
 const editorStore = useAuth();
 const router = useRouter()
+const postsStore = usePosts();
 
 const state: IMainPages = reactive({
-  loader: false,
   auth: {
     name: "",
     password: ""
@@ -35,7 +34,7 @@ const state: IMainPages = reactive({
 
 const setlogin = async () => {
   try {
-    state.loader = true;
+    postsStore.setStateValueByKey('isLoader', true);
     const response: any = await login(state.auth.name, state.auth.password);
 
     editorStore.setAdminData(response)
@@ -44,7 +43,7 @@ const setlogin = async () => {
   } catch (e: any) {
     toast.error(e.response.data.message)
   } finally {
-    state.loader = false;
+    postsStore.setStateValueByKey('isLoader', false);
   }
 
 }

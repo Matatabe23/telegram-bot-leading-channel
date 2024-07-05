@@ -1,22 +1,18 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import Main from '@/views/Main.vue';
-
-import PublishingPanel from '@/views/publichingPanel/PublishingPanel.vue';
-
-import MainSettings from '@/views/settings/MainSettings.vue';
+import { Component } from 'vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    component: Main
+    component: (): Promise<Component> => import('@/views/Main.vue'),
   },
   {
     path: '/publishing-panel',
-    component: PublishingPanel
+    component: (): Promise<Component> => import('@/views/publichingPanel/PublishPage.vue'),
   },
   {
     path: '/settings',
-    component: MainSettings
+    component: (): Promise<Component> => import('@/views/settings/MainSettings.vue'),
   },
 ]
 

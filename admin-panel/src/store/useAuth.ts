@@ -35,9 +35,5 @@ export const useAuth = defineStore('auth', {
     setAdminData(adminData: adminData)  {
       this.adminData = parseDataForAdmin(adminData)
     },
-
-    setExitAuth()  {
-      this.auth = false;
-    }
   }
 });

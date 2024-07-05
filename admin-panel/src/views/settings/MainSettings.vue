@@ -1,27 +1,16 @@
 <template>
   <div class="main-settings">
-    <addingPublicationTimeSettings/>
+    <addingPublicationTimeSettings />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
 import addingPublicationTimeSettings from '@/components/form/settingsPanel/addingPublicationTimeSettings.vue'
 
-export default defineComponent({
-  data() {
-    return {
-
-    }
-  },
-  components:{
-    addingPublicationTimeSettings
-  }
-})
 </script>
 
 <style lang="scss">
-.main-settings{
+.main-settings {
   width: 100%;
 }
 </style>

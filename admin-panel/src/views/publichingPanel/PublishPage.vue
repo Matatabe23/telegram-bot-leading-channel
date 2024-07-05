@@ -1,6 +1,6 @@
 <template>
   <div class="publishing-panel">
-    <Publish />
+    <PublishPanel />
     <PublishPosts @post-panel="openPostPanel" />
 
     <PostPanel v-if="state.postPanel" :images="state.images" @close="closePostPanel" />
@@ -10,7 +10,7 @@
 
 <script lang="ts" setup>
 import { reactive } from 'vue';
-import Publish from '@/views/publichingPanel/Publish.vue'
+import PublishPanel from '@/views/publichingPanel/PublishPanel.vue'
 import PublishPosts from '@/views/publichingPanel/PublishPosts.vue'
 import PostPanel from '@/components/form/postPanel/PostPanel.vue'
 import { receivingPost } from '@/http/postsAPI';

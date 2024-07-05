@@ -2,6 +2,7 @@
   <div class="app">
     <TreePanel v-if="route.path !== '/'" />
     <router-view />
+    <Loader v-if="isLoader"/>
   </div>
 </template>
 
@@ -9,16 +10,21 @@
 import { onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuth } from '@/store/useAuth';
+import { usePosts } from '@/store/usePosts';
 import { storeToRefs } from 'pinia';
 import TreePanel from '@/components/Panel/TreePanel/ThreePanel.vue'
+import Loader from '@/components/UI/Loader.vue'
 
 const router = useRouter()
 const route = useRoute()
-const editorStore = useAuth();
-const { auth } = storeToRefs(editorStore);
+const authStore = useAuth();
+const { auth } = storeToRefs(authStore);
+
+const postsStore = usePosts();
+const { isLoader } = storeToRefs(postsStore);
 
 const getDataAdmin = async () => {
-  await editorStore.checkDataWeb();
+  await authStore.checkDataWeb();
   if (route.path === '/' && auth.value === true) {
     await router.push('publishing-panel')
   } else if (route.path !== '/' && auth.value === false) {

@@ -1,5 +1,4 @@
 export interface IMainPages {
-  loader: boolean,
   auth: {
     name: string,
     password: string
@@ -7,7 +6,6 @@ export interface IMainPages {
 }
 
 export interface IPublish {
-  loader: boolean,
   isSettingsPanelOpen: boolean
   images: string[],
   imagePost: any,

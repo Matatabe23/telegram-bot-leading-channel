@@ -40,9 +40,6 @@
             <option value="10">10</option>
           </select>
     </div>
-
-
-    <Loader v-if="isLoader" overlay="false" class="posts__loaderPosts" />
   </div>
 </template>
 
@@ -56,7 +53,7 @@ import { storeToRefs } from 'pinia';
 
 const toast = useToast()
 const editorStore = usePosts();
-const { postsList, totalCount, publishTime, isLoader, form } = storeToRefs(editorStore);
+const { postsList, totalCount, publishTime, form } = storeToRefs(editorStore);
 
 const emit = defineEmits(['get-posts', 'post-panel']);
 

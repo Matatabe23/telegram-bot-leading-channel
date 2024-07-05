@@ -36,7 +36,6 @@
 
     <div class="publishing-panel__overlay" v-if="state.isSettingsPanelOpen"
       @click="state.isSettingsPanelOpen = !state.isSettingsPanelOpen" />
-    <Loader v-if="state.loader" />
 
     <ProcentLoader :overlay="state.processLoader.overlay" :total="state.processLoader.total"
       :loaded="state.processLoader.loaded" />
@@ -57,7 +56,6 @@ const editorStore = usePosts();
 const folderInput = ref('')
 
 const state: IPublish = reactive({
-  loader: false,
   isSettingsPanelOpen: false,
   images: [],
   imagePost: [],
@@ -93,7 +91,7 @@ const publicationPost = async () => {
       return
     }
 
-    state.loader = true;
+    editorStore.setStateValueByKey('isLoader', true)
 
     if (state.imagePost.length > 10) {
       toast.error('Не более 10 медиафайлов!')
@@ -115,7 +113,7 @@ const publicationPost = async () => {
   } catch (e: any) {
     toast.error(e.response.data.message)
   } finally {
-    state.loader = false;
+    editorStore.setStateValueByKey('isLoader', false)
   }
 }
 
