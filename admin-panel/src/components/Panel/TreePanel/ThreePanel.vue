@@ -1,6 +1,6 @@
 <template>
-  <div class="tree-panel" :class="{ 'open-panel': isOpen }">
-    <div class="tree-panel__menu-icon" @click="togglePanel" :class="{ 'opem-menu-icon': isOpen }">
+  <div class="tree-panel" :class="{ 'open-panel': state.isOpen }">
+    <div class="tree-panel__menu-icon" @click="togglePanel" :class="{ 'opem-menu-icon': state.isOpen }">
       <img src="@/assets/image/menu.png" alt="">
     </div>
     <div class="tree-panel__panel">
@@ -12,40 +12,36 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { mapActions } from 'vuex';
+<script lang="ts" setup>
+import { reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuth } from '@/store/useAuth';
 
-export default defineComponent({
-  name: 'TreePanel',
-  data() {
-    return {
-      isOpen: false
-    }
-  },
-  methods: {
-    ...mapActions({
-      setExitAuth: 'setExitAuth'
-    }),
+const router = useRouter()
+const editorStore = useAuth();
 
-    togglePanel() {
-      this.isOpen = !this.isOpen;
-    },
+const state = reactive({
+  isOpen: false
+})
 
-    async navigateTo(route: string) {
-      this.isOpen = false;
-      await this.$router.push(route);
-    },
+const togglePanel = () => {
+  state.isOpen = !state.isOpen;
+}
 
-    async exit() {
-      await localStorage.removeItem('admin');
-      await localStorage.removeItem('token');
-      await this.setExitAuth();
-      this.isOpen = false;
-      await this.$router.push('/');
-    }
-  }
-});
+const navigateTo = (route: string) => {
+  state.isOpen = false;
+  router.push(route);
+}
+
+const exit = async () => {
+  localStorage.removeItem('admin');
+  localStorage.removeItem('token');
+  editorStore.setStateValueByKey('auth', false);
+  state.isOpen = false;
+  await router.push('/');
+}
+
+
 </script>
 
 <style lang="scss">

@@ -1,43 +1,35 @@
 <template>
   <div class="app">
-    <TreePanel v-if="$route.path !== '/'" />
+    <TreePanel v-if="route.path !== '/'" />
     <router-view />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { mapActions, mapGetters } from 'vuex';
+<script lang="ts" setup>
+import { onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useAuth } from '@/store/useAuth';
+import { storeToRefs } from 'pinia';
+import TreePanel from '@/components/Panel/TreePanel/ThreePanel.vue'
 
-export default defineComponent({
-  data() {
-    return {
+const router = useRouter()
+const route = useRoute()
+const editorStore = useAuth();
+const { auth } = storeToRefs(editorStore);
 
-    }
-  },
-  methods: {
-    ...mapActions({
-      checkDataWeb: 'checkDataWeb'
-    }),
-
-    async getDataAdmin() {
-      await this.checkDataWeb();
-      if (this.$route.path === '/' && this.getAuthInfo === true) {
-        await this.$router.push('publishing-panel')
-      } else if(this.$route.path !== '/' && this.getAuthInfo === false) {
-        await this.$router.push('/')
-      }
-    }
-  },
-  mounted() {
-    this.getDataAdmin()
-  },
-  computed: {
-    ...mapGetters({
-      getAuthInfo: 'getAuthInfo'
-    })
+const getDataAdmin = async () => {
+  await editorStore.checkDataWeb();
+  if (route.path === '/' && auth.value === true) {
+    await router.push('publishing-panel')
+  } else if (route.path !== '/' && auth.value === false) {
+    await router.push('/')
   }
-});
+}
+
+onMounted(() => {
+  getDataAdmin()
+})
+
 </script>
 
 <style lang="scss">

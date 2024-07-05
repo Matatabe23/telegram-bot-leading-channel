@@ -13,6 +13,5 @@ export const login = async (name:string, password:string) => {
 export const checkDataWeb = async () => {
 	const { data } = await $autHost.get('api/admin/CheckDataWeb',) 
 	localStorage.setItem('token', data.token )
-	localStorage.setItem('admin', JSON.stringify(data.admin));
 	return jwtDecode(data.token)
 }

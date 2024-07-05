@@ -3,59 +3,51 @@
 
     <div class="main__authorization">
       <h1>Авторизация</h1>
-      <input type="text" v-model="auth.name" placeholder="Введите ваше имя пользователя" />
-      <input type="password" v-model="auth.password" placeholder="Введите пароль" />
-      <MainButton class="main__main-button" @click="login">Авторизоваться</MainButton>
+      <input type="text" v-model="state.auth.name" placeholder="Введите ваше имя пользователя" />
+      <input type="password" v-model="state.auth.password" placeholder="Введите пароль" />
+      <MainButton class="main__main-button" @click="setlogin">Авторизоваться</MainButton>
     </div>
 
-    <Loader v-if="loader" />
+    <Loader v-if="state.loader" />
 
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { IMainPages, adminData } from '@/types'
-import { mapActions } from 'vuex';
+<script lang="ts" setup>
+import { reactive } from 'vue';
+import { IMainPages } from '@/types'
 import { login } from '@/http/adminAPI'
 import { useToast } from 'vue-toastification';
-
+import { useAuth } from '@/store/useAuth';
+import { useRouter } from 'vue-router';
 
 const toast = useToast()
+const editorStore = useAuth();
+const router = useRouter()
 
-export default defineComponent({
-  data(): IMainPages {
-    return {
-      loader: false,
-      auth: {
-        name: "",
-        password: ""
-      },
-    }
+const state: IMainPages = reactive({
+  loader: false,
+  auth: {
+    name: "",
+    password: ""
   },
-  methods: {
-    ...mapActions({
-      storeAdminData: 'storeAdminData'
-    }),
-    
-    async login() {
-      try {
-        this.loader = true;
+})
 
-        const response = await login(this.auth.name, this.auth.password);
+const setlogin = async () => {
+  try {
+    state.loader = true;
+    const response: any = await login(state.auth.name, state.auth.password);
 
-        this.storeAdminData(response);
+    editorStore.setAdminData(response)
 
-        this.$router.push('/publishing-panel');
-      } catch (e: any) {
-        toast.error(e.response.data.message)
-      } finally {
-        this.loader = false;
-      }
+    router.push('/publishing-panel');
+  } catch (e: any) {
+    toast.error(e.response.data.message)
+  } finally {
+    state.loader = false;
+  }
 
-    }
-  },
-});
+}
 </script>
 
 <style lang="scss">

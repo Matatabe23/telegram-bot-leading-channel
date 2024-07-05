@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { IStoreState, IPosts, IPublishTime } from '@/types';
+import { IStoreState } from '@/store/type/posts.i';
 import { receiving } from '@/http/postsAPI';
 
 export const usePosts = defineStore('posts', {

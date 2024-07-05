@@ -1,11 +1,9 @@
 import { createApp } from 'vue'
 import App from '@/App.vue'
 import router from '@/router'
-import store from '@/store'
 import { createPinia } from 'pinia';
 
 import componentUI from '@/components/UI'
-import componentPanels from '@/components/Panel'
 
 import Toast, { POSITION } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
@@ -13,7 +11,7 @@ import 'vue-toastification/dist/index.css'
 const pinia = createPinia();
 const app = createApp(App)
 
-const components = [...componentUI, ...componentPanels];
+const components = [...componentUI];
 components.forEach((component: any) => {
   app.component(component.name, component);
 });
@@ -35,5 +33,4 @@ app.use(Toast, {
 app
   .use(router)
   .use(pinia)
-  .use(store)
   .mount('#app')

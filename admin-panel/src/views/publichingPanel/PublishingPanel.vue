@@ -1,18 +1,18 @@
 <template>
   <div class="publishing-panel">
-    <publish />
+    <Publish />
     <PublishPosts @post-panel="openPostPanel" />
 
-    <postPanel v-if="state.postPanel" :images="state.images" @close="closePostPanel" />
+    <PostPanel v-if="state.postPanel" :images="state.images" @close="closePostPanel" />
     <div class="publishing-panel__overplay" v-if="state.overlay" @click="closePostPanel" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { reactive } from 'vue';
-import publish from '@/views/publichingPanel/Publish.vue'
+import Publish from '@/views/publichingPanel/Publish.vue'
 import PublishPosts from '@/views/publichingPanel/PublishPosts.vue'
-import postPanel from '@/components/form/postPanel/postPanel.vue'
+import PostPanel from '@/components/form/postPanel/PostPanel.vue'
 import { receivingPost } from '@/http/postsAPI';
 
 const state = reactive({

@@ -44,17 +44,15 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import { publication, instantPublicationPosts } from '@/http/postsAPI';
 import { IPublish } from '@/types';
 import { useToast } from 'vue-toastification';
 import { usePosts } from '@/store/usePosts';
-import { storeToRefs } from 'pinia';
 
 
 const toast = useToast()
 const editorStore = usePosts();
-const { postsList, totalCount, publishTime, isLoader, form } = storeToRefs(editorStore);
 
 const folderInput = ref('')
 
@@ -152,7 +150,6 @@ const handleFolderSelection = async (event: any) => {
         toast.error('Ошибка в работе с файлами')
         return
       }
-
 
       if (number !== null) {
         if (!groupedFiles[number]) {

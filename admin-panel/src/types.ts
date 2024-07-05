@@ -1,22 +1,9 @@
-export interface authInfo {
-  name: string,
-  password: string
-}
-
 export interface IMainPages {
   loader: boolean,
-  auth: authInfo,
-}
-
-export interface adminData {
-  id: number,
-  name: string,
-  role: string
-}
-
-export interface AuthState {
-  adminData: adminData | null,
-  auth: boolean
+  auth: {
+    name: string,
+    password: string
+  },
 }
 
 export interface IPublish {
@@ -41,27 +28,6 @@ export interface IImageData {
   updatedAt: string
 }
 
-export interface IPosts {
-  createdAt: string,
-  updatedAt: string,
-  id: number,
-  imageData: IImageData[]
-}
-
-export interface IPublishTime {
-  createdAt: string,
-  hour: string,
-  id: number,
-  minute: string,
-  updatedAt: string
-}
-
-export interface IPostsList {
-  posts: IPosts[],
-  publishTime: IPublishTime,
-  totalCount: number
-}
-
 export interface IPublishPosts {
   loaderPosts: boolean,
   currentPage: number,
@@ -82,13 +48,18 @@ export interface IAddingPublicationTimeSettings {
   listPublicationTimes: IGetListRegularPublicationTimes[]
 }
 
-export interface IStoreState {
-  isLoader: boolean,
-  postsList: IPosts[],
-  totalCount: number,
-  publishTime: IPublishTime[],
-  form: {
-    currentPage: number,
-    postsPerPage: number
-  }
+export interface IPosts {
+  createdAt: string,
+  updatedAt: string,
+  id: number,
+  imageData: IImageData[]
 }
+
+export interface IPublishTime {
+  createdAt: string,
+  hour: string,
+  id: number,
+  minute: string,
+  updatedAt: string
+}
+
