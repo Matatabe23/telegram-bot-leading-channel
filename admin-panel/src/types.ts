@@ -61,3 +61,9 @@ export interface IPublishTime {
   updatedAt: string
 }
 
+export interface IImageBlock {
+  id: number,
+  image: string,
+  dataBasePostId: number
+}
+

@@ -17,6 +17,7 @@ const administrators = db.define('administrators', {
 
 const dataBasePost = db.define('dataBasePost', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  watched: { type: DataTypes.BOOLEAN, defaultValue: false }
 })
 
 const imageData = db.define('imageData', {
@@ -26,8 +27,8 @@ const imageData = db.define('imageData', {
 
 const regularPublicationTime = db.define('regularPublicationTime', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  hour: {type: DataTypes.STRING},
-  minute: {type: DataTypes.STRING}
+  hour: { type: DataTypes.STRING },
+  minute: { type: DataTypes.STRING }
 })
 
 dataBasePost.hasMany(imageData);

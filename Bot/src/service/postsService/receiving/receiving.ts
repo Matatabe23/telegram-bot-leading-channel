@@ -1,12 +1,21 @@
 import { dataBasePost, imageData, regularPublicationTime } from '../../../models/models.js';
 import { S3_BUCKET_NAME, S3_PATH } from "../../../const/constENV.js";
 
-export async function receiving(page: number, pageSize: number) {
+export async function receiving(page: number, pageSize: number, watched?: string) {
   if (isNaN(page) || isNaN(pageSize)) {
     throw new Error('Неверный формат параметров запроса');
   }
 
   const offset = (page - 1) * pageSize;
+
+  let whereCondition: {
+    watched?: boolean
+  } = {};
+  if (watched === 'watched') {
+    whereCondition = { ...whereCondition, watched: true }
+  } else if (watched === 'unwatched') {
+    whereCondition = { ...whereCondition, watched: false }
+  }
 
   const posts = await dataBasePost.findAll({
     include: [{
@@ -14,9 +23,13 @@ export async function receiving(page: number, pageSize: number) {
       limit: 1
     }],
     limit: pageSize,
-    offset: offset
+    offset: offset,
+    where: whereCondition
   });
-  const totalCount = await dataBasePost.count();
+
+  const totalCount = await dataBasePost.count({
+    where: whereCondition
+  });
 
   const updatedPosts = posts.map(post => {
     post.dataValues.imageData = post.dataValues.imageData.map(img => {

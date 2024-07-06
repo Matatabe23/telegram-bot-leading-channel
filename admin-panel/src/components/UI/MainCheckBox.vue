@@ -1,6 +1,6 @@
 <template>
   <div class="main-check-box" @click="setCheckBox()">
-    <input type="checkbox" :checked="modelValue" :style="{ width: width, height: height }">
+    <input type="checkbox" class="main-check-box__input" :checked="modelValue" :style="{ width: width, height: height }">
     {{ label }}
   </div>
 </template>
@@ -46,5 +46,9 @@ export default defineComponent({
   background-color: var(--button-color);
   cursor: pointer;
   user-select: none;
+
+  &__input{
+    cursor: pointer;
+  }
 }
 </style>

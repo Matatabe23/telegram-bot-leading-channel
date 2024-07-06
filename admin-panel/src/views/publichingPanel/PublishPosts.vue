@@ -1,11 +1,16 @@
 <template>
   <div class="posts">
-    <div class="posts__header" v-if="totalCount">
+    <div class="posts__header">
       <div class="posts__info">
-        <div>Всего постов: {{ totalCount }}</div>
+        <div v-if="totalCount">Всего постов: {{ totalCount }}</div>
         <div v-if="lastPublishDate">Крайняя дата публикации: {{ lastPublishDate }}</div>
       </div>
       <div class="posts__download">
+        <select @change="updateWatched" v-model="form.watched" class="posts__select-watched">
+          <option value="">Нечего</option>
+          <option value="watched">Просмотренные</option>
+          <option value="unwatched">Не просмотренные</option>
+        </select>
         <MainButton class="posts__deleteButton" @click="downloadSqlDataBases">Скачать базу данных SQL</MainButton>
       </div>
     </div>
@@ -20,7 +25,7 @@
           <h2 class="posts__postTitle">id: {{ post.id }}</h2>
           <div class="posts__controle-buttons">
             <MainButton class="posts__deleteButton" @click=delPost(post.id)>Удалить</MainButton>
-            <MainButton class="posts__openButton" @click="$emit('post-panel', post.id)">Открыть</MainButton>
+            <MainButton class="posts__openButton" @click="router.push(`post/${post.id}`)">Открыть</MainButton>
             <MainButton class="posts__pushButton" @click=publishInstantlyPost(post.id)>Опубликовать</MainButton>
           </div>
         </div>
@@ -49,23 +54,24 @@ import { deletePost, publishInstantly } from '@/http/postsAPI'
 import { useToast } from 'vue-toastification';
 import { usePosts } from '@/store/usePosts';
 import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
+import { watch } from 'fs';
 
 
 const toast = useToast()
 const editorStore = usePosts();
+const router = useRouter()
 const { postsList, totalCount, publishTime, form } = storeToRefs(editorStore);
-
-const emit = defineEmits(['get-posts', 'post-panel']);
 
 
 const setPage = (page: number) => {
-  editorStore.setStateValueByKey('form', {...form.value, currentPage: page});
+  editorStore.setStateValueByKey('form', { ...form.value, currentPage: page });
   editorStore.getPosts();
 }
 
 const updatePostsPerPage = async (event: Event) => {
   const value = (event.target as HTMLSelectElement).value;
-  editorStore.setStateValueByKey('form', {...form.value, postsPerPage: parseInt(value, 10), currentPage: 1});
+  editorStore.setStateValueByKey('form', { ...form.value, postsPerPage: parseInt(value, 10), currentPage: 1 });
   editorStore.getPosts();
 }
 
@@ -74,14 +80,14 @@ const delPost = async (id: number) => {
     if (!confirm('Вы уверены, что хотите удалить пост?')) {
       return;
     }
-    editorStore.setIsLoader(true)
+    editorStore.setStateValueByKey('isLoader', true);
     const result = await deletePost(id);
     toast.success(result)
     editorStore.getPosts();
   } catch (e) {
 
-  } finally{
-    editorStore.setIsLoader(false)
+  } finally {
+    editorStore.setStateValueByKey('isLoader', false);
   }
 }
 
@@ -90,12 +96,14 @@ const publishInstantlyPost = async (id: number) => {
     if (!confirm('Вы уверены, что хотите опубликовать пост?')) {
       return;
     }
-    editorStore.setIsLoader(true)
+    editorStore.setStateValueByKey('isLoader', true);
     const result = await publishInstantly(id);
     toast.success(result);
     editorStore.getPosts();
   } catch (e: any) {
     toast.error(e.response.data);
+  } finally {
+    editorStore.setStateValueByKey('isLoader', false);
   }
 }
 
@@ -141,7 +149,17 @@ const lastPublishDate = computed(() => {
   return lastPostDate.toLocaleDateString();
 })
 
+const updateWatched = (event: Event) => {
+  const value = (event.target as HTMLSelectElement).value;
+
+  localStorage.setItem('watched', JSON.stringify(value))
+  editorStore.setStateValueByKey('form', { ...form.value, watched: value});
+  editorStore.getPosts();
+}
+
 onMounted(() => {
+  const watched = JSON.parse(localStorage.getItem('watched') || '');
+  editorStore.setStateValueByKey('form', { ...form.value, watched});
   editorStore.getPosts();
 })
 </script>
@@ -258,6 +276,10 @@ onMounted(() => {
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
+  }
+
+  &__select-watched{
+    margin-right: 20px;
   }
 }
 </style>

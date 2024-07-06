@@ -1,4 +1,5 @@
 import { $host, $autHost } from "@/http/index";
+import { IImageBlock } from '@/types'
 
 // Функция публикации поста
 export const publication = async (files: FileList, waterMark: boolean) => {
@@ -21,8 +22,8 @@ export const instantPublicationPosts = async (files: FileList, waterMark: boolea
   return data;
 }
 
-export const receiving = async (page: number, pageSize: number) => {
-  const { data } = await $autHost.get('api/posts/receiving', { params: { page, pageSize } });
+export const receiving = async (page: number, pageSize: number, watched?: string) => {
+  const { data } = await $autHost.get('api/posts/receiving', { params: { page, pageSize, watched } });
   return data;
 }
 
@@ -38,5 +39,15 @@ export const publishInstantly = async (id: number) => {
 
 export const receivingPost = async (id: number) => {
   const { data } = await $autHost.get(`api/posts/receivingPost/${id}`);
+  return data;
+}
+
+export const changePage = async (id: number, where: string, watched: string) => {
+  const { data } = await $autHost.get(`api/posts/changePage/${id}`, { params: { where, watched } });
+  return data;
+}
+
+export const deleteSelectedImgs = async (idList: IImageBlock) => {
+  const { data } = await $autHost.get(`api/posts/deleteSelectedImgs`, { params: { idList } });
   return data;
 }

@@ -10,7 +10,8 @@ export const usePosts = defineStore('posts', {
     publishTime: [],
     form: {
       currentPage: 1,
-      postsPerPage: 3
+      postsPerPage: 3,
+      watched: ''
     }
   }),
 
@@ -26,7 +27,7 @@ export const usePosts = defineStore('posts', {
 
     async getPosts() {
       try {
-        const posts = await receiving(this.form.currentPage, this.form.postsPerPage);
+        const posts = await receiving(this.form.currentPage, this.form.postsPerPage, this.form.watched);
         this.postsList = posts.posts;
         this.totalCount = posts.totalCount;
         this.publishTime = posts.publishTime;

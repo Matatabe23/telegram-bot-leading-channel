@@ -25,3 +25,9 @@ export interface IAdministratorRole {
   AdminslistAccess: boolean,
   ChangeInfo: string[]
 }
+
+export interface IImageBlock {
+  id: number,
+  image: string,
+  dataBasePostId: number
+}

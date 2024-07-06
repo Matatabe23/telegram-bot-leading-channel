@@ -7,6 +7,7 @@ export interface IStoreState {
   publishTime: IPublishTime[],
   form: {
     currentPage: number,
-    postsPerPage: number
+    postsPerPage: number,
+    watched: string
   }
 }

@@ -12,7 +12,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useAuth } from '@/store/useAuth';
 import { usePosts } from '@/store/usePosts';
 import { storeToRefs } from 'pinia';
-import TreePanel from '@/components/Panel/TreePanel/ThreePanel.vue'
+import TreePanel from '@/components/form/TreePanel/ThreePanel.vue'
 import Loader from '@/components/UI/Loader.vue'
 
 const router = useRouter()

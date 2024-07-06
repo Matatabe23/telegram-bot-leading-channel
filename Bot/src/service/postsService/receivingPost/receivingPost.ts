@@ -8,8 +8,14 @@ export async function receivingPost(id: number) {
   }
   const images = await imageData.findAll({ where: { dataBasePostId: id } });
   const imageList = images.map((item) => {
-    return `${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`;
+    return {
+      id: item.dataValues.id,
+      img: `${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`,
+      dataBasePostId: item.dataValues.dataBasePostId
+    };
   });
+
+  await post.update({ watched: true });
 
   return imageList
 }

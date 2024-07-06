@@ -7,10 +7,17 @@ const routes: Array<RouteRecordRaw> = [
     component: (): Promise<Component> => import('@/views/Main.vue'),
   },
   {
+    name: 'Панель публикации',
     path: '/publishing-panel',
     component: (): Promise<Component> => import('@/views/publichingPanel/PublishPage.vue'),
   },
   {
+    name: 'Пост',
+    path: '/post/:id',
+    component: (): Promise<Component> => import('@/views/post/postData.vue'),
+  },
+  {
+    name: 'Настройки',
     path: '/settings',
     component: (): Promise<Component> => import('@/views/settings/MainSettings.vue'),
   },

@@ -5,8 +5,9 @@ import { createPinia } from 'pinia';
 
 import componentUI from '@/components/UI'
 
-import Toast, { POSITION } from 'vue-toastification'
+import Toast from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import { toastOptions } from '@/useApp/toast'
 
 const pinia = createPinia();
 const app = createApp(App)
@@ -16,21 +17,8 @@ components.forEach((component: any) => {
   app.component(component.name, component);
 });
 
-app.use(Toast, {
-  position: POSITION.TOP_RIGHT,
-  timeout: 5000,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: true,
-  draggablePercent: 0.6,
-  showCloseButtonOnHover: false,
-  hideProgressBar: false,
-  closeButton: 'button',
-  icon: true,
-  rtl: false,
-});
-
 app
+  .use(Toast, toastOptions)
   .use(router)
   .use(pinia)
   .mount('#app')

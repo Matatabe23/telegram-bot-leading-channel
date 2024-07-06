@@ -1,20 +1,15 @@
 import multer from 'multer'
-import { dataBasePost, imageData } from '../models/models.js'
-import { instantPublicationPosts } from '../routerBot/instantPublicationPosts.js'
 import { multerPath } from '../const/const.js'
-import { uploadImageToS3 } from '../service/s3-service.js'
-import addWatermark from '../service/waterMark-service.js'
 import { Request, Response } from 'express';
-import { deleteImageFromS3 } from '../service/s3-service.js'
-import { S3_BUCKET_NAME, S3_PATH } from "../const/constENV.js";
 
-import {publication} from '../service/postsService/publication/publication.js'
-import {instantPublicationPost} from '../service/postsService/instantPublicationPosts/instantPublicationPosts.js'
-import {receiving} from '../service/postsService/receiving/receiving.js'
-import {deletePost} from '../service/postsService/deletePost/deletePost.js'
-import {publishInstantly} from '../service/postsService/publishInstantly/publishInstantly.js'
-import {receivingPost} from '../service/postsService/receivingPost/receivingPost.js'
-
+import { publication } from '../service/postsService/publication/publication.js'
+import { instantPublicationPost } from '../service/postsService/instantPublicationPosts/instantPublicationPosts.js'
+import { receiving } from '../service/postsService/receiving/receiving.js'
+import { deletePost } from '../service/postsService/deletePost/deletePost.js'
+import { publishInstantly } from '../service/postsService/publishInstantly/publishInstantly.js'
+import { receivingPost } from '../service/postsService/receivingPost/receivingPost.js'
+import { changePage } from '../service/postsService/changePage/changePage.js'
+import { deleteSelectedImgs } from '../service/postsService/deleteSelectedImgs/deleteSelectedImgs.js'
 
 const upload = multer({ dest: multerPath })
 
@@ -70,20 +65,21 @@ class PostsController {
     try {
       const page = req.query.page ? parseInt(req.query.page.toString()) : 1;
       const pageSize = req.query.pageSize ? parseInt(req.query.pageSize.toString()) : 10;
-  
-      const result = await receiving(page, pageSize)
-  
+      const watched = req.query.watched;
+
+      const result = await receiving(page, pageSize, watched)
+
       res.send({ ...result });
     } catch (error) {
       console.error(error);
       res.status(500).send('Server Error');
     }
   }
-  
+
   async deletePost(req: Request, res: Response) {
     try {
       const { id } = req.params;
- 
+
       const result = await deletePost(id);
 
       res.send(result);
@@ -96,7 +92,7 @@ class PostsController {
   async publishInstantly(req: Request, res: Response) {
     try {
       const { id } = req.params;
-  
+
       const result = await publishInstantly(id)
       res.send(result);
     } catch (error) {
@@ -110,6 +106,33 @@ class PostsController {
       const { id } = req.params;
 
       const result = await receivingPost(id)
+
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+    }
+  }
+
+  async changePage(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { where, watched } = req.query
+
+      const result = await changePage(id, where, watched);
+
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+    }
+  }
+
+  async deleteSelectedImgs(req: Request, res: Response) {
+    try {
+      const { idList } = req.query
+
+      const result = await deleteSelectedImgs(idList);
 
       res.send(result);
     } catch (error) {
