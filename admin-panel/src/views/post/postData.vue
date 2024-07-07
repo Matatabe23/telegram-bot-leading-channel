@@ -3,18 +3,14 @@
     <div class="post-panel__buttons">
       <MainButton @click="backPage">Предыдущий пост</MainButton>
       <MainButton @click="delPost">Удалить пост</MainButton>
-      <MainButton @click=>Сохранить изменения</MainButton>
-      <MainButton @click="nextPage">Следующий пост</MainButton>
-    </div>
-
-    <div class="post-panel__controle-buttons">
       <MainButton @click="deleteSelectedImg">Удалить выбранные изображения</MainButton>
+      <MainButton @click="nextPage">Следующий пост</MainButton>
     </div>
 
     <div class="post-panel__img-list">
       <div v-for="(photo, index) in state.images" :key="index" class="post-panel__img-item">
-        <img :src="photo.img" alt="Photo" class="post-panel__image">
-        <MainCheckBox height="20px" class="post-panel__delete-check-box"
+        <img :src="photo.img" alt="Photo" class="post-panel__image" @load="checkImageLoaded">
+        <MainCheckBox height="20px" class="post-panel__delete-check-box" v-if="state.imagesToLoad < 1"
           :model-value="state.checkListImage.some(checkId => checkId.id === photo.id)"
           @update:model-value="setValueSheckBox(photo)" />
       </div>
@@ -39,13 +35,21 @@ const { postsList, totalCount, publishTime, form } = storeToRefs(editorStore);
 
 const state = reactive({
   images: [],
-  checkListImage: []
+  checkListImage: [],
+  imagesToLoad: 0
 })
 
 const openPostPanel = async () => {
   const postId = Number(route.params.id);
   state.images = await receivingPost(postId);
 }
+
+const checkImageLoaded = () => {
+  state.imagesToLoad--;
+  if (state.imagesToLoad === 0) {
+    editorStore.setStateValueByKey('isLoader', false);
+  }
+};
 
 const delPost = async () => {
   try {
@@ -66,31 +70,43 @@ const delPost = async () => {
 
 const backPage = async () => {
   try {
+    state.images = []
     editorStore.setStateValueByKey('isLoader', true);
+
     const watched = JSON.parse(localStorage.getItem('watched') || '');
     const response = await changePage(Number(route.params.id), 'back', watched)
     router.push(response.postId.toString())
+
     state.images = response.imageList
   } catch (e) {
     router.push('/publishing-panel');
     toast.error('Пост не найден');
   } finally {
-    editorStore.setStateValueByKey('isLoader', false);
+    state.imagesToLoad = state.images.length;
+    if (state.imagesToLoad === 0) {
+      editorStore.setStateValueByKey('isLoader', false);
+    }
   }
 }
 
 const nextPage = async () => {
   try {
+    state.images = []
     editorStore.setStateValueByKey('isLoader', true);
+
     const watched = JSON.parse(localStorage.getItem('watched') || '');
     const response = await changePage(Number(route.params.id), 'next', watched)
     router.push(response.postId.toString())
+
     state.images = response.imageList
   } catch (e) {
     router.push('/publishing-panel');
     toast.error('Пост не найден');
   } finally {
-    editorStore.setStateValueByKey('isLoader', false);
+    state.imagesToLoad = state.images.length;
+    if (state.imagesToLoad === 0) {
+      editorStore.setStateValueByKey('isLoader', false);
+    }
   }
 }
 
@@ -166,10 +182,6 @@ onMounted(() => {
     position: absolute;
     top: 5px;
     right: 5px;
-  }
-
-  &__controle-buttons {
-    margin: 20px 100px;
   }
 }
 </style>
