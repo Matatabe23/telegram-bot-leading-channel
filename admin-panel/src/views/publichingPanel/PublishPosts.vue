@@ -152,13 +152,13 @@ const lastPublishDate = computed(() => {
 const updateWatched = (event: Event) => {
   const value = (event.target as HTMLSelectElement).value;
 
-  localStorage.setItem('watched', JSON.stringify(value))
+  localStorage.setItem('watched', (value))
   editorStore.setStateValueByKey('form', { ...form.value, watched: value});
   editorStore.getPosts();
 }
 
 onMounted(() => {
-  const watched = JSON.parse(localStorage.getItem('watched') || '');
+  const watched = localStorage.getItem('watched') || "";
   editorStore.setStateValueByKey('form', { ...form.value, watched});
   editorStore.getPosts();
 })
