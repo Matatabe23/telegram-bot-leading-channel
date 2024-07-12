@@ -73,13 +73,14 @@ const backPage = async () => {
     state.images = []
     editorStore.setStateValueByKey('isLoader', true);
 
-    const watched = JSON.parse(localStorage.getItem('watched') || '');
+    const watched = localStorage.getItem('watched') || ''
     const response = await changePage(Number(route.params.id), 'back', watched)
     router.push(response.postId.toString())
 
     state.images = response.imageList
   } catch (e) {
     router.push('/publishing-panel');
+    localStorage.setItem('watched', (''))
     toast.error('Пост не найден');
   } finally {
     state.imagesToLoad = state.images.length;
@@ -94,13 +95,14 @@ const nextPage = async () => {
     state.images = []
     editorStore.setStateValueByKey('isLoader', true);
 
-    const watched = JSON.parse(localStorage.getItem('watched') || '');
+    const watched = localStorage.getItem('watched') || ''
     const response = await changePage(Number(route.params.id), 'next', watched)
     router.push(response.postId.toString())
 
     state.images = response.imageList
   } catch (e) {
     router.push('/publishing-panel');
+    localStorage.setItem('watched', (''))
     toast.error('Пост не найден');
   } finally {
     state.imagesToLoad = state.images.length;
@@ -134,6 +136,7 @@ const deleteSelectedImg = async () => {
     editorStore.setStateValueByKey('isLoader', false);
   }
 }
+
 
 
 

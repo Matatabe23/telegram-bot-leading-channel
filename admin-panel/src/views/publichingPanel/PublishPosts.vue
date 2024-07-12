@@ -49,13 +49,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineComponent, onMounted, reactive } from 'vue';
+import { computed, onMounted } from 'vue';
 import { deletePost, publishInstantly } from '@/http/postsAPI'
 import { useToast } from 'vue-toastification';
 import { usePosts } from '@/store/usePosts';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
-import { watch } from 'fs';
 
 
 const toast = useToast()

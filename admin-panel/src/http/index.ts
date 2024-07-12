@@ -1,6 +1,6 @@
 import axios from 'axios'; 
 
-const url = 'http://77.222.37.32:5000/'
+const url = 'http://qugor.online:5000/'
 // const url = 'http://localhost:5000/'
 
 const $host = axios.create({
