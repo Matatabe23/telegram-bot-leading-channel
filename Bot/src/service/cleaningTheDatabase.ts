@@ -1,5 +1,5 @@
-import schedule, { Job } from 'node-schedule';
-import { S3Client, S3ClientConfig, PutObjectCommand, DeleteObjectCommand, PutBucketPolicyCommand, ListObjectsV2Command, PutObjectAclCommand } from "@aws-sdk/client-s3";
+import schedule from 'node-schedule';
+import { S3Client, S3ClientConfig, DeleteObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { S3_BUCKET_NAME, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, S3_FOLDER_SAVED, S3_PATH } from "../const/constENV.js";
 import { imageData } from '../models/models.js';
 

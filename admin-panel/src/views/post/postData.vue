@@ -24,14 +24,12 @@ import { receivingPost, deletePost, changePage } from '@/http/postsAPI';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { usePosts } from '@/store/usePosts';
-import { storeToRefs } from 'pinia';
 import { deleteSelectedImgs } from '@/http/postsAPI'
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const editorStore = usePosts();
-const { postsList, totalCount, publishTime, form } = storeToRefs(editorStore);
 
 const state = reactive({
   images: [],
@@ -126,7 +124,7 @@ const deleteSelectedImg = async () => {
     if (state.checkListImage.length >= 1) {
       editorStore.setStateValueByKey('isLoader', true);
       await deleteSelectedImgs(state.checkListImage);
-      openPostPanel()
+      openPostPanel();
     } else {
       toast.error('Нету выбранных img')
     }

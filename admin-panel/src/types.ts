@@ -43,7 +43,8 @@ export interface IGetListRegularPublicationTimes {
 export interface IAddingPublicationTimeSettings {
   hour: string,
   minute: string,
-  listPublicationTimes: IGetListRegularPublicationTimes[]
+  listPublicationTimes: IGetListRegularPublicationTimes[],
+  timeType: string
 }
 
 export interface IPosts {
@@ -65,5 +66,10 @@ export interface IImageBlock {
   id: number,
   image: string,
   dataBasePostId: number
+}
+
+export interface IOptionsFromSelect {
+  value: string;
+  label: string;
 }
 

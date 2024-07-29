@@ -11,9 +11,9 @@ export async function publication(files: any, waterMark: boolean) {
     let url: string
     if (waterMark === true) {
       await addWatermark(file)
-      url = await uploadImageToS3(file)
+      url = await uploadImageToS3(file, postId)
     } else {
-      url = await uploadImageToS3(file)
+      url = await uploadImageToS3(file, postId)
     }
 
     await imageData.create({

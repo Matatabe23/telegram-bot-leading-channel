@@ -12,11 +12,11 @@ const s3ClientConfig: S3ClientConfig = {
 };
 const s3Client = new S3Client(s3ClientConfig);
 
-export function uploadImageToS3(imagePath: any): Promise<string> {
+export function uploadImageToS3(imagePath: any, postId: number): Promise<string> {
   return new Promise((resolve, reject) => {
     const imgStream = fs.createReadStream(imagePath.path);
 
-    const fileName = `${S3_FOLDER_SAVED}/QugorArts_${Date.now()}.png`;
+    const fileName = `${S3_FOLDER_SAVED}/${Date.now()}_${postId}.png`;
 
     const params = {
       Bucket: S3_BUCKET_NAME,

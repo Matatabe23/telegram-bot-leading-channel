@@ -1,123 +1,143 @@
 <template>
   <div class="adding-publication-time-settings">
     <div class="adding-publication-time-settings__save-time">
-      <h3>Указать время постоянной публикации</h3>
-      <div class="adding-publication-time-settings__hour">
+      <h3>Настройка времени публикации</h3>
+      <div class="adding-publication-time-settings__type">
+        <label for="timeType">Канал:</label>
+        <select id="timeType" v-model="state.timeType">
+          <option value="constant">Постоянное</option>
+          <option value="regular">Регулярное</option>
+        </select>
+      </div>
+
+      <div class="adding-publication-time-settings__time">
         <label for="hourInput">Часы:</label>
-        <input id="hourInput" v-model="hour" type="string" min="0" max="24" placeholder="От 0 до 24">
-      </div>
-      <div class="adding-publication-time-settings__minute">
+        <select id="hourInput" v-model="state.hour">
+          <option v-for="h in 24" :key="h" :value="h">{{ h }}</option>
+        </select>
         <label for="minuteInput">Минуты:</label>
-        <input id="minuteInput" v-model="minute" type="string" min="0" max="59" placeholder="От 0 до 59">
+        <select id="minuteInput" v-model="state.minute">
+          <option v-for="m in 60" :key="m" :value="m">{{ m }}</option>
+        </select>
       </div>
+
       <MainButton @click="saveTime">Сохранить</MainButton>
-      <h3 v-if="listPublicationTimes.length">Время регулярной публикации</h3>
-      <div class="adding-publication-time-settings__list-time" v-for="listPublicationTime in listPublicationTimes">
+      <h3 v-if="state.listPublicationTimes.length">Время регулярной публикации</h3>
+      <div class="adding-publication-time-settings__list-time" v-for="listPublicationTime in state.listPublicationTimes"
+        :key="listPublicationTime.id">
         <div>
-          Часы:
-          {{ listPublicationTime.hour }}
+          Часы: {{ listPublicationTime.hour }}
         </div>
         <div>
-          Минуты:
-          {{ listPublicationTime.minute }}
+          Минуты: {{ listPublicationTime.minute }}
         </div>
         <MainButton @click="deleteTime(listPublicationTime.id)">Удалить</MainButton>
       </div>
     </div>
-
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { defineComponent, onMounted, reactive } from 'vue';
 import { addingPublicationTime, getListRegularPublicationTimes, deleteItemPublicationTimes } from '@/http/settingsAPI'
 import { IAddingPublicationTimeSettings } from '@/types'
 import { useToast } from 'vue-toastification';
 
-
 const toast = useToast()
 
-export default defineComponent({
-  data(): IAddingPublicationTimeSettings {
-    return {
-      hour: '',
-      minute: '',
-      listPublicationTimes: []
-    }
-  },
-  methods: {
-    async saveTime() {
-      try {
-        if (this.hour === '' || this.minute === '') {
-          toast.error('Заполните поля')
-          return
-        }
+const state: IAddingPublicationTimeSettings = reactive({
+  timeType: 'constant', // добавляем новое свойство для выбора типа времени
+  hour: '0',
+  minute: '0',
+  listPublicationTimes: []
+})
 
-        const result = await addingPublicationTime(this.hour, this.minute);
+const getList = async () => {
+  state.listPublicationTimes = await getListRegularPublicationTimes()
+}
 
-        if (result) {
-          this.getList();
-          toast.success('Успешное добавление!')
-          this.hour = ''
-          this.minute = ''
-        }
-      } catch (e: any) {
-        toast.error(e.response.data)
-      }
-    },
-    async getList() {
-      this.listPublicationTimes = await getListRegularPublicationTimes()
-    },
-    async deleteTime(id: number) {
-      const result = await deleteItemPublicationTimes(id);
-      toast.success(result);
-      await this.getList();
+const saveTime = async () => {
+  try {
+    if (state.hour === '' || state.minute === '') {
+      toast.error('Заполните поля')
+      return
     }
-  },
-  mounted() {
-    this.getList()
+
+    const result = await addingPublicationTime(state.hour, state.minute);
+
+    if (result) {
+      await getList();
+      toast.success('Успешное добавление!')
+      state.hour = '0'
+      state.minute = '0'
+    }
+  } catch (e: any) {
+    toast.error(e.response.data)
   }
+}
+
+const deleteTime = async (id: number) => {
+  const result = await deleteItemPublicationTimes(id);
+  toast.success(result);
+  await getList();
+}
+
+onMounted(() => {
+  getList()
 })
 </script>
 
 <style lang="scss">
 .adding-publication-time-settings {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   text-align: center;
+  margin: 20px;
 
   &__save-time {
-    background-color: rgb(100, 100, 100);
-    color: #fff;
-    margin: 50px auto;
-    border: 3px solid gray;
+    background-color: #2f2f2f;
+    color: #ffffff;
+    border: 1px solid #444;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
     border-radius: 10px;
-    border-bottom: 3px solid gray;
-    width: 450px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 350px;
+  }
+
+  &__type,
+  &__time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+
+    select {
+      padding: 10px;
+      margin: 0 5px;
+      border-radius: 5px;
+      border: 1px solid #555;
+      background-color: #3b3b3b;
+      color: #fff;
+    }
   }
 
   &__list-time {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
-    border: 3px solid gray;
+    margin-top: 10px;
+    border: 1px solid #444;
     border-radius: 5px;
     padding: 10px;
+    background-color: #333;
+    color: #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
   }
 
-  &__hour,
-  &__minute {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px 10%;
-
-    input {
-      padding: 10px;
-    }
+  button {
+    margin: 10px 0;
   }
 }
 </style>

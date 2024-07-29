@@ -1,10 +1,9 @@
-import TelegramBot from 'node-telegram-bot-api'
-import { scheduleFunctionExecution } from '../service/regularPublicationBot-service.js'
-import { TELEGRAM_BOT_API_TOKEN } from '../const/constENV.js'
+import TelegramBot from 'node-telegram-bot-api';
+import { scheduleFunctionExecution } from '../service/regularPublicationBot-service.js';
+import { TELEGRAM_BOT_API_TOKEN } from '../const/constENV.js';
 
-export const bot = new TelegramBot(TELEGRAM_BOT_API_TOKEN, { polling: true })
+export const bot = new TelegramBot(TELEGRAM_BOT_API_TOKEN, { polling: true });
 
-scheduleFunctionExecution()
+scheduleFunctionExecution();
 
 export default bot;
-
