@@ -34,9 +34,9 @@ import { useToast } from 'vue-toastification';
 import { usePosts } from '@/store/usePosts';
 import { storeToRefs } from 'pinia';
 import postCard from '@/components/form/postCard/postCard.vue'
-import mainSelect from '@/components/UI/mainSelect.vue'
+import mainSelect from '@/components/UI/mainSelect/mainSelect.vue'
 import { watchedOptions, perPage } from '@/const';
-import { IOptionsFromSelect } from '@/types'
+import { IOptionsFromSelect } from '@/components/UI/mainSelect/mainSelect.i'
 
 const toast = useToast()
 const editorStore = usePosts();

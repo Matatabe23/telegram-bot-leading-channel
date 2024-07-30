@@ -31,3 +31,8 @@ export interface IImageBlock {
   image: string,
   dataBasePostId: number
 }
+
+export enum IEditChannelType {
+  PRIVATED = 'privated',
+  DEFAULT_CHANNEL = 'defaultChannels'
+}

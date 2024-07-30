@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts" setup>
-import { IOptionsFromSelect } from '@/types'
+import { IOptionsFromSelect } from '@/components/UI/mainSelect/mainSelect.i'
 
 const props = defineProps<{
   modelValue: string | number;

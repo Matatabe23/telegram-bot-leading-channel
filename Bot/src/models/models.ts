@@ -31,7 +31,15 @@ const regularPublicationTime = db.define('regularPublicationTime', {
   minute: { type: DataTypes.STRING }
 })
 
+const channels = db.define('channels', {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+  chatId: { type: DataTypes.STRING },
+  privated: {type: DataTypes.BOOLEAN, defaultValue: false },
+  defaultChannels: {type: DataTypes.BOOLEAN, defaultValue: false },
+})
+
 dataBasePost.hasMany(imageData);
 imageData.belongsTo(dataBasePost);
 
-export { administrators, dataBasePost, imageData, regularPublicationTime }
+export { administrators, dataBasePost, imageData, regularPublicationTime, channels }

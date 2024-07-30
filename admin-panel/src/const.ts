@@ -9,3 +9,8 @@ export const perPage = [
   { value: '5', label: '5' },
   { value: '10', label: '10' }
 ];
+
+export const booleanSelect = [
+  { value: false, label: 'Нет' },
+  { value: true, label: 'Да' },
+];

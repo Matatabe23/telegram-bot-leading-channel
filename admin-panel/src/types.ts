@@ -47,6 +47,22 @@ export interface IAddingPublicationTimeSettings {
   timeType: string
 }
 
+export interface IGetListChannels {
+  id: number,
+  name: string,
+  chatId: string,
+  privated: boolean,
+  defaultChannels: boolean,
+  createdAt: string,
+  updatedAt: string
+}
+
+export interface IStateChannels {
+  name: string,
+  chatId: string,
+  listChannels: IGetListChannels[],
+}
+
 export interface IPosts {
   createdAt: string,
   updatedAt: string,
@@ -68,8 +84,8 @@ export interface IImageBlock {
   dataBasePostId: number
 }
 
-export interface IOptionsFromSelect {
-  value: string;
-  label: string;
+export enum IEditChannelType {
+  PRIVATED = 'privated',
+  DEFAULT_CHANNEL = 'defaultChannels'
 }
 
