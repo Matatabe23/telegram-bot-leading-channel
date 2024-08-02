@@ -28,6 +28,8 @@ export default async function sendMessageAtScheduledTime() {
     return;
   }
 
+  console.log(media)
+
   if (CHAT_ID) {
     bot.sendMediaGroup(CHAT_ID, media)
       .then(async () => {

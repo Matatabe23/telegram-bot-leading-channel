@@ -42,4 +42,3 @@ export async function instantPublicationPosts(files: any, stringArray?: boolean)
       });
   });
 }
-
