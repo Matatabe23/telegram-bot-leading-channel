@@ -13,11 +13,11 @@
       <div class="adding-publication-time-settings__time">
         <label for="hourInput">Часы:</label>
         <select id="hourInput" v-model="state.hour">
-          <option v-for="h in 24" :key="h" :value="h">{{ h }}</option>
+          <option v-for="h in 25" :key="h" :value="h - 1">{{ h - 1 }}</option>
         </select>
         <label for="minuteInput">Минуты:</label>
         <select id="minuteInput" v-model="state.minute">
-          <option v-for="m in 60" :key="m" :value="m">{{ m }}</option>
+          <option v-for="m in 61" :key="m" :value="m - 1">{{ m - 1 }}</option>
         </select>
       </div>
 
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineComponent, onMounted, reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 import { addingPublicationTime, getListRegularPublicationTimes, deleteItemPublicationTimes } from '@/http/settingsAPI'
 import { IAddingPublicationTimeSettings } from '@/types'
 import { useToast } from 'vue-toastification';
@@ -46,7 +46,7 @@ import { useToast } from 'vue-toastification';
 const toast = useToast()
 
 const state: IAddingPublicationTimeSettings = reactive({
-  timeType: 'constant', // добавляем новое свойство для выбора типа времени
+  timeType: 'constant',
   hour: '0',
   minute: '0',
   listPublicationTimes: []

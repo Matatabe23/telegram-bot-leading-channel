@@ -2,7 +2,22 @@ import { dataBasePost, imageData } from '../models/models.js';
 import { bot } from '../routerBot/index.js';
 import { deleteImageFromS3 } from '../service/s3-service.js';
 import { CHAT_ID } from '../const/constENV.js';
-import { S3_BUCKET_NAME, S3_PATH } from "../const/constENV.js";
+import { S3_BUCKET_NAME, S3_PATH } from '../const/constENV.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { downloadFile } from '../service/downloadFile.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const imageFolder = path.join(__dirname, '../image');
+
+fs.mkdir(imageFolder, { recursive: true }, (err) => {
+  if (err) {
+    console.error('Ошибка при создании папки:', err);
+  }
+});
 
 export default async function sendMessageAtScheduledTime() {
   const postWithImages: any = await dataBasePost.findOne({
@@ -12,14 +27,23 @@ export default async function sendMessageAtScheduledTime() {
 
   if (!postWithImages) return;
 
-  const media = postWithImages.imageData.map((item: any) => {
-    return {
-      type: 'photo',
-      media: `${S3_PATH}${S3_BUCKET_NAME}/${item.image}`,
-      id: item.id,
-      caption: '#QugorArts'
-    };
-  });
+  const media: any = [];
+
+  for (const item of postWithImages.imageData) {
+    const localFilePath = path.join(imageFolder, path.basename(item.image));
+    try {
+      await downloadFile(`${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`, localFilePath);
+      media.push({
+        type: 'photo',
+        media: fs.createReadStream(localFilePath),
+        id: item.id,
+        caption: '#QugorArts'
+      });
+    } catch (error) {
+      console.error('Ошибка при скачивании файла из S3:', error);
+      return;
+    }
+  }
 
   const postId = postWithImages.id;
 
@@ -28,21 +52,34 @@ export default async function sendMessageAtScheduledTime() {
     return;
   }
 
-  console.log(media)
-
   if (CHAT_ID) {
     bot.sendMediaGroup(CHAT_ID, media)
       .then(async () => {
-        media.map(async (item: any) => {
-          await imageData.destroy({
-            where: { id: item.id },
-          });
+        fs.readdir(imageFolder, (err, files) => {
+          if (err) {
+            console.error('Ошибка при чтении папки:', err);
+            return;
+          }
 
-          deleteImageFromS3(item.media);
+          files.forEach(file => {
+            const filePath = path.join(imageFolder, file);
+            fs.unlink(filePath, (err) => {
+              if (err) {
+                console.error('Ошибка при удалении файла:', err);
+              } else {
+                console.log('Файл успешно удален:', filePath);
+              }
+            });
+          });
         });
-        await dataBasePost.destroy({
-          where: { id: postId },
-        });
+
+        await Promise.all(
+          postWithImages.imageData.map(async (item: any) => {
+            await imageData.destroy({ where: { id: item.id } });
+            deleteImageFromS3(item.image);
+          })
+        );
+        await dataBasePost.destroy({ where: { id: postId } });
       })
       .catch((error: Error) => {
         console.error('Ошибка при отправке сообщения:', error);
