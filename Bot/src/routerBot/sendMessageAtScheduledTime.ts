@@ -4,21 +4,7 @@ import { deleteImageFromS3 } from '../service/s3-service.js';
 import { CHAT_ID } from '../const/constENV.js';
 import { S3_BUCKET_NAME, S3_PATH } from '../const/constENV.js';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import { downloadFile, deleteLocalFile } from '../utils/downloadFile.js';
-
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const imageFolder = path.join(__dirname, '../image');
-
-fs.mkdir(imageFolder, { recursive: true }, (err) => {
-  if (err) {
-    console.error('Ошибка при создании папки:', err);
-  }
-});
 
 export default async function sendMessageAtScheduledTime() {
   const postWithImages: any = await dataBasePost.findOne({
