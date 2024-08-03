@@ -7,7 +7,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { downloadFile } from '../service/downloadFile.js';
+import { downloadFile } from '../utils/downloadFile.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -32,7 +32,7 @@ export default async function sendMessageAtScheduledTime() {
   for (const item of postWithImages.imageData) {
     const localFilePath = path.join(imageFolder, path.basename(item.image));
     try {
-      await downloadFile(`${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`, localFilePath);
+      await downloadFile(`${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`);
       media.push({
         type: 'photo',
         media: fs.createReadStream(localFilePath),
