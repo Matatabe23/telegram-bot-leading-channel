@@ -7,7 +7,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { downloadFile } from '../utils/downloadFile.js';
+import { downloadFile, deleteLocalFile } from '../utils/downloadFile.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,12 +31,14 @@ export default async function sendMessageAtScheduledTime() {
   const media: any = [];
 
   for (const item of postWithImages.imageData) {
-    const localFilePath = path.join(imageFolder, path.basename(item.image));
+    let filePath: any = '';
     try {
-      await downloadFile(`${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`);
+      const result = await downloadFile(`${S3_PATH}${S3_BUCKET_NAME}/${item.dataValues.image}`);
+      filePath = result;
+
       media.push({
         type: 'photo',
-        media: fs.createReadStream(localFilePath),
+        media: fs.createReadStream(filePath),
         id: item.id,
         caption: '#QugorArts'
       });
@@ -55,23 +58,8 @@ export default async function sendMessageAtScheduledTime() {
   if (CHAT_ID) {
     bot.sendMediaGroup(CHAT_ID, media)
       .then(async () => {
-        fs.readdir(imageFolder, (err, files) => {
-          if (err) {
-            console.error('Ошибка при чтении папки:', err);
-            return;
-          }
-
-          files.forEach(file => {
-            const filePath = path.join(imageFolder, file);
-            fs.unlink(filePath, (err) => {
-              if (err) {
-                console.error('Ошибка при удалении файла:', err);
-              } else {
-                console.log('Файл успешно удален:', filePath);
-              }
-            });
-          });
-        });
+        const deletePromises = postWithImages.imageData.map(file => deleteLocalFile(file.dataValues.image.split('/').pop()));
+        await Promise.all(deletePromises);
 
         await Promise.all(
           postWithImages.imageData.map(async (item: any) => {
