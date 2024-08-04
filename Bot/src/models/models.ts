@@ -35,11 +35,13 @@ const channels = db.define('channels', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING },
   chatId: { type: DataTypes.STRING },
-  privated: {type: DataTypes.BOOLEAN, defaultValue: false },
-  defaultChannels: {type: DataTypes.BOOLEAN, defaultValue: false },
+  settings: {type: DataTypes.STRING },
 })
 
 dataBasePost.hasMany(imageData);
 imageData.belongsTo(dataBasePost);
+
+channels.hasMany(regularPublicationTime);
+regularPublicationTime.belongsTo(channels);
 
 export { administrators, dataBasePost, imageData, regularPublicationTime, channels }

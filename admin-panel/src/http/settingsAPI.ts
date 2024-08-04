@@ -1,12 +1,13 @@
 import { $host, $autHost } from "@/http/index";
+import { IEditChannelType } from '@/types'
 
-export const addingPublicationTime = async (hour: string, minute: string) => {
-  const { data } = await $autHost.post('api/settings/addingPublicationTime', { hour, minute });
+export const addingPublicationTime = async (hour: string, minute: string, channelId: number) => {
+  const { data } = await $autHost.post('api/settings/addingPublicationTime', { hour, minute, channelId });
   return data;
 }
 
-export const getListRegularPublicationTimes = async () => {
-  const { data } = await $autHost.get('api/settings/getListRegularPublicationTimes');
+export const getListRegularPublicationTimes = async (channelId: number) => {
+  const { data } = await $autHost.get('api/settings/getListRegularPublicationTimes', { params: { channelId } });
   return data;
 }
 
@@ -30,7 +31,7 @@ export const deleteChannel = async (id: number) => {
   return data;
 }
 
-export const editChannel = async (id: number, value: boolean, type: string) => {
-  const { data } = await $autHost.put('api/settings/editChannel', { id, value, type } );
+export const editChannel = async (id: number, settings: string[]) => {
+  const { data } = await $autHost.put('api/settings/editChannel', { id, settings });
   return data;
 }

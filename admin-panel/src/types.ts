@@ -43,6 +43,7 @@ export interface IGetListRegularPublicationTimes {
 export interface IAddingPublicationTimeSettings {
   hour: string,
   minute: string,
+  channelId: number,
   listPublicationTimes: IGetListRegularPublicationTimes[],
   timeType: string
 }
@@ -51,16 +52,18 @@ export interface IGetListChannels {
   id: number,
   name: string,
   chatId: string,
-  privated: boolean,
-  defaultChannels: boolean,
+  settings: string,
   createdAt: string,
   updatedAt: string
 }
 
 export interface IStateChannels {
-  name: string,
-  chatId: string,
-  listChannels: IGetListChannels[],
+  form: {
+    name: string,
+    chatId: string,
+
+    listChannels: IGetListChannels[]
+  }
 }
 
 export interface IPosts {

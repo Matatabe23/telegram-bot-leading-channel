@@ -2,23 +2,24 @@
   <div class="adding-publication-time-settings">
     <div class="adding-publication-time-settings__save-time">
       <h3>Настройка времени публикации</h3>
-      <div class="adding-publication-time-settings__type">
-        <label for="timeType">Канал:</label>
-        <select id="timeType" v-model="state.timeType">
-          <option value="constant">Постоянное</option>
-          <option value="regular">Регулярное</option>
-        </select>
-      </div>
+      <v-select class="adding-publication-time-settings__select" :items="formattedChannels" 
+        label="Выберите канал" @update:model-value="selectChanel" variant="outlined"></v-select>
 
       <div class="adding-publication-time-settings__time">
-        <label for="hourInput">Часы:</label>
-        <select id="hourInput" v-model="state.hour">
-          <option v-for="h in 25" :key="h" :value="h - 1">{{ h - 1 }}</option>
-        </select>
-        <label for="minuteInput">Минуты:</label>
-        <select id="minuteInput" v-model="state.minute">
-          <option v-for="m in 61" :key="m" :value="m - 1">{{ m - 1 }}</option>
-        </select>
+        <v-select
+        id="hourInput"
+        v-model="state.hour"
+        :items="hoursSelectValue"
+        label="Часы"
+        variant="outlined"
+      ></v-select>
+      <v-select
+        id="minuteInput"
+        v-model="state.minute"
+        :items="minutesSelectValue"
+        label="Минуты"
+        variant="outlined"
+      ></v-select>
       </div>
 
       <MainButton @click="saveTime">Сохранить</MainButton>
@@ -38,22 +39,33 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { addingPublicationTime, getListRegularPublicationTimes, deleteItemPublicationTimes } from '@/http/settingsAPI'
-import { IAddingPublicationTimeSettings } from '@/types'
+import { IAddingPublicationTimeSettings, IGetListChannels } from '@/types'
 import { useToast } from 'vue-toastification';
+import { VSelect } from 'vuetify/components';
+
 
 const toast = useToast()
+
+const props = defineProps<{
+  listChannels: IGetListChannels[];
+}>();
+
+const emit = defineEmits<{
+  'get-list': [],
+}>();
 
 const state: IAddingPublicationTimeSettings = reactive({
   timeType: 'constant',
   hour: '0',
   minute: '0',
-  listPublicationTimes: []
+  channelId: 0,
+  listPublicationTimes: [],
 })
 
 const getList = async () => {
-  state.listPublicationTimes = await getListRegularPublicationTimes()
+  state.listPublicationTimes = await getListRegularPublicationTimes(state.channelId)
 }
 
 const saveTime = async () => {
@@ -63,7 +75,7 @@ const saveTime = async () => {
       return
     }
 
-    const result = await addingPublicationTime(state.hour, state.minute);
+    const result = await addingPublicationTime(state.hour, state.minute, state.channelId);
 
     if (result) {
       await getList();
@@ -82,9 +94,19 @@ const deleteTime = async (id: number) => {
   await getList();
 }
 
-onMounted(() => {
-  getList()
+const formattedChannels = computed(() => {
+  return props.listChannels.map(channel => (channel.name));
 })
+
+const selectChanel = (name: string | null) => {
+  const channel = props.listChannels.find(channel => channel.name === name);
+  state.channelId = Number(channel?.id)
+  getList()
+};
+
+const hoursSelectValue = computed(() => Array.from({ length: 25 }, (_, i) => i.toString()));
+const minutesSelectValue = computed(() => Array.from({ length: 61 }, (_, i) => i.toString()));
+
 </script>
 
 <style lang="scss">
@@ -106,12 +128,19 @@ onMounted(() => {
     width: 350px;
   }
 
-  &__type,
+  &__select {
+    margin-top: 10px;
+    .v-field__input {
+     // min-height: 20px;
+    }
+  }
+
   &__time {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin: 10px 0;
+    gap: 10px;
 
     select {
       padding: 10px;

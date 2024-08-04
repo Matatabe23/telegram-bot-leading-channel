@@ -4,39 +4,29 @@
       <h3>Добавить новый канал</h3>
 
       <div class="adding-new-channels__form">
-        <div class="adding-new-channels__form__block">
-          <label for="hourInput">Имя канала:</label>
-          <input type="text" v-model="state.name">
-        </div>
-        <div class="adding-new-channels__form__block">
-          <label for="minuteInput">айди чата:</label>
-          <input type="text" v-model="state.chatId">
-        </div>
+        <v-text-field clearable label="Имя канала" variant="outlined" v-model="state.form.name"></v-text-field>
+        <v-text-field clearable label="айди чата" variant="outlined" v-model="state.form.chatId"></v-text-field>
       </div>
 
       <MainButton @click="saveChannel">Сохранить</MainButton>
-      <h3 v-if="state.listChannels.length">Список чатов</h3>
-      <div class="adding-new-channels__list-channels" v-for="channel in state.listChannels" :key="channel.id">
+      <h3 v-if="props.listChannels.length">Список чатов</h3>
+      <div class="adding-new-channels__list-channels" v-for="channel in props.listChannels" :key="channel.id">
         <div>
           Имя чата: {{ channel.name }}
         </div>
         <div>
           Айди чата: {{ channel.chatId }}
         </div>
-        <div>
-          Приватность чата:
-          <select v-model="channel.privated" @change="updateDefaultChannel(channel.id, $event, IEditChannelType.PRIVATED)">
-            <option :value="true">Да</option>
-            <option :value="false">Нет</option>
-          </select>
-        </div>
-        <div>
-          Канал дефолтный:
-          <select v-model="channel.defaultChannels" @change="updateDefaultChannel(channel.id, $event, IEditChannelType.DEFAULT_CHANNEL)">
-            <option :value="true">Да</option>
-            <option :value="false">Нет</option>
-          </select>
-        </div>
+        <VSwitch hide-details label="Приватность чата"
+          @change="updateDefaultChannel(channel, IEditChannelType.PRIVATED)"
+          :model-value="channel.settings.includes(IEditChannelType.PRIVATED)">
+        </VSwitch>
+
+        <VSwitch hide-details label="Канал дефолтный"
+          @change="updateDefaultChannel(channel, IEditChannelType.DEFAULT_CHANNEL)"
+          :model-value="channel.settings.includes(IEditChannelType.DEFAULT_CHANNEL)">
+        </VSwitch>
+
         <MainButton @click="delChannel(channel.id)">Удалить</MainButton>
       </div>
     </div>
@@ -44,37 +34,47 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive } from 'vue';
-import { addingNewChannels, getListChannel, deleteChannel, editChannel } from '@/http/settingsAPI'
-import { IStateChannels, IEditChannelType } from '@/types'
+import { reactive, watch } from 'vue';
+import { addingNewChannels, deleteChannel, editChannel } from '@/http/settingsAPI'
+import { IStateChannels, IEditChannelType, IGetListChannels } from '@/types'
 import { useToast } from 'vue-toastification';
 
 const toast = useToast()
 
+const props = defineProps<{
+  listChannels: IGetListChannels[];
+}>();
+
+const emit = defineEmits<{
+  'get-list': [],
+}>();
+
 const state: IStateChannels = reactive({
-  name: '',
-  chatId: '',
-  listChannels: []
+  form: {
+    name: '',
+    chatId: '',
+    listChannels: []
+  }
 })
 
 const getList = async () => {
-  state.listChannels = await getListChannel()
+  emit('get-list')
 }
 
 const saveChannel = async () => {
   try {
-    if (state.name === '' || state.chatId === '') {
+    if (state.form.name === '' || state.form.chatId === '') {
       toast.error('Заполните поля')
       return
     }
 
-    const result = await addingNewChannels(state.name, state.chatId);
+    const result = await addingNewChannels(state.form.name, state.form.chatId);
 
     if (result) {
       await getList();
       toast.success('Успешное добавление!')
-      state.name = ''
-      state.chatId = ''
+      state.form.name = ''
+      state.form.chatId = ''
     }
   } catch (e: any) {
     toast.error(e.response.data)
@@ -87,19 +87,33 @@ const delChannel = async (id: number) => {
   await getList();
 }
 
-const updateDefaultChannel = async (channelId: number, event: Event, type: IEditChannelType) => {
-  try{
-    const isDefault = event.target.value
-    await editChannel(channelId, isDefault, type)
+const updateDefaultChannel = async (channel: IGetListChannels, type: IEditChannelType) => {
+  try {
+    const settings = channel.settings.length > 0 ? [...channel.settings.split(',')] : [];
+
+    if (settings.includes(type)) {
+      const index = settings.indexOf(type);
+      if (index > -1) {
+        settings.splice(index, 1);
+      }
+    } else if (!settings.includes(type)) {
+      settings.push(type)
+    }
+
+    await editChannel(channel.id, settings);
     await getList();
-  } catch(e){
-    //
+  } catch (e) {
+    console.error(e);
   }
 }
 
-  onMounted(() => {
-    getList()
-  })
+
+
+
+watch(() => props.listChannels, (value) => {
+  state.form.listChannels = value
+  console.log(state.form.listChannels.find(channel => channel.id === 3)?.settings)
+})
 </script>
 
 <style lang="scss">
@@ -122,22 +136,7 @@ const updateDefaultChannel = async (channelId: number, event: Event, type: IEdit
   }
 
   &__form {
-
-    &__block {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 5px;
-    }
-
-    input {
-      padding: 10px;
-      margin: 0 5px;
-      border-radius: 5px;
-      border: 1px solid #555;
-      background-color: #3b3b3b;
-      color: #fff;
-    }
+    margin-top: 15px;
   }
 
   &__list-channels {

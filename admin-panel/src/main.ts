@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from '@/App.vue'
 import router from '@/router'
 import { createPinia } from 'pinia';
+import vuetify from "@/plugins/vuetify";
 
 import componentUI from '@/components/UI'
 
@@ -21,4 +22,5 @@ app
   .use(Toast, toastOptions)
   .use(router)
   .use(pinia)
+  .use(vuetify)
   .mount('#app')

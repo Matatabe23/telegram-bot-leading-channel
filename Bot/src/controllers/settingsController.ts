@@ -7,12 +7,14 @@ import { addingNewChannels } from '../service/settingsService/addingNewChannels/
 import { deleteChannel } from '../service/settingsService/deleteChannel/deleteChannel.js'
 import { editChannel } from '../service/settingsService/editChannel/editChannel.js'
 
+import { IEditChannelType } from '../type/types.js';
+
 class AdministratorController {
   async addingPublicationTime(req: Request, res: Response) {
     try {
-      const { hour, minute } = req.body
+      const { hour, minute, channelId } = req.body
 
-      const result = await addingPublicationTime(hour, minute)
+      const result = await addingPublicationTime(hour, minute, channelId)
 
       res.json(result);
     } catch (error) {
@@ -22,10 +24,19 @@ class AdministratorController {
   }
 
   async getListRegularPublicationTimes(req: Request, res: Response) {
-    const list = await regularPublicationTime.findAll()
+    try {
+        const { channelId } = req.query;
+        const list = await regularPublicationTime.findAll({
+            where: { channelId: channelId }
+        });
 
-    res.json(list)
-  }
+        res.json(list);
+    } catch (error) {
+        console.error('Error fetching regular publication times:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
 
   async deleteItemPublicationTimes(req: Request, res: Response) {
     try {
@@ -41,9 +52,9 @@ class AdministratorController {
 
   async addingNewChannels(req: Request, res: Response) {
     try {
-      const { name, chatId, privated } = req.body;
+      const { name, chatId } = req.body;
 
-      const result = await addingNewChannels(name, chatId, privated)
+      const result = await addingNewChannels(name, chatId)
       res.json(result);
     } catch (error) {
       console.error(error);
@@ -52,7 +63,13 @@ class AdministratorController {
   }
 
   async getListChannel(req: Request, res: Response) {
-    const list = await channels.findAll()
+    const list = await channels.findAll({
+      include: [
+        {
+          model: regularPublicationTime,
+        }
+      ]
+    });
 
     res.json(list)
   }
@@ -71,9 +88,9 @@ class AdministratorController {
 
   async editChannel(req: Request, res: Response) {
     try {
-      const { id, value, type } = req.body;
+      const { id, settings } = req.body;
 
-      const result = await editChannel(id, value, type)
+      const result = await editChannel(id, settings)
 
       res.json(result);
     } catch (error) {
