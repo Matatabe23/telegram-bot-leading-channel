@@ -6,16 +6,14 @@ export interface IMainPages {
 }
 
 export interface IPublish {
-  isSettingsPanelOpen: boolean
   images: string[],
   imagePost: any,
-  waterMark: boolean,
-  instantPublication: boolean,
   processLoader: {
     overlay: boolean,
     total: number,
     loaded: number
-  }
+  },
+  settingsArray: string[]
 }
 
 export interface IImageData {

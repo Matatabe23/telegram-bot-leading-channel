@@ -1,7 +1,7 @@
 export const watchedOptions = [
-  { value: '', label: 'Нечего' },
-  { value: 'watched', label: 'Просмотренные' },
-  { value: 'unwatched', label: 'Не просмотренные' }
+  { value: '', title: 'Нечего' },
+  { value: 'watched', title: 'Просмотренные' },
+  { value: 'unwatched', title: 'Не просмотренные' }
 ];
 
 export const perPage = [
@@ -10,7 +10,7 @@ export const perPage = [
   { value: '10', label: '10' }
 ];
 
-export const booleanSelect = [
-  { value: false, label: 'Нет' },
-  { value: true, label: 'Да' },
+export const settingsSelectPublish = [
+  { value: 'waterMark', title: 'Водяной знак', subtitle: 'Engineering', },
+  { value: 'instantPublication', title: 'Опубликовать сразу', subtitle: 'Engineering', },
 ];

@@ -7,8 +7,6 @@ import { addingNewChannels } from '../service/settingsService/addingNewChannels/
 import { deleteChannel } from '../service/settingsService/deleteChannel/deleteChannel.js'
 import { editChannel } from '../service/settingsService/editChannel/editChannel.js'
 
-import { IEditChannelType } from '../type/types.js';
-
 class AdministratorController {
   async addingPublicationTime(req: Request, res: Response) {
     try {

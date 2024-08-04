@@ -9,33 +9,29 @@
 
       <div class="publishing-panel__publishes-form">
 
-        <div>
+        <v-btn color="#5865f2" variant="flat" @click="selectFile">
           <label for="file-upload" class="publishing-panel__custom-file-upload">
             <i class="fas fa-upload"></i> Загрузить файлы
           </label>
-          <input id="file-upload" type="file" multiple @change="handleFileUpload">
-        </div>
-        <div>
+          <input id="file-upload" type="file" ref="fileInput" multiple @change="handleFileUpload">
+        </v-btn>
+        <v-btn color="#5865f2" variant="flat" @click="selectFolder">
           <input type="file" id="file-upload" ref="folderInput" webkitdirectory @change="handleFolderSelection">
-          <label @click="selectFolder" class="publishing-panel__custom-file-upload">
+          <label  class="publishing-panel__custom-file-upload">
             <i class="fas fa-upload"></i> Загрузить несколько папок
           </label>
-        </div>
+        </v-btn>
 
-        <MainButton @click="state.isSettingsPanelOpen = !state.isSettingsPanelOpen">Настройки</MainButton>
-        <MainButton @click="publicationPost">Опубликовать</MainButton>
+        <div class="publishing-panel__select-settings">
+          <v-select label="Настройки" :items="settingsSelectPublish" multiple variant="outlined"
+            v-model="state.settingsArray"></v-select>
+        </div>
+        <v-btn variant="flat" @click="publicationPost" color="#5865f2">
+          Авторизоваться
+        </v-btn>
 
       </div>
     </div>
-
-    <div class="publishing-panel__settings-panel" v-if="state.isSettingsPanelOpen">
-      <div class="publishing-panel__close" @click="state.isSettingsPanelOpen = !state.isSettingsPanelOpen">✖</div>
-      <MainCheckBox label="Водяной знак" height="20px" v-model="state.waterMark" />
-      <MainCheckBox label="Опубликовать сразу" height="20px" v-model="state.instantPublication" />
-    </div>
-
-    <div class="publishing-panel__overlay" v-if="state.isSettingsPanelOpen"
-      @click="state.isSettingsPanelOpen = !state.isSettingsPanelOpen" />
 
     <ProcentLoader :overlay="state.processLoader.overlay" :total="state.processLoader.total"
       :loaded="state.processLoader.loaded" />
@@ -45,28 +41,30 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref, watch } from 'vue';
 import { publication, instantPublicationPosts } from '@/http/postsAPI';
-import { IPublish } from '@/types';
+import { IPublish, } from '@/types';
 import { useToast } from 'vue-toastification';
 import { usePosts } from '@/store/usePosts';
+import { settingsSelectPublish } from '@/const';
 
 
 const toast = useToast()
 const editorStore = usePosts();
 
 const folderInput = ref('')
+const fileInput = ref('')
+
 
 const state: IPublish = reactive({
-  isSettingsPanelOpen: false,
   images: [],
   imagePost: [],
-  waterMark: false,
-  instantPublication: false,
 
   processLoader: {
     overlay: false,
     total: 1,
     loaded: 0,
-  }
+  },
+
+  settingsArray: []
 })
 
 const handleFileUpload = async (event: any) => {
@@ -98,10 +96,10 @@ const publicationPost = async () => {
       return
     }
     let result
-    if (state.instantPublication) {
-      result = await instantPublicationPosts(state.imagePost, state.waterMark);
+    if (state.settingsArray.includes('instantPublication')) {
+      result = await instantPublicationPosts(state.imagePost, state.settingsArray.includes('waterMark'));
     } else {
-      result = await publication(state.imagePost, state.waterMark);
+      result = await publication(state.imagePost, state.settingsArray.includes('waterMark'));
     }
 
     if (result) {
@@ -118,18 +116,16 @@ const publicationPost = async () => {
 }
 
 const getSettings = async () => {
-  const waterMarkString = localStorage.getItem('waterMark');
-  const instantPublication = localStorage.getItem('instantPublication');
-  if (waterMarkString !== null) {
-    state.waterMark = JSON.parse(waterMarkString);
-  }
-  if (instantPublication !== null) {
-    state.instantPublication = JSON.parse(instantPublication);
-  }
+  const settingsArray = localStorage.getItem('settingsArray');
+  if (settingsArray !== null && JSON.parse(settingsArray).length > 0) state.settingsArray = JSON.parse(settingsArray).split(',');
 }
 
 const selectFolder = () => {
   folderInput.value.click()
+}
+
+const selectFile = () => {
+  fileInput.value.click()
 }
 
 const handleFolderSelection = async (event: any) => {
@@ -164,7 +160,7 @@ const handleFolderSelection = async (event: any) => {
 
     for (let i = 0; i < folderContent.length; i++) {
       const file = folderContent[i] as FileList;
-      await publication(file, state.waterMark);
+      await publication(file, state.settingsArray.includes('waterMark'));
       state.processLoader.loaded += 1
     }
 
@@ -177,13 +173,9 @@ const handleFolderSelection = async (event: any) => {
   }
 }
 
-watch(() => state.waterMark, (value) => {
-  localStorage.setItem('waterMark', JSON.stringify(value))
-})
-
-watch(() => state.instantPublication, (value) => {
-  localStorage.setItem('instantPublication', JSON.stringify(value))
-})
+watch(() => state.settingsArray, (value) => {
+  localStorage.setItem('settingsArray', JSON.stringify(value.join(',')))
+}, { deep: true })
 
 onMounted(() => {
   getSettings()
@@ -222,6 +214,7 @@ onMounted(() => {
 
   &__publishes-form {
     display: flex;
+    align-items: center;
     justify-content: space-around;
     width: 100%;
     padding: 20px 0;
@@ -234,9 +227,7 @@ onMounted(() => {
     cursor: pointer;
     font-size: 16px;
     color: #fff;
-    background-color: var(--button-color);
     border-radius: 5px;
-    padding: 10px 20px;
     transition: all 0.3s ease;
 
     &:hover {
@@ -264,6 +255,17 @@ onMounted(() => {
     top: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
+  }
+
+  &__select-settings {
+    width: 30%;
+    color: #fff;
+
+    .v-input__details {
+      min-height: 0;
+      padding: 0;
+      height: 0;
+    }
   }
 
   &__overlay {

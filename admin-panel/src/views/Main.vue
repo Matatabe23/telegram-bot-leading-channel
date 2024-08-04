@@ -3,9 +3,11 @@
 
     <div class="main__authorization">
       <h1>Авторизация</h1>
-      <input type="text" v-model="state.auth.name" placeholder="Введите ваше имя пользователя" />
-      <input type="password" v-model="state.auth.password" placeholder="Введите пароль" />
-      <MainButton class="main__main-button" @click="setlogin">Авторизоваться</MainButton>
+      <v-text-field clearable label="Логин" variant="outlined" v-model="state.auth.name"></v-text-field>
+      <v-text-field type='password' clearable label="Пароль" variant="outlined" v-model="state.auth.password"></v-text-field>
+      <v-btn variant="tonal" :loading="isLoader" @click="setlogin">
+        Авторизоваться
+      </v-btn>
     </div>
 
   </div>
@@ -19,11 +21,13 @@ import { useToast } from 'vue-toastification';
 import { useAuth } from '@/store/useAuth';
 import { useRouter } from 'vue-router';
 import { usePosts } from '@/store/usePosts';
+import { storeToRefs } from 'pinia';
 
 const toast = useToast()
 const editorStore = useAuth();
 const router = useRouter()
 const postsStore = usePosts();
+const { isLoader } = storeToRefs(postsStore);
 
 const state: IMainPages = reactive({
   auth: {
@@ -68,14 +72,10 @@ const setlogin = async () => {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     height: 300px;
-    width: 350px;
+    width: 400px;
   }
 
   input {
-    margin-bottom: 10px;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
     width: 280px;
   }
 

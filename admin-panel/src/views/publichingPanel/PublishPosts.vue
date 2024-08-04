@@ -5,8 +5,10 @@
         <div v-if="totalCount">Всего постов: {{ totalCount }}</div>
         <div v-if="lastPublishDate">Крайняя дата публикации: {{ lastPublishDate }}</div>
       </div>
-      <mainSelect class="posts__select-watched" :options="watchedOptions" v-model="form.watched"
-        @onChange="updateWatched" />
+      <div class="posts__select">
+        <v-select clearable label="Фильтр"  v-model="form.watched" :items="watchedOptions"
+          variant="outlined" @update:model-value="updateWatched"></v-select>
+      </div>
     </div>
 
 
@@ -22,7 +24,7 @@
             :class="{ 'active': pageNumber === form.currentPage }">{{ pageNumber }}</button>
           <button @click="setPage(lastPage)" :disabled="form.currentPage === lastPage">>></button>
           <mainSelect class="posts__select-watched" :options="perPage" v-model="form.postsPerPage"
-          @onChange="updatePostsPerPage" />
+            @onChange="updatePostsPerPage" />
     </div>
   </div>
 </template>
@@ -123,9 +125,9 @@ const lastPublishDate = computed(() => {
   return lastPostDate.toLocaleDateString();
 })
 
-const updateWatched = (value: IOptionsFromSelect) => {
-  localStorage.setItem('watched', (value.value))
-  editorStore.setStateValueByKey('form', { ...form.value, watched: value.value });
+const updateWatched = (value: string) => {
+  localStorage.setItem('watched', (value))
+  editorStore.setStateValueByKey('form', { ...form.value, watched: value });
   editorStore.getPosts();
 }
 
@@ -152,6 +154,10 @@ onMounted(() => {
 
   &__info {
     margin-bottom: 10px;
+  }
+
+  &__select {
+    width: 25%;
   }
 
   &__download {

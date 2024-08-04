@@ -9,7 +9,7 @@ class AdministratorController {
       const result = await login(name, password)
       return res.json({ ...result });
     } catch(e) {
-      console.log(e)
+      res.status(500).send('Ошибка')
     }
   }
 
