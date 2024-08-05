@@ -27,7 +27,7 @@
             v-model="state.settingsArray"></v-select>
         </div>
         <v-btn variant="flat" @click="publicationPost" color="#5865f2">
-          Авторизоваться
+          Опубликовать
         </v-btn>
 
       </div>
@@ -220,6 +220,8 @@ onMounted(() => {
     padding: 20px 0;
     border-top: 3px solid gray;
     border-radius: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   &__custom-file-upload {

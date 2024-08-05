@@ -1,4 +1,4 @@
-import { dataBasePost, imageData, regularPublicationTime } from '../../../models/models.js';
+import { dataBasePosts, imageData, regularPublicationTime } from '../../../models/models.js';
 import { S3_BUCKET_NAME, S3_PATH } from "../../../const/constENV.js";
 
 export async function receiving(page: number, pageSize: number, watched?: string) {
@@ -17,7 +17,7 @@ export async function receiving(page: number, pageSize: number, watched?: string
     whereCondition = { ...whereCondition, watched: false }
   }
 
-  const posts = await dataBasePost.findAll({
+  const posts = await dataBasePosts.findAll({
     include: [{
       model: imageData,
       limit: 1
@@ -27,7 +27,7 @@ export async function receiving(page: number, pageSize: number, watched?: string
     where: whereCondition
   });
 
-  const totalCount = await dataBasePost.count({
+  const totalCount = await dataBasePosts.count({
     where: whereCondition
   });
 

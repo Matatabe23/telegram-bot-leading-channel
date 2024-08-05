@@ -1,10 +1,14 @@
 <template>
   <div class="post-panel">
     <div class="post-panel__buttons">
-      <MainButton @click="backPage">Предыдущий пост</MainButton>
-      <MainButton @click="delPost">Удалить пост</MainButton>
-      <MainButton @click="deleteSelectedImg">Удалить выбранные изображения</MainButton>
-      <MainButton @click="nextPage">Следующий пост</MainButton>
+      <v-btn variant="flat" @click="backPage" color="#5865f2">Предыдущий пост</v-btn>
+      <v-btn variant="flat" @click="delPost" color="#5865f2">Удалить пост</v-btn>
+      <v-btn variant="flat" @click="deleteSelectedImg" color="#5865f2">Удалить выбранные изображения</v-btn>
+      <div class="post-panel__select-channel">
+        <v-select label="Каналы публикации" :items="channelsListSelect" multiple variant="outlined"
+          v-model="state.form.useChannelList" @update:model-value="updateChannelList"></v-select>
+      </div>
+      <v-btn variant="flat" @click="nextPage" color="#5865f2">Следующий пост</v-btn>
     </div>
 
     <div class="post-panel__img-list">
@@ -19,12 +23,12 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 import { receivingPost, deletePost, changePage } from '@/http/postsAPI';
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { usePosts } from '@/store/usePosts';
-import { deleteSelectedImgs } from '@/http/postsAPI'
+import { deleteSelectedImgs, editPostLinkСhannels } from '@/http/postsAPI'
 
 const route = useRoute()
 const router = useRouter()
@@ -34,12 +38,59 @@ const editorStore = usePosts();
 const state = reactive({
   images: [],
   checkListImage: [],
-  imagesToLoad: 0
+  imagesToLoad: 0,
+  channelsList: [],
+
+  form: {
+    useChannelList: []
+  }
 })
 
+
 const openPostPanel = async () => {
-  const postId = Number(route.params.id);
-  state.images = await receivingPost(postId);
+  try {
+    editorStore.setStateValueByKey('isLoader', false);
+    state.form.useChannelList = []
+    state.images = []
+
+    const response = await receivingPost(Number(route.params.id));
+    state.images = response.imageList;
+    state.channelsList = response.channelsList;
+    state.form.useChannelList = response.channelsPost?.map(item => item.id)
+  } catch (e) {
+    router.push('/publishing-panel');
+    localStorage.setItem('watched', (''))
+    toast.error('Пост не найде');
+  } finally {
+    state.imagesToLoad = state.images.length;
+    if (state.imagesToLoad === 0) {
+      editorStore.setStateValueByKey('isLoader', false);
+    }
+  }
+}
+
+const switchPostPanel = async (who: string) => {
+  try {
+    editorStore.setStateValueByKey('isLoader', true);
+    state.form.useChannelList = []
+    state.images = []
+    const watched = localStorage.getItem('watched') || ''
+
+    const response = await changePage(Number(route.params.id), who, watched)
+    state.images = response.imageList;
+    state.channelsList = response.channelsList;
+    state.form.useChannelList = response.channelsPost?.map(item => item.id)
+    router.push(response.postId.toString())
+  } catch (e) {
+    router.push('/publishing-panel');
+    localStorage.setItem('watched', (''))
+    toast.error('Пост не найде');
+  } finally {
+    state.imagesToLoad = state.images.length;
+    if (state.imagesToLoad === 0) {
+      editorStore.setStateValueByKey('isLoader', false);
+    }
+  }
 }
 
 const checkImageLoaded = () => {
@@ -56,9 +107,8 @@ const delPost = async () => {
     }
     editorStore.setStateValueByKey('isLoader', true);
     const result = await deletePost(Number(route.params.id));
-    toast.success(result)
-    editorStore.getPosts();
     nextPage()
+    toast.success(result)
   } catch (e) {
 
   } finally {
@@ -67,47 +117,11 @@ const delPost = async () => {
 }
 
 const backPage = async () => {
-  try {
-    state.images = []
-    editorStore.setStateValueByKey('isLoader', true);
-
-    const watched = localStorage.getItem('watched') || ''
-    const response = await changePage(Number(route.params.id), 'back', watched)
-    router.push(response.postId.toString())
-
-    state.images = response.imageList
-  } catch (e) {
-    router.push('/publishing-panel');
-    localStorage.setItem('watched', (''))
-    toast.error('Пост не найден');
-  } finally {
-    state.imagesToLoad = state.images.length;
-    if (state.imagesToLoad === 0) {
-      editorStore.setStateValueByKey('isLoader', false);
-    }
-  }
+  switchPostPanel('back')
 }
 
 const nextPage = async () => {
-  try {
-    state.images = []
-    editorStore.setStateValueByKey('isLoader', true);
-
-    const watched = localStorage.getItem('watched') || ''
-    const response = await changePage(Number(route.params.id), 'next', watched)
-    router.push(response.postId.toString())
-
-    state.images = response.imageList
-  } catch (e) {
-    router.push('/publishing-panel');
-    localStorage.setItem('watched', (''))
-    toast.error('Пост не найден');
-  } finally {
-    state.imagesToLoad = state.images.length;
-    if (state.imagesToLoad === 0) {
-      editorStore.setStateValueByKey('isLoader', false);
-    }
-  }
+  switchPostPanel('next')
 }
 
 const setValueSheckBox = async (value: any) => {
@@ -135,8 +149,13 @@ const deleteSelectedImg = async () => {
   }
 }
 
+const channelsListSelect = computed(() =>
+  state.channelsList.map(item => ({ title: item.name, value: item.id }))
+);
 
-
+const updateChannelList = async () => {
+  await editPostLinkСhannels(Number(route.params.id), state.form.useChannelList)
+}
 
 onMounted(() => {
   openPostPanel()
@@ -150,12 +169,15 @@ onMounted(() => {
   &__buttons {
     display: flex;
     justify-content: space-around;
+    align-items: center;
     margin: 80px auto 0 auto;
     border: 3px solid grey;
     background-color: rgb(81, 86, 86);
     border-radius: 15px;
     width: 90%;
     padding: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   &__img-list {
@@ -166,6 +188,17 @@ onMounted(() => {
     gap: 10px;
     width: 100%;
     margin: 50px 0;
+  }
+
+  &__select-channel {
+    min-width: 30%;
+    color: #fff;
+
+    .v-input__details {
+      min-height: 0;
+      padding: 0;
+      height: 0;
+    }
   }
 
   &__img-item {

@@ -1,10 +1,8 @@
-import { dataBasePost, imageData } from '../../../models/models.js';
+import { dataBasePosts, imageData, channels } from '../../../models/models.js';
 import { S3_BUCKET_NAME, S3_PATH } from "../../../const/constENV.js";
 import { Op } from 'sequelize';
 
 export async function changePage(id: number, where: string, watched: string) {
-  let post;
-
   let whereCondition: {
     watched?: boolean
   } = {};
@@ -14,33 +12,38 @@ export async function changePage(id: number, where: string, watched: string) {
     whereCondition = { ...whereCondition, watched: false }
   }
 
-  if (where === 'next') {
-    post = await dataBasePost.findOne({
-      where: {
-        id: {
-          [Op.gt]: id
-        }, 
-        ...whereCondition
-      },
-      order: [['id', 'ASC']]
-    });
-  } else if (where === 'back') {
-    post = await dataBasePost.findOne({
-      where: {
-        id: {
-          [Op.lt]: id
-        }, 
-        ...whereCondition
-      },
-      order: [['id', 'DESC']]
-    });
-  }
+  const condition = where === 'next' 
+  ? { [Op.gt]: id } 
+  : where === 'back' 
+  ? { [Op.lt]: id } 
+  : null;
+
+const order = where === 'next' 
+  ? [['id', 'ASC']] 
+  : where === 'back' 
+  ? [['id', 'DESC']] 
+  : [['id', 'ASC']];
+
+
+  const post = await dataBasePosts.findOne({
+    include: [
+      { model: channels },
+      { model: imageData },
+    ],
+    where: {
+      id: condition,
+      ...whereCondition
+    },
+    ...order
+  });
+
+  const channelsList = await channels.findAll();
 
   if (!post) {
     throw new Error('Пост не найден');
   }
 
-  const images = await imageData.findAll({ where: { dataBasePostId: post.id } });
+  const images = await imageData.findAll({ where: { dataBasePostId: post.dataValues.id } });
   const imageList = images.map((item) => {
     return {
       id: item.dataValues.id,
@@ -51,5 +54,5 @@ export async function changePage(id: number, where: string, watched: string) {
 
   await post.update({ watched: true });
 
-  return { postId: post.id, imageList };
+  return { postId: post.dataValues.id, imageList, channelsPost: post.dataValues.channels, channelsList };
 }

@@ -15,7 +15,7 @@ const administrators = db.define('administrators', {
   role: { type: DataTypes.STRING, defaultValue: EAdministratorRole.USER },
 })
 
-const dataBasePost = db.define('dataBasePost', {
+const dataBasePosts = db.define('dataBasePosts', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   watched: { type: DataTypes.BOOLEAN, defaultValue: false }
 })
@@ -35,13 +35,33 @@ const channels = db.define('channels', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   name: { type: DataTypes.STRING },
   chatId: { type: DataTypes.STRING },
-  settings: {type: DataTypes.STRING },
+  settings: { type: DataTypes.STRING },
 })
 
-dataBasePost.hasMany(imageData);
-imageData.belongsTo(dataBasePost);
+const ChannelPosts = db.define('ChannelPosts', {
+  channelId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: channels,
+      key: 'id'
+    }
+  },
+  postId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: dataBasePosts,
+      key: 'id'
+    }
+  }
+})
+
+dataBasePosts.hasMany(imageData);
+imageData.belongsTo(dataBasePosts);
 
 channels.hasMany(regularPublicationTime);
 regularPublicationTime.belongsTo(channels);
 
-export { administrators, dataBasePost, imageData, regularPublicationTime, channels }
+channels.belongsToMany(dataBasePosts, { through: ChannelPosts });
+dataBasePosts.belongsToMany(channels, { through: ChannelPosts });
+
+export { administrators, dataBasePosts, imageData, regularPublicationTime, channels, ChannelPosts }

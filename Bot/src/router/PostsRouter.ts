@@ -11,5 +11,6 @@ router.post('/publishInstantly/:id', authMiddleware, postsController.publishInst
 router.get('/receivingPost/:id', authMiddleware, postsController.receivingPost)
 router.get('/changePage/:id', authMiddleware, postsController.changePage)
 router.get('/deleteSelectedImgs', authMiddleware, postsController.deleteSelectedImgs)
+router.put('/editPostLinkChannels', authMiddleware, postsController.editPostLinkСhannels)
 
 export default router

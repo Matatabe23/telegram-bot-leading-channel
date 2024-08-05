@@ -10,6 +10,7 @@ import { publishInstantly } from '../service/postsService/publishInstantly/publi
 import { receivingPost } from '../service/postsService/receivingPost/receivingPost.js'
 import { changePage } from '../service/postsService/changePage/changePage.js'
 import { deleteSelectedImgs } from '../service/postsService/deleteSelectedImgs/deleteSelectedImgs.js'
+import { editPostLinkСhannels } from '../service/postsService/editPostLinkСhannels/editPostLinkСhannels.js'
 
 const upload = multer({ dest: multerPath })
 
@@ -133,6 +134,19 @@ class PostsController {
       const { idList } = req.query
 
       const result = await deleteSelectedImgs(idList);
+
+      res.send(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server Error');
+    }
+  }
+
+  async editPostLinkСhannels(req: Request, res: Response) {
+    try {
+      const { postId, channelIds } = req.body.params
+
+      const result = await editPostLinkСhannels(postId, channelIds);
 
       res.send(result);
     } catch (error) {

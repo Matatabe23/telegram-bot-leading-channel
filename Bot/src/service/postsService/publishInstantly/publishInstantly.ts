@@ -1,10 +1,10 @@
-import { dataBasePost, imageData } from '../../../models/models.js';
+import { dataBasePosts, imageData } from '../../../models/models.js';
 import { S3_BUCKET_NAME, S3_PATH } from "../../../const/constENV.js";
 import { deleteImageFromS3 } from '../../s3-service.js'
 import { instantPublicationPosts } from '../../../routerBot/instantPublicationPosts.js'
 
 export async function publishInstantly(id: number) {
-  const post = await dataBasePost.findByPk(id);
+  const post = await dataBasePosts.findByPk(id);
   if (!post) {
     throw new Error('Пост не найден');
   }
