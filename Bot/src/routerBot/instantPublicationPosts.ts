@@ -2,10 +2,9 @@ import { bot } from './index.js';
 import fs from 'fs';
 import { downloadFile } from '../utils/downloadFile.js';
 import { waterMark } from '../const/const.js';
-import { CHAT_ID } from '../const/constENV.js';
 import { deleteLocalFile } from '../utils/downloadFile.js';
 
-export async function instantPublicationPosts(files: any, stringArray?: boolean) {
+export async function instantPublicationPosts(files: any, chatId: string, stringArray?: boolean) {
   return new Promise(async (resolve, reject) => {
     const media: any = [];
 
@@ -40,7 +39,8 @@ export async function instantPublicationPosts(files: any, stringArray?: boolean)
     }
 
     try {
-      await bot.sendMediaGroup(CHAT_ID as string, media);
+      console.log(chatId)
+      await bot.sendMediaGroup(chatId as string, media);
       const deletePromises = files.map(file => deleteLocalFile(stringArray ? file.split('/').pop() : file.path.split('\\').pop()));
       await Promise.all(deletePromises);
 

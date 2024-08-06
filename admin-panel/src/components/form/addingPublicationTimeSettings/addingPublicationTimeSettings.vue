@@ -44,17 +44,13 @@ import { addingPublicationTime, getListRegularPublicationTimes, deleteItemPublic
 import { IAddingPublicationTimeSettings, IGetListChannels } from '@/types'
 import { useToast } from 'vue-toastification';
 import { VSelect } from 'vuetify/components';
+import { storeToRefs } from 'pinia';
+import { useSettings } from '@/store/useSettings';
 
+const settingsStore = useSettings();
+const { listChannels } = storeToRefs(settingsStore);
 
 const toast = useToast()
-
-const props = defineProps<{
-  listChannels: IGetListChannels[];
-}>();
-
-const emit = defineEmits<{
-  'get-list': [],
-}>();
 
 const state: IAddingPublicationTimeSettings = reactive({
   timeType: 'constant',
@@ -95,11 +91,11 @@ const deleteTime = async (id: number) => {
 }
 
 const formattedChannels = computed(() => {
-  return props.listChannels.map(channel => (channel.name));
+  return listChannels.value.map(channel => (channel.name));
 })
 
 const selectChanel = (name: string | null) => {
-  const channel = props.listChannels.find(channel => channel.name === name);
+  const channel = listChannels.value.find(channel => channel.name === name);
   state.channelId = Number(channel?.id)
   getList()
 };

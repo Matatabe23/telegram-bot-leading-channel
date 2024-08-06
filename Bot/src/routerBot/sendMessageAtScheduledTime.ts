@@ -5,13 +5,17 @@ import { S3_BUCKET_NAME, S3_PATH } from '../const/constENV.js';
 import fs from 'fs';
 import { downloadFile, deleteLocalFile } from '../utils/downloadFile.js';
 
-export default async function sendMessageAtScheduledTime() {
+export default async function sendMessageAtScheduledTime(timeData: { time: Date, chatId: string }) {
   const postWithImages: any = await dataBasePosts.findOne({
-    order: [['id', 'ASC']],
     include: [
-      { model: channels },
+      {
+        model: channels,
+        where: { chatId: timeData.chatId },
+        required: true
+      },
       { model: imageData }
-    ]
+    ],
+    order: [['id', 'ASC']]
   });
 
   if (!postWithImages) return;
@@ -61,9 +65,5 @@ export default async function sendMessageAtScheduledTime() {
         await bot.sendMediaGroup(element.chatId as string, media).then(() => deleteImage())
       }
     }
-  } else {
-    const channelsList = await channels.findAll()
-    const defaultChannel = channelsList.find(item => item.dataValues.settings.includes('defaultChannels'))
-    await bot.sendMediaGroup(defaultChannel?.dataValues.chatId, media).then(() => deleteImage())
-  }
+  } 
 }

@@ -1,17 +1,22 @@
 import addWatermark from '../../waterMark-service.js'
 import { instantPublicationPosts } from '../../../routerBot/instantPublicationPosts.js'
 
-export async function instantPublicationPost(files: any, waterMark: boolean) {
+export async function instantPublicationPost(files: any, waterMark: boolean, chatIdList: string[]) {
+  if(chatIdList.length === 0) throw new Error('Нету каналов для публикации');
 
   if (waterMark === true) {
     for (const file of files) {
       await addWatermark(file)
     }
 
-    await instantPublicationPosts(files)
+    for(const chatId of chatIdList){
+      await instantPublicationPosts(files, chatId)
+    }
     return 'Успешная моментальная публикация'
   }
 
-  await instantPublicationPosts(files);
+  for(const chatId of chatIdList){
+    await instantPublicationPosts(files, chatId)
+  }
   return 'Успешная моментальная публикация'
 }

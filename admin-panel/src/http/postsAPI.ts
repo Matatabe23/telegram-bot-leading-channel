@@ -2,22 +2,24 @@ import { $host, $autHost } from "@/http/index";
 import { IImageBlock } from '@/types'
 
 // Функция публикации поста
-export const publication = async (files: FileList, waterMark: boolean) => {
+export const publication = async (files: FileList, waterMark: boolean, chatIdList: string[]) => {
   const formData = new FormData();
   for (let i = 0; i < files.length; i++) {
     formData.append('files[]', files[i]);
   }
   formData.append('waterMark', waterMark.toString());
+  formData.append('chatIdList', chatIdList.join(','));
   const { data } = await $autHost.post('api/posts/publication', formData);
   return data;
 }
 
-export const instantPublicationPosts = async (files: FileList, waterMark: boolean) => {
+export const instantPublicationPosts = async (files: FileList, waterMark: boolean, chatIdList: string[]) => {
   const formData = new FormData();
   for (let i = 0; i < files.length; i++) {
     formData.append('files[]', files[i]);
   }
   formData.append('waterMark', waterMark.toString());
+  formData.append('chatIdList', chatIdList.join(','));
   const { data } = await $autHost.post('api/posts/instantPublicationPosts', formData);
   return data;
 }

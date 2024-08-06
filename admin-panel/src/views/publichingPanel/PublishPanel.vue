@@ -9,26 +9,35 @@
 
       <div class="publishing-panel__publishes-form">
 
-        <v-btn color="#5865f2" variant="flat" @click="selectFile">
-          <label for="file-upload" class="publishing-panel__custom-file-upload">
-            <i class="fas fa-upload"></i> Загрузить файлы
-          </label>
-          <input id="file-upload" type="file" ref="fileInput" multiple @change="handleFileUpload">
-        </v-btn>
-        <v-btn color="#5865f2" variant="flat" @click="selectFolder">
-          <input type="file" id="file-upload" ref="folderInput" webkitdirectory @change="handleFolderSelection">
-          <label  class="publishing-panel__custom-file-upload">
-            <i class="fas fa-upload"></i> Загрузить несколько папок
-          </label>
-        </v-btn>
+        <div class="publishing-panel__buttons">
+          <v-btn color="#5865f2" variant="flat" @click="selectFile">
+            <label for="file-upload" class="publishing-panel__custom-file-upload">
+              <i class="fas fa-upload"></i> Загрузить файлы
+            </label>
+            <input id="file-upload" type="file" ref="fileInput" multiple @change="handleFileUpload">
+          </v-btn>
+          <v-btn color="#5865f2" variant="flat" @click="selectFolder">
+            <input type="file" id="file-upload" ref="folderInput" webkitdirectory @change="handleFolderSelection">
+            <label class="publishing-panel__custom-file-upload">
+              <i class="fas fa-upload"></i> Загрузить несколько папок
+            </label>
+          </v-btn>
 
-        <div class="publishing-panel__select-settings">
-          <v-select label="Настройки" :items="settingsSelectPublish" multiple variant="outlined"
-            v-model="state.settingsArray"></v-select>
+          <v-btn variant="flat" @click="publicationPost" color="#5865f2">
+            Опубликовать
+          </v-btn>
         </div>
-        <v-btn variant="flat" @click="publicationPost" color="#5865f2">
-          Опубликовать
-        </v-btn>
+
+        <div class="publishing-panel__selects">
+          <div class="publishing-panel__select-settings">
+            <v-select label="Настройки" :items="settingsSelectPublish" multiple variant="outlined"
+              v-model="state.settingsArray"></v-select>
+          </div>
+          <div class="publishing-panel__select-settings">
+            <v-select label="Каналы для публикации" :items="channelsListSelect" multiple variant="outlined"
+              v-model="state.form.useChannelList"></v-select>
+          </div>
+        </div>
 
       </div>
     </div>
@@ -39,12 +48,17 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref, watch } from 'vue';
+import { onMounted, reactive, ref, watch, computed } from 'vue';
 import { publication, instantPublicationPosts } from '@/http/postsAPI';
 import { IPublish, } from '@/types';
 import { useToast } from 'vue-toastification';
 import { usePosts } from '@/store/usePosts';
 import { settingsSelectPublish } from '@/const';
+import { useSettings } from '@/store/useSettings';
+import { storeToRefs } from 'pinia';
+
+const settingsStore = useSettings();
+const { listChannels } = storeToRefs(settingsStore);
 
 
 const toast = useToast()
@@ -64,7 +78,10 @@ const state: IPublish = reactive({
     loaded: 0,
   },
 
-  settingsArray: []
+  settingsArray: [],
+  form: {
+    useChannelList: []
+  }
 })
 
 const handleFileUpload = async (event: any) => {
@@ -97,9 +114,9 @@ const publicationPost = async () => {
     }
     let result
     if (state.settingsArray.includes('instantPublication')) {
-      result = await instantPublicationPosts(state.imagePost, state.settingsArray.includes('waterMark'));
+      result = await instantPublicationPosts(state.imagePost, state.settingsArray.includes('waterMark'), state.form.useChannelList);
     } else {
-      result = await publication(state.imagePost, state.settingsArray.includes('waterMark'));
+      result = await publication(state.imagePost, state.settingsArray.includes('waterMark'), state.form.useChannelList);
     }
 
     if (result) {
@@ -160,7 +177,7 @@ const handleFolderSelection = async (event: any) => {
 
     for (let i = 0; i < folderContent.length; i++) {
       const file = folderContent[i] as FileList;
-      await publication(file, state.settingsArray.includes('waterMark'));
+      await publication(file, state.settingsArray.includes('waterMark'), state.form.useChannelList);
       state.processLoader.loaded += 1
     }
 
@@ -177,9 +194,15 @@ watch(() => state.settingsArray, (value) => {
   localStorage.setItem('settingsArray', JSON.stringify(value.join(',')))
 }, { deep: true })
 
+const channelsListSelect = computed(() =>
+  listChannels.value.map(item => ({ title: item.name, value: item.chatId }))
+);
+
 onMounted(() => {
   getSettings()
 })
+
+settingsStore.getListChannels();
 </script>
 
 <style lang="scss">
@@ -213,15 +236,26 @@ onMounted(() => {
   }
 
   &__publishes-form {
-    display: flex;
+    // display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     width: 100%;
     padding: 20px 0;
     border-top: 3px solid gray;
     border-radius: 10px;
     flex-wrap: wrap;
     gap: 10px;
+  }
+
+  &__buttons{
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 15px;
+  }
+
+  &__selects{
+    display: flex;
+    justify-content: space-around;
   }
 
   &__custom-file-upload {

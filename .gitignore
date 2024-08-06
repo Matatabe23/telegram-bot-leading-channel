@@ -5,6 +5,8 @@ node_modules/
 Main.db
 constENV.ts
 
+.vscode
+
 # Environment configuration
 .env
 

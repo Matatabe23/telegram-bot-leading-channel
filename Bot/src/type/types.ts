@@ -1,6 +1,6 @@
 export interface IPublishTime {
   hour: number,
-  minute: number
+  minute: number,
 }
 
 export interface IAdminDto {
@@ -34,5 +34,4 @@ export interface IImageBlock {
 
 export enum IEditChannelType {
   PRIVATED = 'privated',
-  DEFAULT_CHANNEL = 'defaultChannels'
 }

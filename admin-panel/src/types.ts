@@ -13,7 +13,10 @@ export interface IPublish {
     total: number,
     loaded: number
   },
-  settingsArray: string[]
+  settingsArray: string[],
+  form: {
+    useChannelList: string[]
+  }
 }
 
 export interface IImageData {
@@ -87,6 +90,5 @@ export interface IImageBlock {
 
 export enum IEditChannelType {
   PRIVATED = 'privated',
-  DEFAULT_CHANNEL = 'defaultChannels'
 }
 

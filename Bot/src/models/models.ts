@@ -44,14 +44,16 @@ const ChannelPosts = db.define('ChannelPosts', {
     references: {
       model: channels,
       key: 'id'
-    }
+    },
+    primaryKey: true
   },
   postId: {
     type: DataTypes.INTEGER,
     references: {
       model: dataBasePosts,
       key: 'id'
-    }
+    },
+    primaryKey: true
   }
 })
 

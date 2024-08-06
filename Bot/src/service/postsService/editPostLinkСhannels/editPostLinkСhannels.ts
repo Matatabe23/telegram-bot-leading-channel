@@ -27,7 +27,6 @@ export async function editPostLinkСhannels(postId: number, channelIds?: number[
 
   if (idsToAdd.length > 0) {
     idsToAdd.forEach(async element => {
-      console.log(element)
       await ChannelPosts.create({
         postId,
         channelId: element,
@@ -35,7 +34,6 @@ export async function editPostLinkСhannels(postId: number, channelIds?: number[
       });
     });
   }
-  console.log(idsToDelete, idsToAdd)
 
   return 'Успешное изменение!';
 }

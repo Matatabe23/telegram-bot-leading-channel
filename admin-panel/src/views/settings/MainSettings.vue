@@ -1,25 +1,17 @@
 <template>
   <div class="main-settings">
-    <addingNewChannels @get-list="getList" :listChannels="state.listChannels" />
-    <addingPublicationTimeSettings @get-list="getList" :listChannels="state.listChannels" />
+    <addingNewChannels />
+    <addingPublicationTimeSettings/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
 import addingPublicationTimeSettings from '@/components/form/addingPublicationTimeSettings/addingPublicationTimeSettings.vue'
 import addingNewChannels from '@/components/form/addingNewChannels/addingNewChannels.vue'
-import { getListChannel } from '@/http/settingsAPI'
+import { useSettings } from '@/store/useSettings';
 
-const state = reactive({
-  listChannels: []
-})
-
-const getList = async () => {
-  state.listChannels = await getListChannel()
-}
-
-getList();
+const settingsStore = useSettings();
+settingsStore.getListChannels();
 </script>
 
 <style lang="scss">

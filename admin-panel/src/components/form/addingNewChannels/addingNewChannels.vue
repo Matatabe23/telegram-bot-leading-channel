@@ -9,8 +9,8 @@
       </div>
 
       <MainButton @click="saveChannel">Сохранить</MainButton>
-      <h3 v-if="props.listChannels.length">Список чатов</h3>
-      <div class="adding-new-channels__list-channels" v-for="channel in props.listChannels" :key="channel.id">
+      <h3 v-if="listChannels.length">Список чатов</h3>
+      <div class="adding-new-channels__list-channels" v-for="channel in listChannels" :key="channel.id">
         <div>
           Имя чата: {{ channel.name }}
         </div>
@@ -20,11 +20,6 @@
         <VSwitch hide-details label="Приватность чата"
           @change="updateDefaultChannel(channel, IEditChannelType.PRIVATED)"
           :model-value="channel.settings.includes(IEditChannelType.PRIVATED)">
-        </VSwitch>
-
-        <VSwitch hide-details label="Канал дефолтный"
-          @change="updateDefaultChannel(channel, IEditChannelType.DEFAULT_CHANNEL)"
-          :model-value="channel.settings.includes(IEditChannelType.DEFAULT_CHANNEL)">
         </VSwitch>
 
         <MainButton @click="delChannel(channel.id)">Удалить</MainButton>
@@ -38,12 +33,13 @@ import { reactive, watch } from 'vue';
 import { addingNewChannels, deleteChannel, editChannel } from '@/http/settingsAPI'
 import { IStateChannels, IEditChannelType, IGetListChannels } from '@/types'
 import { useToast } from 'vue-toastification';
+import { useSettings } from '@/store/useSettings';
+import { storeToRefs } from 'pinia';
+
+const settingsStore = useSettings();
+const { listChannels } = storeToRefs(settingsStore);
 
 const toast = useToast()
-
-const props = defineProps<{
-  listChannels: IGetListChannels[];
-}>();
 
 const emit = defineEmits<{
   'get-list': [],
@@ -57,10 +53,6 @@ const state: IStateChannels = reactive({
   }
 })
 
-const getList = async () => {
-  emit('get-list')
-}
-
 const saveChannel = async () => {
   try {
     if (state.form.name === '' || state.form.chatId === '') {
@@ -71,7 +63,7 @@ const saveChannel = async () => {
     const result = await addingNewChannels(state.form.name, state.form.chatId);
 
     if (result) {
-      await getList();
+      settingsStore.getListChannels()
       toast.success('Успешное добавление!')
       state.form.name = ''
       state.form.chatId = ''
@@ -84,7 +76,7 @@ const saveChannel = async () => {
 const delChannel = async (id: number) => {
   const result = await deleteChannel(id);
   toast.success(result);
-  await getList();
+  settingsStore.getListChannels()
 }
 
 const updateDefaultChannel = async (channel: IGetListChannels, type: IEditChannelType) => {
@@ -101,18 +93,14 @@ const updateDefaultChannel = async (channel: IGetListChannels, type: IEditChanne
     }
 
     await editChannel(channel.id, settings);
-    await getList();
+    settingsStore.getListChannels()
   } catch (e) {
     console.error(e);
   }
 }
 
-
-
-
-watch(() => props.listChannels, (value) => {
+watch(() => listChannels.value, (value) => {
   state.form.listChannels = value
-  console.log(state.form.listChannels.find(channel => channel.id === 3)?.settings)
 })
 </script>
 
