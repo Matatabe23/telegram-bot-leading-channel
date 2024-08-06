@@ -134,7 +134,9 @@ const publicationPost = async () => {
 
 const getSettings = async () => {
   const settingsArray = localStorage.getItem('settingsArray');
+  const useChannelList = localStorage.getItem('useChannelList');
   if (settingsArray !== null && JSON.parse(settingsArray).length > 0) state.settingsArray = JSON.parse(settingsArray).split(',');
+  if (useChannelList !== null && JSON.parse(useChannelList).length > 0) state.form.useChannelList = JSON.parse(useChannelList).split(',');
 }
 
 const selectFolder = () => {
@@ -192,6 +194,10 @@ const handleFolderSelection = async (event: any) => {
 
 watch(() => state.settingsArray, (value) => {
   localStorage.setItem('settingsArray', JSON.stringify(value.join(',')))
+}, { deep: true })
+
+watch(() => state.form.useChannelList, (value) => {
+  localStorage.setItem('useChannelList', JSON.stringify(value.join(',')))
 }, { deep: true })
 
 const channelsListSelect = computed(() =>
