@@ -4,6 +4,7 @@ import { uploadImageToS3 } from '../../s3-service.js'
 import {editPostLinkСhannels} from '../editPostLinkСhannels/editPostLinkСhannels.js'
 
 export async function publication(files: any, waterMark: boolean, chatIdList: string[]) {
+  if(chatIdList.length === 0 && chatIdList[0] === '') throw new Error('Нету каналов для публикации');
 
   const post = await dataBasePosts.create()
   const postId = post.dataValues.id

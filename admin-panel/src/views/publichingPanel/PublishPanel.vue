@@ -23,7 +23,7 @@
             </label>
           </v-btn>
 
-          <v-btn variant="flat" @click="publicationPost" color="#5865f2">
+          <v-btn variant="flat" @click="publicationPost" :disabled="state.form.useChannelList.length === 0" color="#5865f2">
             Опубликовать
           </v-btn>
         </div>

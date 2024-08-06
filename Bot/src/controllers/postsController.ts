@@ -28,7 +28,7 @@ class PostsController {
 
         const files: any = req.files
         const waterMark = JSON.parse(req.body.waterMark)
-        const chatIdList = req.body.chatIdList.split(',')
+        const chatIdList = req.body.chatIdList !== '' ? req.body.chatIdList.split(',') : [];
 
         const result = await publication(files, waterMark, chatIdList)
 
@@ -53,7 +53,7 @@ class PostsController {
 
         const files: any = req.files
         const waterMark = JSON.parse(req.body.waterMark);
-        const chatIdList = req.body.chatIdList.split(',');
+        const chatIdList = req.body.chatIdList.lenght > 0 ? req.body.chatIdList.split(',') : [];
 
         const result = await instantPublicationPost(files, waterMark, chatIdList)
         res.send(result);
