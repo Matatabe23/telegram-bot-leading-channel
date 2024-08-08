@@ -10,11 +10,11 @@
       <div class="publishing-panel__publishes-form">
 
         <div class="publishing-panel__buttons">
-          <v-btn color="#5865f2" variant="flat" @click="selectFile">
+          <v-btn color="#5865f2" variant="flat">
+            <input id="file-upload" type="file" ref="fileInput" multiple @change="handleFileUpload">
             <label for="file-upload" class="publishing-panel__custom-file-upload">
               <i class="fas fa-upload"></i> Загрузить файлы
             </label>
-            <input id="file-upload" type="file" ref="fileInput" multiple @change="handleFileUpload">
           </v-btn>
           <v-btn color="#5865f2" variant="flat" @click="selectFolder">
             <input type="file" id="file-upload" ref="folderInput" webkitdirectory @change="handleFolderSelection">

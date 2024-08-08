@@ -1,13 +1,15 @@
 <template>
   <div class="posts">
-    <div class="posts__header">
+    <div class="posts__header" v-if="postsList.length > 0">
       <div class="posts__info">
         <div v-if="totalCount">Всего постов: {{ totalCount }}</div>
         <div v-if="lastPublishDate">Крайняя дата публикации: {{ lastPublishDate }}</div>
       </div>
       <div class="posts__select">
-        <v-select clearable label="Фильтр"  v-model="form.watched" :items="watchedOptions"
-          variant="outlined" @update:model-value="updateWatched"></v-select>
+        <v-select clearable label="Канал" v-model="form.channel" :items="formattedChannels" variant="outlined"
+          @update:model-value="updateChannel"></v-select>
+        <v-select clearable label="Статус просмотра" v-model="form.watched" :items="watchedOptions" variant="outlined"
+          @update:model-value="updateWatched"></v-select>
       </div>
     </div>
 
@@ -39,7 +41,10 @@ import postCard from '@/components/form/postCard/postCard.vue'
 import mainSelect from '@/components/UI/mainSelect/mainSelect.vue'
 import { watchedOptions, perPage } from '@/const';
 import { IOptionsFromSelect } from '@/components/UI/mainSelect/mainSelect.i'
+import { useSettings } from '@/store/useSettings';
 
+const settingsStore = useSettings();
+const { listChannels } = storeToRefs(settingsStore);
 const toast = useToast()
 const editorStore = usePosts();
 const { postsList, totalCount, publishTime, form } = storeToRefs(editorStore);
@@ -131,11 +136,28 @@ const updateWatched = (value: string) => {
   editorStore.getPosts();
 }
 
+const updateChannel = (value: string) => {
+  localStorage.setItem('channel', (value))
+  editorStore.setStateValueByKey('form', { ...form.value, channel: value });
+  editorStore.getPosts();
+}
+
 onMounted(() => {
   const watched = localStorage.getItem('watched') || "";
-  editorStore.setStateValueByKey('form', { ...form.value, watched });
+  const channel = localStorage.getItem('channel') || "";
+  editorStore.setStateValueByKey('form', { ...form.value, watched, channel });
   editorStore.getPosts();
 })
+
+const formattedChannels = computed(() => {
+  const channelsArray = listChannels.value.map(channel => ({
+    title: channel.name,
+    value: channel.id
+  }));
+
+  return [{ title: 'Нечего', value: '' }, ...channelsArray];
+});
+
 </script>
 
 <style lang="scss">
@@ -157,7 +179,9 @@ onMounted(() => {
   }
 
   &__select {
-    width: 25%;
+    display: flex;
+    width: 50%;
+    gap: 10px;
   }
 
   &__download {

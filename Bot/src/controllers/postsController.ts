@@ -69,8 +69,9 @@ class PostsController {
       const page = req.query.page ? parseInt(req.query.page.toString()) : 1;
       const pageSize = req.query.pageSize ? parseInt(req.query.pageSize.toString()) : 10;
       const watched = req.query.watched;
+      const channel = req.query.channel;
 
-      const result = await receiving(page, pageSize, watched)
+      const result = await receiving(page, pageSize, watched, channel)
 
       res.send({ ...result });
     } catch (error) {

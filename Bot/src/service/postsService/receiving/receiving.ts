@@ -1,7 +1,7 @@
-import { dataBasePosts, imageData, regularPublicationTime } from '../../../models/models.js';
+import { dataBasePosts, imageData, regularPublicationTime, channels } from '../../../models/models.js';
 import { S3_BUCKET_NAME, S3_PATH } from "../../../const/constENV.js";
 
-export async function receiving(page: number, pageSize: number, watched?: string) {
+export async function receiving(page: number, pageSize: number, watched?: string, channel?: string) {
   if (isNaN(page) || isNaN(pageSize)) {
     throw new Error('Неверный формат параметров запроса');
   }
@@ -21,7 +21,13 @@ export async function receiving(page: number, pageSize: number, watched?: string
     include: [{
       model: imageData,
       limit: 1
-    }],
+    },
+    {
+      model: channels,
+      through: { attributes: [] }, // Не выбираем поля из промежуточной таблицы
+      where: channel ? { id: channel } : undefined
+    }
+  ],
     limit: pageSize,
     offset: offset,
     where: whereCondition

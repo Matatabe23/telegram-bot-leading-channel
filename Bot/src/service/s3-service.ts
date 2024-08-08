@@ -16,7 +16,7 @@ export function uploadImageToS3(imagePath: any, postId: number): Promise<string>
   return new Promise((resolve, reject) => {
     const imgStream = fs.createReadStream(imagePath.path);
 
-    const fileName = `${S3_FOLDER_SAVED}/${Date.now()}_${postId}.png`;
+    const fileName = `${S3_FOLDER_SAVED}/${postId}/${Date.now()}.png`;
 
     const params = {
       Bucket: S3_BUCKET_NAME,

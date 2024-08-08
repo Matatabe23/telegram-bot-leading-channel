@@ -24,8 +24,8 @@ export const instantPublicationPosts = async (files: FileList, waterMark: boolea
   return data;
 }
 
-export const receiving = async (page: number, pageSize: number, watched?: string) => {
-  const { data } = await $autHost.get('api/posts/receiving', { params: { page, pageSize, watched } });
+export const receiving = async (page: number, pageSize: number, watched?: string, channel?: string) => {
+  const { data } = await $autHost.get('api/posts/receiving', { params: { page, pageSize, watched, channel } });
   return data;
 }
 

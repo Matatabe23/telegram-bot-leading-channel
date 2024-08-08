@@ -8,6 +8,7 @@ export interface IStoreState {
   form: {
     currentPage: number,
     postsPerPage: number,
-    watched: string
+    watched: string,
+    channel: string
   }
 }
