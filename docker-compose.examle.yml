@@ -5,7 +5,7 @@ services:
     image: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: SaoTop123
+      MYSQL_ROOT_PASSWORD: - #Введите пароль
       MYSQL_DATABASE: qugor_arts
     ports:
       - 3306:3306
