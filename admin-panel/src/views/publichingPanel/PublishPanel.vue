@@ -143,10 +143,6 @@ const selectFolder = () => {
   folderInput.value.click()
 }
 
-const selectFile = () => {
-  fileInput.value.click()
-}
-
 const handleFolderSelection = async (event: any) => {
   try {
     const files = event.target.files;

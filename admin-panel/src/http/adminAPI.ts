@@ -6,7 +6,6 @@ export const login = async (name:string, password:string) => {
 	const { data } = await $host.post('api/admin/login', { name, password })
 	localStorage.setItem('token', data.token)
 	localStorage.setItem('admin', JSON.stringify(data.admin));
-  console.log(data)
 	return jwtDecode(data.token)
 }
 
