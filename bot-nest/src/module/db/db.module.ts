@@ -3,12 +3,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 
 // Импортируем модели
-import { Administrators } from './models/administrators.model';
-import { DataBasePosts } from './models/dataBasePosts.model';
-import { ImageData } from './models/imageData.model';
-import { RegularPublicationTime } from './models/regularPublicationTime.model';
-import { Channels } from './models/channels.model';
-import { ChannelPosts } from './models/channelPosts.model';
+import { Administrators } from './models/administrators.repository';
+import { DataBasePosts } from './models/dataBasePosts.repository';
+import { ImageData } from './models/imageData.repository';
+import { RegularPublicationTime } from './models/regularPublicationTime.repository';
+import { Channels } from './models/channels.repository';
+import { ChannelPosts } from './models/channelPosts.repository';
 
 @Module({
   imports: [
@@ -34,6 +34,15 @@ import { ChannelPosts } from './models/channelPosts.model';
       }),
       inject: [ConfigService],
     }),
+    SequelizeModule.forFeature([
+      Administrators,
+      DataBasePosts,
+      ImageData,
+      RegularPublicationTime,
+      Channels,
+      ChannelPosts,
+    ]),
   ],
+  exports: [SequelizeModule],
 })
 export class DBModule {}

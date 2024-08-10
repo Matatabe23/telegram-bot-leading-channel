@@ -1,6 +1,6 @@
 import { Column, Model, Table, ForeignKey } from 'sequelize-typescript';
-import { Channels } from './channels.model';
-import { DataBasePosts } from './dataBasePosts.model';
+import { Channels } from './channels.repository';
+import { DataBasePosts } from './dataBasePosts.repository';
 
 @Table
 export class ChannelPosts extends Model {

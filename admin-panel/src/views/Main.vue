@@ -45,11 +45,11 @@ const setlogin = async () => {
 
     router.push('/publishing-panel');
   } catch (e: any) {
-    toast.error(e.response.data.message)
+    console.log(e)
+    toast.error('Произошла неизвестная ошибка')
   } finally {
     postsStore.setStateValueByKey('isLoader', false);
   }
-
 }
 </script>
 

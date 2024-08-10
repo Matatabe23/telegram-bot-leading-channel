@@ -1,5 +1,5 @@
 import { Column, Model, Table } from 'sequelize-typescript';
-import { EAdministratorRole } from '../../types-and-constants/types';
+import { EAdministratorRole } from '../../../type/types';
 
 @Table
 export class Administrators extends Model {
