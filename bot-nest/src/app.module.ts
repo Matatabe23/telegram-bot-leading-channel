@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SequelizeModule } from '@nestjs/sequelize';
+import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PostsModule } from './posts/posts.module';
-import { AdminModule } from './admin/admin.module';
-import { SettingsModule } from './settings/settings.module';
 import { ServiceModule } from './service/service.module';
+import { ModulesModule } from './modules/modules.module';
+import { DBModule } from './db/db.module';
 
 @Module({
   imports: [
@@ -15,23 +13,8 @@ import { ServiceModule } from './service/service.module';
       load: [configuration],
       isGlobal: true,
     }),
-    SequelizeModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        dialect: 'mysql',
-        host: configService.get('dbHost'),
-        port: 3306,
-        username: configService.get('dbUser'),
-        password: configService.get('dbPassword'),
-        database: configService.get('dbName'),
-        autoLoadModels: true, // Автоматическая загрузка моделей
-        synchronize: true, // авто синхронизация базы данных
-      }),
-      inject: [ConfigService],
-    }),
-    PostsModule,
-    AdminModule,
-    SettingsModule,
+    ModulesModule,
+    DBModule,
     ServiceModule,
   ],
   controllers: [AppController],
