@@ -4,11 +4,11 @@ import { SequelizeModule } from '@nestjs/sequelize';
 
 // Импортируем модели
 import { Administrators } from './models/administrators.repository';
-import { DataBasePosts } from './models/dataBasePosts.repository';
+import { DataBasePosts } from './models/data-base-posts.repository';
 import { ImageData } from './models/imageData.repository';
 import { RegularPublicationTime } from './models/regularPublicationTime.repository';
 import { Channels } from './models/channels.repository';
-import { ChannelPosts } from './models/channelPosts.repository';
+import { ChannelPosts } from './models/channel-posts.repository';
 
 @Module({
   imports: [

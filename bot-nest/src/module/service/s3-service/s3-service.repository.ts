@@ -9,11 +9,13 @@ import {
 } from '@aws-sdk/client-s3';
 import * as fs from 'fs';
 import { getS3ClientConfig } from 'src/config/s3.config';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class S3Repository {
   private readonly s3Client: S3Client;
   private readonly logger = new Logger(S3Repository.name);
+  private readonly configService: ConfigService;
 
   constructor() {
     this.s3Client = new S3Client(getS3ClientConfig);
@@ -23,10 +25,10 @@ export class S3Repository {
     return new Promise((resolve, reject) => {
       const imgStream = fs.createReadStream(imagePath.path);
 
-      const fileName = `${process.env.S3_FOLDER_SAVED}/${postId}/${Date.now()}.png`;
+      const fileName = `${this.configService.get('S3_FOLDER_SAVED')}/${postId}/${Date.now()}.png`;
 
       const params = {
-        Bucket: process.env.S3_BUCKET_NAME,
+        Bucket: this.configService.get('S3_BUCKET_NAME'),
         Key: fileName,
         Body: imgStream,
         ContentType: 'image/png',
@@ -56,8 +58,8 @@ export class S3Repository {
     const imageKey = urlParts[urlParts.length - 1];
 
     const params = new DeleteObjectCommand({
-      Bucket: process.env.S3_BUCKET_NAME,
-      Key: `${process.env.S3_FOLDER_SAVED}/${imageKey}`,
+      Bucket: this.configService.get('S3_BUCKET_NAME'),
+      Key: `${this.configService.get('S3_FOLDER_SAVED')}/${imageKey}`,
     });
 
     try {
@@ -80,28 +82,28 @@ export class S3Repository {
           Effect: 'Allow',
           Principal: '*',
           Action: 's3:GetObject',
-          Resource: `arn:aws:s3:::${process.env.S3_BUCKET_NAME}/*`,
+          Resource: `arn:aws:s3:::${this.configService.get('S3_BUCKET_NAME')}/*`,
         },
       ],
     };
 
     try {
       const putPolicyCommand = new PutBucketPolicyCommand({
-        Bucket: process.env.S3_BUCKET_NAME,
+        Bucket: this.configService.get('S3_BUCKET_NAME'),
         Policy: JSON.stringify(bucketPolicy),
       });
       await this.s3Client.send(putPolicyCommand);
       this.logger.log('Bucket policy updated to allow public access.');
 
       const listObjectsCommand = new ListObjectsV2Command({
-        Bucket: process.env.S3_BUCKET_NAME,
+        Bucket: this.configService.get('S3_BUCKET_NAME'),
       });
       const objects = await this.s3Client.send(listObjectsCommand);
 
       if (objects.Contents) {
         for (const object of objects.Contents) {
           const putObjectAclCommand = new PutObjectAclCommand({
-            Bucket: process.env.S3_BUCKET_NAME,
+            Bucket: this.configService.get('S3_BUCKET_NAME'),
             Key: object.Key,
             ACL: 'public-read',
           });
@@ -117,14 +119,14 @@ export class S3Repository {
   // async deleteAllObjectsFromS3(): Promise<void> {
   //   try {
   //     const listObjectsCommand = new ListObjectsV2Command({
-  //       Bucket: process.env.S3_BUCKET_NAME,
+  //       Bucket: this.configService.get('S3_BUCKET_NAME'),
   //     });
   //     const objects = await this.s3Client.send(listObjectsCommand);
 
   //     if (objects.Contents) {
   //       for (const object of objects.Contents) {
   //         const deleteObjectCommand = new DeleteObjectCommand({
-  //           Bucket: process.env.S3_BUCKET_NAME,
+  //           Bucket: this.configService.get('S3_BUCKET_NAME'),
   //           Key: object.Key,
   //         });
   //         await this.s3Client.send(deleteObjectCommand);

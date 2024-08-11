@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Body,
+  Req,
   Query,
   HttpException,
   UseGuards,
@@ -21,7 +22,6 @@ export class AdminController {
   ) {
     try {
       const result = await this.adminService.login(name, password);
-      console.log(result);
       return result;
     } catch (e) {
       console.log(e);
@@ -31,10 +31,9 @@ export class AdminController {
 
   @Get('check-data')
   @UseGuards(AuthGuard)
-  async checkDataWeb(@Query('id') id: number) {
-    console.log(id);
+  async checkDataWeb(@Req() request: any) {
     try {
-      const result = await this.adminService.checkDataWeb(1);
+      const result = await this.adminService.checkDataWeb(request.body.id);
       return result;
     } catch (e) {
       throw new HttpException('Ошибка', 500);
