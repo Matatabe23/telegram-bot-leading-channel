@@ -15,6 +15,7 @@ import { FileModule } from './module/service/file-service/file-service.module';
 import { WaterMarkModule } from './module/service/water-mark-service/water-mark-service.module';
 import { TokenModule } from './module/service/token-service/token-service.module';
 import { TGModule } from './module/service/tg-bot-service/tg-bot-service.module';
+import { RegularPublicationBotModule } from './module/service/regular-publication-bot-service/regular-publication-bot-service.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { TGModule } from './module/service/tg-bot-service/tg-bot-service.module'
     FileModule,
     WaterMarkModule,
     TokenModule,
+    RegularPublicationBotModule,
 
     TGModule,
   ],

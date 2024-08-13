@@ -1,14 +1,14 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import moment from 'moment-timezone';
-import schedule, { Job } from 'node-schedule';
+import * as moment from 'moment-timezone';
+import * as schedule from 'node-schedule';
 import { RegularPublicationTime } from 'src/module/db/models/regularPublicationTime.repository';
-import { Channel } from 'diagnostics_channel';
+import { Channels } from 'src/module/db/models/channels.repository';
 import { TGBotService } from '../tg-bot-service/tg-bot-service.repository';
 
 @Injectable()
 export class RegularPublicationBotRepository implements OnModuleInit {
-  private jobs: Job[] = [];
+  private jobs: any[] = [];
 
   constructor(
     @InjectModel(RegularPublicationTime)
@@ -24,7 +24,7 @@ export class RegularPublicationBotRepository implements OnModuleInit {
     });
   }
 
-  private async scheduleFunctionExecution() {
+  async scheduleFunctionExecution() {
     moment.tz.setDefault('Europe/Moscow');
 
     const times = await this.getPublishTimesFromDB();
@@ -56,7 +56,7 @@ export class RegularPublicationBotRepository implements OnModuleInit {
         try {
           const allRegularPublicationTimes =
             await this.regularPublicationTime.findAll({
-              include: [{ model: Channel } as any],
+              include: [{ model: Channels }],
             });
           resolve(
             allRegularPublicationTimes.map((time: any) => ({

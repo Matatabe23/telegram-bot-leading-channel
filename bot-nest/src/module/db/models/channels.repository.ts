@@ -1,4 +1,5 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, Model, Table, HasMany } from 'sequelize-typescript';
+import { RegularPublicationTime } from './regularPublicationTime.repository';
 
 @Table
 export class Channels extends Model {
@@ -13,4 +14,7 @@ export class Channels extends Model {
 
   @Column
   settings: string;
+
+  @HasMany(() => RegularPublicationTime)
+  regularPublicationTimes: RegularPublicationTime[];
 }

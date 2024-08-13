@@ -1,4 +1,11 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import {
+  Column,
+  ForeignKey,
+  Model,
+  Table,
+  BelongsTo,
+} from 'sequelize-typescript';
+import { Channels } from './channels.repository';
 
 @Table
 export class RegularPublicationTime extends Model {
@@ -10,4 +17,11 @@ export class RegularPublicationTime extends Model {
 
   @Column
   minute: string;
+
+  @ForeignKey(() => Channels)
+  @Column
+  channelId: number;
+
+  @BelongsTo(() => Channels)
+  channel: Channels;
 }
