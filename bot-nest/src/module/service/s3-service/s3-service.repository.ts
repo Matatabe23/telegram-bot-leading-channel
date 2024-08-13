@@ -18,19 +18,18 @@ export class S3Repository {
   private readonly configService: ConfigService;
 
   constructor() {
-    this.s3Client = new S3Client(getS3ClientConfig);
+    this.s3Client = new S3Client(getS3ClientConfig());
   }
 
   async uploadImageToS3(imagePath: any, postId: number): Promise<string> {
     return new Promise((resolve, reject) => {
-      const imgStream = fs.createReadStream(imagePath.path);
-
-      const fileName = `${this.configService.get('S3_FOLDER_SAVED')}/${postId}/${Date.now()}.png`;
+      const fileName = `${process.env.S3_FOLDER_SAVED}/${postId}/${Date.now()}.png`;
+      console.log(getS3ClientConfig());
 
       const params = {
-        Bucket: this.configService.get('S3_BUCKET_NAME'),
+        Bucket: process.env.S3_BUCKET_NAME,
         Key: fileName,
-        Body: imgStream,
+        Body: imagePath.buffer,
         ContentType: 'image/png',
         ContentDisposition: 'inline',
       };

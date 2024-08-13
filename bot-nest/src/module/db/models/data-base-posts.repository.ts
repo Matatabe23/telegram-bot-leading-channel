@@ -1,4 +1,13 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  HasMany,
+  BelongsToMany,
+} from 'sequelize-typescript';
+import { ImageData } from './imageData.repository';
+import { Channels } from './channels.repository';
+import { ChannelPosts } from './channel-posts.repository';
 
 @Table
 export class DataBasePosts extends Model {
@@ -7,4 +16,10 @@ export class DataBasePosts extends Model {
 
   @Column({ defaultValue: false })
   watched: boolean;
+
+  @HasMany(() => ImageData)
+  images: ImageData[];
+
+  @BelongsToMany(() => Channels, () => ChannelPosts)
+  channels: Channels[];
 }

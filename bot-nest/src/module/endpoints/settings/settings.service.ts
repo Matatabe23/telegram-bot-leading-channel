@@ -69,8 +69,6 @@ export class SettingsService {
   async addingNewChannels(name, chatId) {
     if (!name || !chatId) throw new Error('Некорректные данные');
 
-    console.log(name, chatId);
-
     await this.channels.create({
       name: name,
       chatId: chatId,

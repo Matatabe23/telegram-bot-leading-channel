@@ -1,16 +1,13 @@
 // s3.config.ts
-import { ConfigService } from '@nestjs/config';
 import { S3ClientConfig } from '@aws-sdk/client-s3';
 
-export const getS3ClientConfig = (
-  configService: ConfigService,
-): S3ClientConfig => {
+export const getS3ClientConfig = (): S3ClientConfig => {
   return {
     region: 'us-east-1',
-    endpoint: configService.get('s3Path'),
+    endpoint: process.env.S3_PATH,
     credentials: {
-      accessKeyId: configService.get('s3AccessKeyId') || '',
-      secretAccessKey: configService.get('s3SecretAccessKey') || '',
+      accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
     },
   };
 };

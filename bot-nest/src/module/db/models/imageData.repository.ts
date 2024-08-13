@@ -1,4 +1,11 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import {
+  Column,
+  Model,
+  Table,
+  ForeignKey,
+  BelongsTo,
+} from 'sequelize-typescript';
+import { DataBasePosts } from './data-base-posts.repository';
 
 @Table
 export class ImageData extends Model {
@@ -7,4 +14,11 @@ export class ImageData extends Model {
 
   @Column
   image: string;
+
+  @ForeignKey(() => DataBasePosts)
+  @Column
+  dataBasePostId: number;
+
+  @BelongsTo(() => DataBasePosts)
+  dataBasePost: DataBasePosts;
 }

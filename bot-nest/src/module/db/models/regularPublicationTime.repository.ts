@@ -1,8 +1,8 @@
 import {
   Column,
-  ForeignKey,
   Model,
   Table,
+  ForeignKey,
   BelongsTo,
 } from 'sequelize-typescript';
 import { Channels } from './channels.repository';
