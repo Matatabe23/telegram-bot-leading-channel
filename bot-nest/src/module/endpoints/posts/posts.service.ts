@@ -35,7 +35,9 @@ export class PostsService {
     if (chatIdList.length === 0 && chatIdList[0] === '')
       throw new Error('Нету каналов для публикации');
 
-    const post = await this.dataBasePosts.create();
+    const post = await this.dataBasePosts.create({
+      waterMark,
+    });
     const postId = post.dataValues.id;
 
     const chatIds = await Promise.all(
@@ -50,13 +52,7 @@ export class PostsService {
     const chatId = chatIds.map((item) => item?.dataValues.id);
 
     for (const file of files) {
-      let url: string;
-      if (waterMark === true) {
-        await this.waterMarkRepository.addWatermark(file);
-        url = await this.s3Repository.uploadImageToS3(file, postId);
-      } else {
-        url = await this.s3Repository.uploadImageToS3(file, postId);
-      }
+      const url = await this.s3Repository.uploadImageToS3(file, postId);
 
       await this.imageData.create({
         image: url,
@@ -93,8 +89,8 @@ export class PostsService {
       idsToDelete.forEach(async (element) => {
         await this.channelPosts.destroy({
           where: {
-            postId,
             channelId: element,
+            postId: postId,
           },
         });
       });
@@ -103,9 +99,8 @@ export class PostsService {
     if (idsToAdd.length > 0) {
       idsToAdd.forEach(async (element) => {
         await this.channelPosts.create({
-          postId,
           channelId: element,
-          dataBasePostId: postId,
+          postId: postId,
         });
       });
     }
@@ -167,27 +162,27 @@ export class PostsService {
         },
         {
           model: Channels,
-          through: { attributes: [] }, // Не выбираем поля из промежуточной таблицы
+          through: { attributes: [] },
           where: channel ? { id: channel } : undefined,
         },
       ],
-      limit: pageSize,
+      limit: Number(pageSize),
       offset: offset,
       where: whereCondition,
     });
 
-    const totalCount = await this.dataBasePosts.count({
-      where: whereCondition,
-    });
-
     const updatedPosts = posts.map((post) => {
-      post.dataValues.imageData = post.dataValues.imageData.map((img) => {
+      post.dataValues.imageData = post.dataValues.images.map((img) => {
         img.image = `${this.configService.get('S3_PATH')}${this.configService.get('S3_BUCKET_NAME')}/${img.dataValues.image}`;
         return img;
       });
       return post;
     });
+
     const list = await this.regularPublicationTime.findAll();
+    const totalCount = await this.dataBasePosts.count({
+      where: whereCondition,
+    });
 
     return { posts: updatedPosts, totalCount, publishTime: list };
   }

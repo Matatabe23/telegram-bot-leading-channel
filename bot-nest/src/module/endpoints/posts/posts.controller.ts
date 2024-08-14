@@ -95,9 +95,9 @@ export class PostsController {
   @UseGuards(AuthGuard)
   async receiving(
     @Query('page') page: number,
-    @Query('page') pageSize: number,
-    @Query('page') watched: string,
-    @Query('page') channel: string,
+    @Query('pageSize') pageSize: number,
+    @Query('watched') watched: string,
+    @Query('channel') channel: string,
   ) {
     try {
       const result = this.postsService.receiving(
@@ -107,7 +107,7 @@ export class PostsController {
         channel,
       );
 
-      return { ...result };
+      return result;
     } catch (error) {
       console.error(error);
       throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);

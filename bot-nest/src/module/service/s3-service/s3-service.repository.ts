@@ -24,7 +24,6 @@ export class S3Repository {
   async uploadImageToS3(imagePath: any, postId: number): Promise<string> {
     return new Promise((resolve, reject) => {
       const fileName = `${process.env.S3_FOLDER_SAVED}/${postId}/${Date.now()}.png`;
-      console.log(getS3ClientConfig());
 
       const params = {
         Bucket: process.env.S3_BUCKET_NAME,
@@ -38,11 +37,6 @@ export class S3Repository {
       this.s3Client
         .send(uploadCommand)
         .then(() => {
-          fs.unlink(`${imagePath.destination}${imagePath.filename}`, (err) => {
-            if (err) {
-              this.logger.error('Ошибка при удалении файла:', err);
-            }
-          });
           resolve(fileName);
         })
         .catch((err) => {

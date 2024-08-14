@@ -17,6 +17,9 @@ export class DataBasePosts extends Model {
   @Column({ defaultValue: false })
   watched: boolean;
 
+  @Column({ defaultValue: false })
+  waterMark: boolean;
+
   @HasMany(() => ImageData)
   images: ImageData[];
 
