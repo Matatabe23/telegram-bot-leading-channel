@@ -46,7 +46,7 @@ const setlogin = async () => {
     router.push('/publishing-panel');
   } catch (e: any) {
     console.log(e)
-    toast.error('Произошла неизвестная ошибка')
+    toast.error(e.response.data.message)
   } finally {
     postsStore.setStateValueByKey('isLoader', false);
   }

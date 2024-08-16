@@ -7,6 +7,7 @@ import {
   Query,
   HttpException,
   UseGuards,
+  HttpStatus,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -24,8 +25,13 @@ export class AdminController {
       const result = await this.adminService.login(name, password);
       return result;
     } catch (e) {
-      console.log(e);
-      throw new HttpException('Ошибка', 500);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -33,10 +39,16 @@ export class AdminController {
   @UseGuards(AuthGuard)
   async checkDataWeb(@Req() request: any) {
     try {
-      const result = await this.adminService.checkDataWeb(request.body.id);
+      const result = await this.adminService.checkDataWeb(request.authData.id);
       return result;
     } catch (e) {
-      throw new HttpException('Ошибка', 500);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

@@ -7,7 +7,6 @@ import {
   ListObjectsV2Command,
   PutObjectAclCommand,
 } from '@aws-sdk/client-s3';
-import * as fs from 'fs';
 import { getS3ClientConfig } from 'src/config/s3.config';
 import { ConfigService } from '@nestjs/config';
 
@@ -49,10 +48,11 @@ export class S3Repository {
   async deleteImageFromS3(imageUrl: string): Promise<void> {
     const urlParts = imageUrl.split('/');
     const imageKey = urlParts[urlParts.length - 1];
+    const idFolder = urlParts[urlParts.length - 2];
 
     const params = new DeleteObjectCommand({
-      Bucket: this.configService.get('S3_BUCKET_NAME'),
-      Key: `${this.configService.get('S3_FOLDER_SAVED')}/${imageKey}`,
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: `${process.env.S3_FOLDER_SAVED}/${idFolder}/${imageKey}`,
     });
 
     try {

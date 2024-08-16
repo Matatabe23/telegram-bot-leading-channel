@@ -1,6 +1,6 @@
 <template>
   <div class="posts">
-    <div class="posts__header" v-if="postsList.length > 0">
+    <div class="posts__header">
       <div class="posts__info">
         <div v-if="totalCount">Всего постов: {{ totalCount }}</div>
         <div v-if="lastPublishDate">Крайняя дата публикации: {{ lastPublishDate }}</div>
@@ -70,7 +70,7 @@ const delPost = async (id: number) => {
     toast.success(result)
     editorStore.getPosts();
   } catch (e) {
-
+    toast.error(e.response.data.message)
   } finally {
     editorStore.setStateValueByKey('isLoader', false);
   }
@@ -86,7 +86,7 @@ const publishInstantlyPost = async (id: number) => {
     toast.success(result);
     editorStore.getPosts();
   } catch (e: any) {
-    toast.error(e.response.data);
+    toast.error(e.response.data.message)
   } finally {
     editorStore.setStateValueByKey('isLoader', false);
   }
@@ -150,9 +150,10 @@ onMounted(() => {
 })
 
 const formattedChannels = computed(() => {
+  if(!listChannels.value) return
   const channelsArray = listChannels.value.map(channel => ({
     title: channel.name,
-    value: channel.id
+    value: channel.id.toString()
   }));
 
   return [{ title: 'Нечего', value: '' }, ...channelsArray];

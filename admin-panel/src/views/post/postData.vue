@@ -60,7 +60,7 @@ const openPostPanel = async () => {
   } catch (e) {
     router.push('/publishing-panel');
     localStorage.setItem('watched', (''))
-    toast.error('Пост не найде');
+    toast.error(e.response.data.message)
   } finally {
     state.imagesToLoad = state.images.length;
     if (state.imagesToLoad === 0) {
@@ -84,7 +84,7 @@ const switchPostPanel = async (who: string) => {
   } catch (e) {
     router.push('/publishing-panel');
     localStorage.setItem('watched', (''))
-    toast.error('Пост не найде');
+    toast.error(e.response.data.message)
   } finally {
     state.imagesToLoad = state.images.length;
     if (state.imagesToLoad === 0) {
@@ -110,7 +110,7 @@ const delPost = async () => {
     nextPage()
     toast.success(result)
   } catch (e) {
-
+    toast.error(e.response.data.message)
   } finally {
     editorStore.setStateValueByKey('isLoader', false);
   }
@@ -140,7 +140,7 @@ const deleteSelectedImg = async () => {
       await deleteSelectedImgs(state.checkListImage);
       openPostPanel();
     } else {
-      toast.error('Нету выбранных img')
+      toast.error(e.response.data.message)
     }
   } catch (e) {
     toast.error('Ошибка')
@@ -154,7 +154,11 @@ const channelsListSelect = computed(() =>
 );
 
 const updateChannelList = async () => {
-  await editPostLinkСhannels(Number(route.params.id), state.form.useChannelList)
+  try{
+    await editPostLinkСhannels(Number(route.params.id), state.form.useChannelList)
+  } catch(e){
+    toast.error(e.response.data.message)
+  }
 }
 
 onMounted(() => {

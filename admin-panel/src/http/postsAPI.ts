@@ -55,6 +55,6 @@ export const deleteSelectedImgs = async (idList: IImageBlock) => {
 }
 
 export const editPostLinkСhannels = async (postId: number, channelIds?: number[]) => {
-  const { data } = await $autHost.put(`api/posts/editPostLinkChannels`, { params: { postId, channelIds } });
+  const { data } = await $autHost.put(`api/posts/editPostLinkChannels`, { postId, channelIds });
   return data;
 }

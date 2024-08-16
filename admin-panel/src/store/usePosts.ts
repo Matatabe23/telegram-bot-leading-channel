@@ -32,9 +32,7 @@ export const usePosts = defineStore('posts', {
         this.postsList = posts.posts;
         this.totalCount = posts.totalCount;
         this.publishTime = posts.publishTime;
-      } catch (e: any) {
-        console.error(e);
-      }
+      } catch (e: any) {}
     }
   }
 });

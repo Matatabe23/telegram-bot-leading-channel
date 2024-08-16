@@ -6,9 +6,9 @@ import {
   UseInterceptors,
   UploadedFiles,
   HttpException,
+  HttpStatus,
   Put,
   Get,
-  HttpStatus,
   Query,
   Delete,
   Param,
@@ -41,9 +41,14 @@ export class PostsController {
       );
 
       return result;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -60,9 +65,14 @@ export class PostsController {
       );
 
       return result;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -85,9 +95,14 @@ export class PostsController {
       );
 
       return result;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -108,45 +123,66 @@ export class PostsController {
       );
 
       return result;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e) {
+      console.log(e, 'qugor');
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   @Delete('deletePost/:id')
   @UseGuards(AuthGuard)
-  async deletePost(@Query('id') id: number) {
+  async deletePost(@Param('id') id: number) {
     try {
       const result = await this.postsService.deletePost(id);
       return result;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   @Post('publishInstantly/:id')
   @UseGuards(AuthGuard)
-  async publishInstantly(@Query('id') id: number) {
+  async publishInstantly(@Param('id') id: number) {
     try {
       const result = await this.postsService.publishInstantly(id);
       return result;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   @Get('receivingPost/:id')
   @UseGuards(AuthGuard)
-  async receivingPost(@Query('id') id: number) {
+  async receivingPost(@Param('id') id: number) {
     try {
       const result = await this.postsService.receivingPost(id);
       return result;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -160,22 +196,32 @@ export class PostsController {
     try {
       const result = await this.postsService.changePage(id, where, watched);
       return result;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
   @Get('deleteSelectedImgs')
   @UseGuards(AuthGuard)
-  async deleteSelectedImgs(@Body() body: { idList: IImageBlock[] }) {
+  async deleteSelectedImgs(@Query() query: { idList: IImageBlock[] }) {
     try {
-      const { idList } = body;
+      const { idList } = query;
       const result = await this.postsService.deleteSelectedImgs(idList);
       return result;
-    } catch (error) {
-      console.error(error);
-      throw new HttpException('Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

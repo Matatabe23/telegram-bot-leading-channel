@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { DataBasePosts } from 'src/module/db/models/data-base-posts.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
@@ -10,7 +10,7 @@ import { TGBotService } from 'src/module/service/tg-bot-service/tg-bot-service.r
 import { IImageBlock } from 'src/type/types';
 import { ConfigService } from '@nestjs/config';
 import { RegularPublicationTime } from 'src/module/db/models/regularPublicationTime.repository';
-import { Op } from 'sequelize';
+import { Op, Order } from 'sequelize';
 
 @Injectable()
 export class PostsService {
@@ -33,7 +33,7 @@ export class PostsService {
 
   async publication(files: any, waterMark: boolean, chatIdList: string[]) {
     if (chatIdList.length === 0 && chatIdList[0] === '')
-      throw new Error('Нету каналов для публикации');
+      throw new NotFoundException('Нету каналов для публикации');
 
     const post = await this.dataBasePosts.create({
       waterMark,
@@ -67,7 +67,7 @@ export class PostsService {
 
   async editPostLinkСhannels(postId: number, channelIds?: number[]) {
     if (!postId || !Array.isArray(channelIds)) {
-      throw new Error('Неверный формат параметров запроса');
+      throw new NotFoundException('Неверный формат параметров запроса');
     }
 
     const existingRecords = await this.channelPosts.findAll({
@@ -114,7 +114,7 @@ export class PostsService {
     chatIdList: string[],
   ) {
     if (chatIdList.length === 0 && chatIdList[0] === '')
-      throw new Error('Нету каналов для публикации');
+      throw new NotFoundException('Нету каналов для публикации');
 
     if (waterMark === true) {
       for (const file of files) {
@@ -140,7 +140,7 @@ export class PostsService {
     channel: string,
   ) {
     if (isNaN(page) || isNaN(pageSize)) {
-      throw new Error('Неверный формат параметров запроса');
+      throw new NotFoundException('Неверный формат параметров запроса');
     }
 
     const offset = (page - 1) * pageSize;
@@ -173,7 +173,7 @@ export class PostsService {
 
     const updatedPosts = posts.map((post) => {
       post.dataValues.imageData = post.dataValues.images.map((img) => {
-        img.image = `${this.configService.get('S3_PATH')}${this.configService.get('S3_BUCKET_NAME')}/${img.dataValues.image}`;
+        img.image = `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${img.dataValues.image}`;
         return img;
       });
       return post;
@@ -182,6 +182,13 @@ export class PostsService {
     const list = await this.regularPublicationTime.findAll();
     const totalCount = await this.dataBasePosts.count({
       where: whereCondition,
+      include: [
+        {
+          model: Channels,
+          through: { attributes: [] },
+          where: channel ? { id: channel } : undefined,
+        },
+      ],
     });
 
     return { posts: updatedPosts, totalCount, publishTime: list };
@@ -190,13 +197,13 @@ export class PostsService {
   async deletePost(id: number) {
     const post = await this.dataBasePosts.findByPk(id);
     if (!post) {
-      throw new Error('Пост не найден');
+      throw new NotFoundException('Пост не найден');
     }
     const images = await this.imageData.findAll({
       where: { dataBasePostId: id },
     });
     const imageList = images.map((item) => {
-      return `${this.configService.get('S3_PATH')}${this.configService.get('S3_BUCKET_NAME')}/${item.dataValues.image}`;
+      return `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`;
     });
 
     await ChannelPosts.destroy({ where: { postId: id } });
@@ -221,16 +228,16 @@ export class PostsService {
     });
 
     if (!post) {
-      throw new Error('Пост не найден');
+      throw new NotFoundException('Пост не найден');
     }
 
     if (post.dataValues.channels.length === 0)
-      throw new Error('Нету каналов для публикации');
+      throw new NotFoundException('Нету каналов для публикации');
     const images = await this.imageData.findAll({
       where: { dataBasePostId: id },
     });
     const imageList = images.map((item) => {
-      return `${this.configService.get('S3_PATH')}${this.configService.get('S3_BUCKET_NAME')}/${item.dataValues.image}`;
+      return `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`;
     });
 
     const deletePost = async () => {
@@ -268,12 +275,12 @@ export class PostsService {
 
     const channelsList = await this.channels.findAll();
 
-    if (!post) throw new Error('Пост не найден');
+    if (!post) throw new NotFoundException('Пост не найден');
 
-    const imageList = post.dataValues.imageData.map((item) => {
+    const imageList = post.dataValues.images.map((item) => {
       return {
         id: item.dataValues.id,
-        img: `${this.configService.get('S3_PATH')}${this.configService.get('S3_BUCKET_NAME')}/${item.dataValues.image}`,
+        img: `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`,
         dataBasePostId: item.dataValues.dataBasePostId,
       };
     });
@@ -295,12 +302,12 @@ export class PostsService {
 
     const condition =
       where === 'next'
-        ? { [Op.gt]: id }
+        ? { id: { [Op.gt]: id } }
         : where === 'back'
-          ? { [Op.lt]: id }
-          : null;
+          ? { id: { [Op.lt]: id } }
+          : {};
 
-    const order =
+    const order: Order =
       where === 'next'
         ? [['id', 'ASC']]
         : where === 'back'
@@ -310,16 +317,16 @@ export class PostsService {
     const post = await this.dataBasePosts.findOne({
       include: [{ model: Channels }, { model: ImageData }],
       where: {
-        id: condition,
+        ...condition,
         ...whereCondition,
       },
-      ...order,
+      order: order,
     });
 
     const channelsList = await this.channels.findAll();
 
     if (!post) {
-      throw new Error('Пост не найден');
+      throw new NotFoundException('Пост не найден');
     }
 
     const images = await this.imageData.findAll({
@@ -328,7 +335,7 @@ export class PostsService {
     const imageList = images.map((item) => {
       return {
         id: item.dataValues.id,
-        img: `${this.configService.get('S3_PATH')}${this.configService.get('S3_BUCKET_NAME')}/${item.dataValues.image}`,
+        img: `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`,
         dataBasePostId: item.dataValues.dataBasePostId,
       };
     });

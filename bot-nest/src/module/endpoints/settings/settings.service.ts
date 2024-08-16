@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RegularPublicationBotRepository } from 'src/module/service/regular-publication-bot-service/regular-publication-bot-service.repository';
 
@@ -22,7 +22,7 @@ export class SettingsService {
       Number(hour) < 0 ||
       Number(hour) > 24
     ) {
-      throw new Error('Некорректные данные');
+      throw new NotFoundException('Некорректные данные');
     }
     if (
       minute === '' ||
@@ -30,10 +30,10 @@ export class SettingsService {
       Number(minute) < 0 ||
       Number(minute) > 59
     ) {
-      throw new Error('Некорректные данные');
+      throw new NotFoundException('Некорректные данные');
     }
     if (!channelId) {
-      throw new Error('Некорректный айди чата');
+      throw new NotFoundException('Некорректный айди чата');
     }
 
     await this.regularPublicationTime.create({
@@ -57,7 +57,7 @@ export class SettingsService {
   async deleteItemPublicationTimes(id) {
     const times = await this.regularPublicationTime.findByPk(id);
     if (!times) {
-      throw new Error('Некорректные данные');
+      throw new NotFoundException('Некорректные данные');
     }
 
     await this.regularPublicationTime.destroy({ where: { id } });
@@ -67,7 +67,7 @@ export class SettingsService {
   }
 
   async addingNewChannels(name, chatId) {
-    if (!name || !chatId) throw new Error('Некорректные данные');
+    if (!name || !chatId) throw new NotFoundException('Некорректные данные');
 
     await this.channels.create({
       name: name,
@@ -92,7 +92,7 @@ export class SettingsService {
   async deleteChannel(id) {
     const times = await this.channels.findByPk(id);
     if (!times) {
-      throw new Error('Некорректные данные');
+      throw new NotFoundException('Некорректные данные');
     }
 
     await this.channels.destroy({ where: { id } });

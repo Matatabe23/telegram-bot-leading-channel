@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import fs from 'fs';
+import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
 
 import { FileRepository } from 'src/module/service/file-service/file-service.repository';
@@ -28,6 +28,7 @@ export class TGBotService {
     @InjectModel(Channels)
     private readonly channels: typeof Channels,
     @InjectModel(ChannelPosts)
+    private readonly channelPosts: typeof ChannelPosts,
     private readonly fileRepository: FileRepository,
     private readonly s3Repository: S3Repository,
     private readonly configService: ConfigService,
@@ -58,7 +59,7 @@ export class TGBotService {
       let filePath: any = '';
       try {
         const result = await this.fileRepository.downloadFile(
-          `${this.configService.get('S3_PATH')}${this.configService.get('S3_BUCKET_NAME')}/${item.dataValues.image}`,
+          `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`,
         );
         filePath = result;
 

@@ -9,6 +9,8 @@ import {
   Param,
   Res,
   UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { SettingsService } from './settings.service';
@@ -29,9 +31,14 @@ export class SettingsController {
         channelId,
       );
       res.json(result);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -45,9 +52,14 @@ export class SettingsController {
       const list =
         await this.settingsService.getListRegularPublicationTimes(channelId);
       res.json(list);
-    } catch (error) {
-      console.error('Error fetching regular publication times:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -60,9 +72,14 @@ export class SettingsController {
     try {
       const result = await this.settingsService.deleteItemPublicationTimes(id);
       res.json(result);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -73,9 +90,14 @@ export class SettingsController {
       const { name, chatId } = body;
       const result = await this.settingsService.addingNewChannels(name, chatId);
       res.json(result);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -85,9 +107,14 @@ export class SettingsController {
     try {
       const list = await this.settingsService.getListChannel();
       res.json(list);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -97,9 +124,14 @@ export class SettingsController {
     try {
       const result = await this.settingsService.deleteChannel(id);
       res.json(result);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -109,9 +141,14 @@ export class SettingsController {
       const { id, settings } = body;
       const result = await this.settingsService.editChannel(id, settings);
       res.json(result);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Server Error');
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
