@@ -12,20 +12,34 @@ export class FileRepository {
     fs.mkdirSync(this.imageFolder, { recursive: true });
   }
 
-  async downloadFile(url: string): Promise<string> {
+  async downloadFile(url: string): Promise<{
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    buffer: Buffer;
+    size: number;
+  }> {
     try {
-      const localFilePath = path.join(this.imageFolder, path.basename(url));
       const response = await axios({
         url,
         method: 'GET',
-        responseType: 'stream',
+        responseType: 'arraybuffer',
       });
-      const writer = fs.createWriteStream(localFilePath);
-      response.data.pipe(writer);
-      return new Promise((resolve, reject) => {
-        writer.on('finish', () => resolve(localFilePath));
-        writer.on('error', reject);
-      });
+
+      const buffer = Buffer.from(response.data);
+      const originalname = path.basename(url);
+      const mimetype =
+        response.headers['content-type'] || 'application/octet-stream';
+
+      return {
+        fieldname: 'files[]',
+        originalname,
+        encoding: '7bit',
+        mimetype,
+        buffer,
+        size: buffer.length,
+      };
     } catch (error) {
       throw new Error('Ошибка при скачивании файла: ' + error.message);
     }

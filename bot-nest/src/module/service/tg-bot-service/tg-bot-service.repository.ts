@@ -11,6 +11,8 @@ import { ImageData } from 'src/module/db/models/imageData.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
 import { ChannelPosts } from 'src/module/db/models/channel-posts.repository';
 
+import { WaterMarkRepository } from '../water-mark-service/water-mark-service.repository';
+
 import * as TelegramBot from 'node-telegram-bot-api';
 
 import { waterMark } from 'src/const/const';
@@ -31,7 +33,7 @@ export class TGBotService {
     private readonly channelPosts: typeof ChannelPosts,
     private readonly fileRepository: FileRepository,
     private readonly s3Repository: S3Repository,
-    private readonly configService: ConfigService,
+    private readonly waterMarkRepository: WaterMarkRepository,
   ) {
     this.bot = new TelegramBot(process.env.TELEGRAM_BOT_API_TOKEN, {
       polling: true,
@@ -54,18 +56,19 @@ export class TGBotService {
     if (!postWithImages) return;
 
     const media: any = [];
-
-    for (const item of postWithImages.imageData) {
-      let filePath: any = '';
+    for (const item of postWithImages.dataValues.images) {
       try {
         const result = await this.fileRepository.downloadFile(
           `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`,
         );
-        filePath = result;
+
+        const mediaBuffer = postWithImages.waterMark
+          ? await this.waterMarkRepository.addWatermark(result)
+          : result;
 
         media.push({
           type: 'photo',
-          media: fs.createReadStream(filePath),
+          media: mediaBuffer.buffer,
           id: item.id,
           caption: '#QugorArts',
         });
@@ -81,15 +84,8 @@ export class TGBotService {
     }
 
     const deleteImage = async () => {
-      const deletePromises = postWithImages.imageData.map((file) =>
-        this.fileRepository.deleteLocalFile(
-          file.dataValues.image.split('/').pop(),
-        ),
-      );
-      await Promise.all(deletePromises);
-
       await Promise.all(
-        postWithImages.imageData.map(async (item: any) => {
+        postWithImages.dataValues.images.map(async (item: any) => {
           await this.imageData.destroy({ where: { id: item.id } });
           this.s3Repository.deleteImageFromS3(item.image);
         }),
@@ -109,33 +105,14 @@ export class TGBotService {
     }
   }
 
-  async instantPublicationPosts(
-    files: any,
-    chatId: string,
-    stringArray?: boolean,
-  ) {
+  async instantPublicationPosts(files: any, chatId: string) {
     return new Promise(async (resolve, reject) => {
       const media: any = [];
 
       for (const file of files) {
-        let filePath: any = '';
-
-        if (stringArray) {
-          try {
-            const result = await this.fileRepository.downloadFile(file);
-            filePath = result;
-          } catch (error) {
-            console.error('Ошибка при скачивании файла:', error);
-            reject(error);
-            return;
-          }
-        } else {
-          filePath = file.path;
-        }
-
         const mediaBlock = {
           type: 'photo',
-          media: fs.createReadStream(filePath),
+          media: file.buffer,
           caption: waterMark,
         };
         media.push(mediaBlock);
@@ -149,13 +126,6 @@ export class TGBotService {
 
       try {
         await this.bot.sendMediaGroup(chatId as string, media);
-        const deletePromises = files.map((file) =>
-          this.fileRepository.deleteLocalFile(
-            stringArray ? file.split('/').pop() : file.path.split('\\').pop(),
-          ),
-        );
-        await Promise.all(deletePromises);
-
         resolve(true);
       } catch (error: any) {
         console.error('Ошибка при отправке сообщения:', error);

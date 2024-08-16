@@ -117,12 +117,17 @@ export class PostsService {
       throw new NotFoundException('Нету каналов для публикации');
 
     if (waterMark === true) {
-      for (const file of files) {
-        await this.waterMarkRepository.addWatermark(file);
-      }
+      const imagesFromWaterMark = await Promise.all(
+        files.map(async (item) => {
+          return this.waterMarkRepository.addWatermark(item);
+        }),
+      );
 
       for (const chatId of chatIdList) {
-        await this.tGBotService.instantPublicationPosts(files, chatId);
+        await this.tGBotService.instantPublicationPosts(
+          imagesFromWaterMark,
+          chatId,
+        );
       }
       return 'Успешная моментальная публикация';
     }
@@ -257,11 +262,7 @@ export class PostsService {
     }
 
     for (const element of post.dataValues.channels) {
-      await this.tGBotService.instantPublicationPosts(
-        path,
-        element.chatId,
-        true,
-      );
+      await this.tGBotService.instantPublicationPosts(path, element.chatId);
     }
     await deletePost();
 
