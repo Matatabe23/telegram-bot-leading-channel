@@ -32,7 +32,7 @@ export class PostsService {
   ) {}
 
   async publication(files: any, waterMark: boolean, chatIdList: string[]) {
-    if (chatIdList.length === 0 && chatIdList[0] === '')
+    if (chatIdList.length === 0 || chatIdList[0] === '')
       throw new NotFoundException('Нету каналов для публикации');
 
     const post = await this.dataBasePosts.create({
