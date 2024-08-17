@@ -7,10 +7,9 @@
       <div class="post__post-ietails">
         <h2 class="post__post-title">id: {{ props.post.id }}</h2>
         <div class="post__controle-buttons">
-          <MainButton class="post__delete-button" @click="emit('delete-post', props.post.id)">Удалить</MainButton>
-          <MainButton class="post__open-button" @click="router.push(`post/${props.post.id}`)">Открыть</MainButton>
-          <MainButton class="post__push-button" @click="emit('publish-instantly-post', props.post.id)">Опубликовать
-          </MainButton>
+          <v-btn color="#5865f2" variant="flat" @click="emit('delete-post', props.post.id)">Удалить</v-btn>
+          <v-btn color="#5865f2" variant="flat" @click="router.push(`post/${props.post.id}`)">Открыть</v-btn>
+          <v-btn color="#5865f2" variant="flat" @click="emit('publish-instantly-post', props.post.id)">Опубликовать</v-btn>
         </div>
       </div>
     </div>

@@ -8,9 +8,9 @@ import { WaterMarkRepository } from 'src/module/service/water-mark-service/water
 import { S3Repository } from 'src/module/service/s3-service/s3-service.repository';
 import { TGBotService } from 'src/module/service/tg-bot-service/tg-bot-service.repository';
 import { IImageBlock } from 'src/type/types';
-import { ConfigService } from '@nestjs/config';
 import { RegularPublicationTime } from 'src/module/db/models/regularPublicationTime.repository';
 import { Op, Order } from 'sequelize';
+import { FileRepository } from 'src/module/service/file-service/file-service.repository';
 
 @Injectable()
 export class PostsService {
@@ -28,7 +28,7 @@ export class PostsService {
     private readonly waterMarkRepository: WaterMarkRepository,
     private readonly s3Repository: S3Repository,
     private readonly tGBotService: TGBotService,
-    private readonly configService: ConfigService,
+    private readonly fileRepository: FileRepository,
   ) {}
 
   async publication(files: any, waterMark: boolean, chatIdList: string[]) {
@@ -238,11 +238,9 @@ export class PostsService {
 
     if (post.dataValues.channels.length === 0)
       throw new NotFoundException('Нету каналов для публикации');
+
     const images = await this.imageData.findAll({
       where: { dataBasePostId: id },
-    });
-    const imageList = images.map((item) => {
-      return `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`;
     });
 
     const deletePost = async () => {
@@ -251,18 +249,27 @@ export class PostsService {
 
       await post.destroy();
 
-      for (const image of imageList) {
-        await this.s3Repository.deleteImageFromS3(image);
+      for (const image of images) {
+        await this.s3Repository.deleteImageFromS3(image.dataValues.image);
       }
     };
 
-    const path: string[] = [];
-    for (const image of imageList) {
-      path.push(image);
+    const files = [];
+
+    for (const image of images) {
+      const result = await this.fileRepository.downloadFile(
+        `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${image.dataValues.image}`,
+      );
+
+      files.push(result);
     }
 
     for (const element of post.dataValues.channels) {
-      await this.tGBotService.instantPublicationPosts(path, element.chatId);
+      await this.tGBotService.instantPublicationPosts(
+        files,
+        element.chatId,
+        post.dataValues.waterMark,
+      );
     }
     await deletePost();
 

@@ -10,7 +10,7 @@
       <div class="publishing-panel__publishes-form">
 
         <div class="publishing-panel__buttons">
-          <v-btn color="#5865f2" variant="flat">
+          <v-btn color="#5865f2" variant="flat" @click="selectFile">
             <input id="file-upload" type="file" ref="fileInput" multiple @change="handleFileUpload">
             <label for="file-upload" class="publishing-panel__custom-file-upload">
               <i class="fas fa-upload"></i> Загрузить файлы
@@ -143,6 +143,10 @@ const selectFolder = () => {
   folderInput.value.click()
 }
 
+const selectFile = () => {
+  fileInput.value.click()
+}
+
 const handleFolderSelection = async (event: any) => {
   try {
     const files = event.target.files;
@@ -262,15 +266,12 @@ settingsStore.getListChannels();
 
   &__custom-file-upload {
     display: inline-block;
-    cursor: pointer;
     font-size: 16px;
     color: #fff;
     border-radius: 5px;
     transition: all 0.3s ease;
-
-    &:hover {
-      background-color: var(--button-hover-color);
-    }
+    cursor: pointer;
+    pointer-events: none;
   }
 
   #file-upload {

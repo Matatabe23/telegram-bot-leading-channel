@@ -6,9 +6,10 @@ import { WaterMarkModule } from 'src/module/service/water-mark-service/water-mar
 import { S3Module } from 'src/module/service/s3-service/s3-service.module';
 import { DBModule } from 'src/module/db/db.module';
 import { TGModule } from 'src/module/service/tg-bot-service/tg-bot-service.module';
+import { FileModule } from 'src/module/service/file-service/file-service.module';
 
 @Module({
-  imports: [DBModule, WaterMarkModule, S3Module, TGModule],
+  imports: [DBModule, WaterMarkModule, S3Module, TGModule, FileModule],
   controllers: [PostsController],
   providers: [PostsService, AuthGuard],
 })

@@ -15,7 +15,6 @@ export class WaterMarkRepository {
     size: number;
   }) {
     try {
-      // Чтение изображения из буфера
       const image = await Jimp.read(file.buffer);
       let watermark = await Jimp.read('src/assets/image/waterMark.png');
       watermark = watermark.resize(
@@ -23,21 +22,17 @@ export class WaterMarkRepository {
         watermark.bitmap.height / 1.5,
       );
 
-      // Расположение водяного знака
       const x = (image.bitmap.width - watermark.bitmap.width) / 2;
       const y = image.bitmap.height - watermark.bitmap.height - 10;
 
-      // Наложение водяного знака на изображение
       image.composite(watermark, x, y, {
         mode: Jimp.BLEND_SOURCE_OVER,
         opacitySource: 1,
         opacityDest: 1,
       });
 
-      // Конвертация изображения обратно в буфер
       const outputBuffer = await image.getBufferAsync(Jimp.MIME_PNG);
 
-      // Возврат результата
       return {
         ...file,
         buffer: outputBuffer,

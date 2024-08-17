@@ -1,7 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import * as fs from 'fs';
-import { ConfigService } from '@nestjs/config';
 
 import { FileRepository } from 'src/module/service/file-service/file-service.repository';
 import { S3Repository } from 'src/module/service/s3-service/s3-service.repository';
@@ -14,8 +12,6 @@ import { ChannelPosts } from 'src/module/db/models/channel-posts.repository';
 import { WaterMarkRepository } from '../water-mark-service/water-mark-service.repository';
 
 import * as TelegramBot from 'node-telegram-bot-api';
-
-import { waterMark } from 'src/const/const';
 
 @Injectable()
 export class TGBotService {
@@ -105,23 +101,30 @@ export class TGBotService {
     }
   }
 
-  async instantPublicationPosts(files: any, chatId: string) {
+  async instantPublicationPosts(
+    files: any,
+    chatId: string,
+    waterMark?: boolean,
+  ) {
     return new Promise(async (resolve, reject) => {
       const media: any = [];
-
-      for (const file of files) {
-        const mediaBlock = {
-          type: 'photo',
-          media: file.buffer,
-          caption: waterMark,
-        };
-        media.push(mediaBlock);
-      }
-
-      if (media.length > 10) {
+      if (files.length > 10) {
         console.error('Слишком много медиафайлов');
         reject(new Error('Слишком много медиафайлов'));
         return;
+      }
+
+      for (const file of files) {
+        const mediaBuffer = waterMark
+          ? await this.waterMarkRepository.addWatermark(file)
+          : file;
+
+        const mediaBlock = {
+          type: 'photo',
+          media: mediaBuffer.buffer,
+          caption: '#QugorArts',
+        };
+        media.push(mediaBlock);
       }
 
       try {
