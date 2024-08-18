@@ -4,7 +4,7 @@
       <div class="post__post-images">
         <img class="post__post-image" v-for="img in props.post.imageData" :key="img.id" :src="img.image" alt="">
       </div>
-      <div class="post__post-ietails">
+      <div class="post__post-details">
         <h2 class="post__post-title">id: {{ props.post.id }}</h2>
         <div class="post__controle-buttons">
           <v-btn color="#5865f2" variant="flat" @click="emit('delete-post', props.post.id)">Удалить</v-btn>
@@ -44,6 +44,7 @@ const emit = defineEmits<{
 
   &__post-content {
     display: flex;
+    align-items: center;
     padding: 20px;
   }
 
@@ -56,15 +57,14 @@ const emit = defineEmits<{
     height: 100px;
     border-radius: 8px;
     object-fit: cover;
-    margin-bottom: 10px;
   }
 
   &__post-details {
-    flex: 1;
   }
 
   &__post-title {
     font-size: 18px;
+    font-weight: 400;
     margin-bottom: 10px;
     color: #333;
   }

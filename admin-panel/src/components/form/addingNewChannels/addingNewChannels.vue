@@ -22,7 +22,7 @@
           :model-value="channel.settings.includes(IEditChannelType.PRIVATED)">
         </VSwitch>
 
-        <MainButton @click="delChannel(channel.id)">Удалить</MainButton>
+        <v-btn color="#5865f2" variant="flat" @click="delChannel(channel.id)">Удалить</v-btn>
       </div>
     </div>
   </div>

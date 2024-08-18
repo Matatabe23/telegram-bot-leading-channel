@@ -22,7 +22,7 @@
       ></v-select>
       </div>
 
-      <MainButton @click="saveTime">Сохранить</MainButton>
+      <v-btn color="#5865f2" variant="flat" @click="saveTime">Сохранить</v-btn>
       <h3 v-if="state.listPublicationTimes.length">Время регулярной публикации</h3>
       <div class="adding-publication-time-settings__list-time" v-for="listPublicationTime in state.listPublicationTimes"
         :key="listPublicationTime.id">
@@ -32,7 +32,7 @@
         <div>
           Минуты: {{ listPublicationTime.minute }}
         </div>
-        <MainButton @click="deleteTime(listPublicationTime.id)">Удалить</MainButton>
+        <v-btn color="#5865f2" variant="flat" @click="deleteTime(listPublicationTime.id)">Удалить</v-btn>
       </div>
     </div>
   </div>
