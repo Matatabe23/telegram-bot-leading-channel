@@ -30,12 +30,3 @@ export const roles: IAdministratorRole[] = [
     ChangeInfo: [],
   },
 ];
-
-export const NOT_AUTHORIZED = 'Не авторизован';
-export const NO_ACCESS = 'Нет доступа';
-export const USER_NOT_FOUND = 'Пользователь не найден';
-export const ERROR = 'Ошибка';
-
-export const multerPath = 'src/image/';
-
-export const waterMark = '#QugorArts';

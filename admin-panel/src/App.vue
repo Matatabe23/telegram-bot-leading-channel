@@ -2,7 +2,7 @@
   <div class="app">
     <TreePanel v-if="route.path !== '/'" />
     <router-view />
-    <Loader v-if="isLoader"/>
+    <Loader v-if="isLoader" />
   </div>
 </template>
 
@@ -14,7 +14,9 @@ import { usePosts } from '@/store/usePosts';
 import { storeToRefs } from 'pinia';
 import TreePanel from '@/components/form/TreePanel/ThreePanel.vue'
 import Loader from '@/components/UI/Loader.vue'
+import { useSettings } from '@/store/useSettings';
 
+const settingsStore = useSettings();
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuth();
@@ -33,7 +35,8 @@ const getDataAdmin = async () => {
 }
 
 onMounted(() => {
-  getDataAdmin()
+  getDataAdmin();
+  settingsStore.getListChannels();
 })
 
 </script>

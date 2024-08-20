@@ -207,8 +207,6 @@ const channelsListSelect = computed(() =>
 onMounted(() => {
   getSettings()
 })
-
-settingsStore.getListChannels();
 </script>
 
 <style lang="scss">

@@ -29,17 +29,20 @@ import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { usePosts } from '@/store/usePosts';
 import { deleteSelectedImgs, editPostLinkСhannels } from '@/http/postsAPI'
+import { useSettings } from '@/store/useSettings';
+import { storeToRefs } from 'pinia';
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 const editorStore = usePosts();
+const settingsStore = useSettings();
+const { listChannels } = storeToRefs(settingsStore);
 
 const state = reactive({
   images: [],
   checkListImage: [],
   imagesToLoad: 0,
-  channelsList: [],
 
   form: {
     useChannelList: []
@@ -55,7 +58,6 @@ const openPostPanel = async () => {
 
     const response = await receivingPost(Number(route.params.id));
     state.images = response.imageList;
-    state.channelsList = response.channelsList;
     state.form.useChannelList = response.channelsPost?.map(item => item.id)
   } catch (e) {
     router.push('/publishing-panel');
@@ -78,7 +80,6 @@ const switchPostPanel = async (who: string) => {
 
     const response = await changePage(Number(route.params.id), who, watched)
     state.images = response.imageList;
-    state.channelsList = response.channelsList;
     state.form.useChannelList = response.channelsPost?.map(item => item.id)
     router.push(response.postId.toString())
   } catch (e) {
@@ -149,9 +150,15 @@ const deleteSelectedImg = async () => {
   }
 }
 
-const channelsListSelect = computed(() =>
-  state.channelsList.map(item => ({ title: item.name, value: item.id }))
-);
+const channelsListSelect = computed(() => {
+  if(!listChannels.value) return
+  const channelsArray = listChannels.value.map(channel => ({
+    title: channel.name,
+    value: channel.id
+  }));
+
+  return channelsArray
+});
 
 const updateChannelList = async () => {
   try{

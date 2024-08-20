@@ -281,8 +281,6 @@ export class PostsService {
       include: [{ model: Channels }, { model: ImageData }],
     });
 
-    const channelsList = await this.channels.findAll();
-
     if (!post) throw new NotFoundException('Пост не найден');
 
     const imageList = post.dataValues.images.map((item) => {
@@ -295,7 +293,7 @@ export class PostsService {
 
     await post.update({ watched: true });
 
-    return { imageList, channelsPost: post.dataValues.channels, channelsList };
+    return { imageList, channelsPost: post.dataValues.channels };
   }
 
   async changePage(id: number, where: string, watched: string) {
@@ -331,8 +329,6 @@ export class PostsService {
       order: order,
     });
 
-    const channelsList = await this.channels.findAll();
-
     if (!post) {
       throw new NotFoundException('Пост не найден');
     }
@@ -354,7 +350,6 @@ export class PostsService {
       postId: post.dataValues.id,
       imageList,
       channelsPost: post.dataValues.channels,
-      channelsList,
     };
   }
 

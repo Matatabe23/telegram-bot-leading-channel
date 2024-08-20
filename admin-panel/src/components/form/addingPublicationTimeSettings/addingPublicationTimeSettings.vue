@@ -41,7 +41,7 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 import { addingPublicationTime, getListRegularPublicationTimes, deleteItemPublicationTimes } from '@/http/settingsAPI'
-import { IAddingPublicationTimeSettings, IGetListChannels } from '@/types'
+import { IAddingPublicationTimeSettings } from '@/types'
 import { useToast } from 'vue-toastification';
 import { VSelect } from 'vuetify/components';
 import { storeToRefs } from 'pinia';
