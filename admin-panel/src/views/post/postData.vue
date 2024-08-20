@@ -77,8 +77,9 @@ const switchPostPanel = async (who: string) => {
     state.form.useChannelList = []
     state.images = []
     const watched = localStorage.getItem('watched') || ''
+    const channel = localStorage.getItem('channel') || ''
 
-    const response = await changePage(Number(route.params.id), who, watched)
+    const response = await changePage(Number(route.params.id), who, watched, channel)
     state.images = response.imageList;
     state.form.useChannelList = response.channelsPost?.map(item => item.id)
     router.push(response.postId.toString())
@@ -151,7 +152,7 @@ const deleteSelectedImg = async () => {
 }
 
 const channelsListSelect = computed(() => {
-  if(!listChannels.value) return
+  if (!listChannels.value) return
   const channelsArray = listChannels.value.map(channel => ({
     title: channel.name,
     value: channel.id
@@ -161,9 +162,9 @@ const channelsListSelect = computed(() => {
 });
 
 const updateChannelList = async () => {
-  try{
+  try {
     await editPostLinkСhannels(Number(route.params.id), state.form.useChannelList)
-  } catch(e){
+  } catch (e) {
     toast.error(e.response.data.message)
   }
 }

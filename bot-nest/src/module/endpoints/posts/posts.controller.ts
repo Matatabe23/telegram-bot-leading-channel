@@ -192,9 +192,15 @@ export class PostsController {
     @Param('id') id: number,
     @Query('where') where?: string,
     @Query('watched') watched?: string,
+    @Query('channel') channel?: string,
   ) {
     try {
-      const result = await this.postsService.changePage(id, where, watched);
+      const result = await this.postsService.changePage(
+        id,
+        where,
+        watched,
+        channel,
+      );
       return result;
     } catch (e) {
       throw new HttpException(

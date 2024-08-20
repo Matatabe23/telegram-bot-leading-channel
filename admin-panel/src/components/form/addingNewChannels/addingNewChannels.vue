@@ -8,7 +8,7 @@
         <v-text-field clearable label="айди чата" variant="outlined" v-model="state.form.chatId"></v-text-field>
       </div>
 
-      <MainButton @click="saveChannel">Сохранить</MainButton>
+      <v-btn color="#5865f2" variant="flat" @click="saveChannel">Сохранить</v-btn>
       <h3 v-if="listChannels.length">Список чатов</h3>
       <div class="adding-new-channels__list-channels" v-for="channel in listChannels" :key="channel.id">
         <div>

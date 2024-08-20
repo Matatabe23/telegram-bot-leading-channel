@@ -44,8 +44,8 @@ export const receivingPost = async (id: number) => {
   return data;
 }
 
-export const changePage = async (id: number, where: string, watched: string) => {
-  const { data } = await $autHost.get(`api/posts/changePage/${id}`, { params: { where, watched } });
+export const changePage = async (id: number, where: string, watched: string, channel?: string) => {
+  const { data } = await $autHost.get(`api/posts/changePage/${id}`, { params: { where, watched, channel } });
   return data;
 }
 

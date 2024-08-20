@@ -296,7 +296,12 @@ export class PostsService {
     return { imageList, channelsPost: post.dataValues.channels };
   }
 
-  async changePage(id: number, where: string, watched: string) {
+  async changePage(
+    id: number,
+    where: string,
+    watched: string,
+    channel: string,
+  ) {
     let whereCondition: {
       watched?: boolean;
     } = {};
@@ -321,7 +326,14 @@ export class PostsService {
           : [['id', 'ASC']];
 
     const post = await this.dataBasePosts.findOne({
-      include: [{ model: Channels }, { model: ImageData }],
+      include: [
+        {
+          model: Channels,
+          through: { attributes: [] },
+          where: channel ? { id: channel } : undefined,
+        },
+        { model: ImageData },
+      ],
       where: {
         ...condition,
         ...whereCondition,
@@ -333,10 +345,7 @@ export class PostsService {
       throw new NotFoundException('Пост не найден');
     }
 
-    const images = await this.imageData.findAll({
-      where: { dataBasePostId: post.dataValues.id },
-    });
-    const imageList = images.map((item) => {
+    const imageList = post.images.map((item) => {
       return {
         id: item.dataValues.id,
         img: `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`,
