@@ -1,0 +1,24 @@
+@import '@vueup/vue-quill/dist/vue-quill.snow.css';
+
+.ql-toolbar.ql-snow {
+	border: none;
+	border-bottom: 1px solid #939599;
+	padding: 0;
+}
+
+.ql-container.ql-snow {
+	border: none;
+}
+
+.ql-editor {
+	padding: 1rem 0 0 0;
+}
+
+.ql-editor.ql-blank::before {
+	color: #939599;
+	content: attr(data-placeholder);
+	font-style: normal;
+	font-weight: 500;
+	pointer-events: none;
+	left: 0px;
+}

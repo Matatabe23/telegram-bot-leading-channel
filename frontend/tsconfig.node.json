@@ -1,0 +1,17 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "declaration": false,
+        "module": "Es2022",
+        "target": "ES2022",
+        "jsx": "preserve",
+        "moduleResolution": "Bundler",
+        "types": [
+            "node",
+        ],
+        "noEmit": true,
+    },
+        "include": [
+    "vite.config.ts",
+    ],
+}

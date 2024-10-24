@@ -1,0 +1,44 @@
+@import './floating.scss';
+@import './quillEditor.scss';
+@import 'swiper/css';
+
+html {
+	scroll-behavior: smooth;
+}
+
+%custom-scroll {
+	&::-webkit-scrollbar {
+		width: 12px;
+		background-color: #e6e8ed;
+		border-radius: 10px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		height: 20px;
+		max-height: 40px;
+		box-shadow: inset 0 0 10px 10px #0075ff;
+		border: solid 2px transparent;
+		border-radius: 10px;
+	}
+}
+
+.custom-scroll {
+	@extend %custom-scroll;
+}
+
+.v-popper--theme-menu .v-popper {
+	&__inner {
+		background: white;
+		box-shadow: 0 0 12px 0 #00000026;
+		padding: 16px;
+		border-radius: 16px;
+	}
+
+	&__arrow-outer {
+		display: none;
+	}
+
+	&__arrow-inner {
+		display: none;
+	}
+}
