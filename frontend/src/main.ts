@@ -8,6 +8,9 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import { router } from './app/router';
 
+import vuetify from '@/shared/plugins/vuetify';
+import Toast, { toastOptions } from '@/shared/plugins/toast';
+
 const app = createApp(App);
 const pinia = createPinia();
 
@@ -19,5 +22,7 @@ app.use(FloatingVue)
     .use(VueLazyload, {
         preLoad: 2
     })
+    .use(Toast, toastOptions)
+    .use(vuetify)
     .use(VueTheMask)
     .mount('#app');
