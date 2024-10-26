@@ -1,7 +1,7 @@
 <template>
-	<Auth />
+	<Posts />
 </template>
 
 <script lang="ts" setup>
-	import { Auth } from '@/entities';
+	import { Posts } from '@/entities';
 </script>
