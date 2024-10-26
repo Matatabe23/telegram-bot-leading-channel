@@ -1,15 +1,11 @@
 <template>
-	<div
-		class="publishing-panel w-11/12 mx-auto min-w-[650px] mb-12 border-3 border-gray-600 rounded-lg bg-gray-800 p-4"
-	>
-		<div class="publishing-panel__image">
-			<div
-				class="publishing-panel__image-form flex flex-wrap justify-center items-center gap-2 overflow-y-auto relative"
-			>
+	<div class="publishing-panel flex flex-col w-full mb-12 p-4">
+		<div class="border-2 rounded-2xl">
+			<div class="flex flex-wrap justify-center items-center gap-2 overflow-y-auto relative">
 				<div
 					v-for="(photo, index) in state.images"
 					:key="index"
-					class="publishing-panel__form w-[25vh] h-[40vh] relative"
+					class="w-[25vh] h-[40vh] relative"
 				>
 					<img
 						:src="photo"
@@ -20,9 +16,9 @@
 			</div>
 
 			<div
-				class="publishing-panel__publishes-form flex flex-col items-center justify-center gap-2 pt-4 border-t-3 border-gray-500"
+				class="flex flex-col items-center justify-center gap-2 pt-4 border-t-3 border-gray-500"
 			>
-				<div class="publishing-panel__buttons flex justify-around mb-4">
+				<div class="flex justify-evenly mb-4 w-full">
 					<v-btn
 						color="#5865f2"
 						variant="flat"
@@ -73,8 +69,8 @@
 					</v-btn>
 				</div>
 
-				<div class="publishing-panel__selects flex justify-around">
-					<div class="publishing-panel__select-settings w-1/3 text-white">
+				<div class="flex w-full justify-evenly">
+					<div class="publishing-panel__select-settings">
 						<v-select
 							label="Настройки"
 							:items="settingsSelectPublish"
@@ -83,7 +79,7 @@
 							v-model="state.settingsArray"
 						/>
 					</div>
-					<div class="publishing-panel__select-settings w-1/3 text-white">
+					<div class="publishing-panel__select-settings">
 						<v-select
 							label="Каналы для публикации"
 							:items="channelsListSelect"
@@ -96,11 +92,11 @@
 			</div>
 		</div>
 
-		<ProcentLoader
+		<!-- <ProcentLoader
 			:overlay="state.processLoader.overlay"
 			:total="state.processLoader.total"
 			:loaded="state.processLoader.loaded"
-		/>
+		/> -->
 	</div>
 </template>
 
@@ -288,30 +284,12 @@
 
 <style lang="scss">
 	.publishing-panel {
-		@apply flex flex-col w-full min-w-[650px] mb-12 p-4 border-2 border-gray-600 rounded-lg bg-gray-800;
-
-		&__image-form {
-			@apply flex flex-wrap justify-center items-center gap-2 overflow-y-auto relative;
-		}
-
-		&__form {
-			@apply w-[25vh] h-[40vh] relative object-contain;
-		}
-
-		&__publishes-form {
-			@apply flex flex-col items-center justify-center gap-2 pt-4 border-t-2 border-gray-500;
-		}
-
-		&__buttons {
-			@apply flex justify-around mb-4;
-		}
-
 		&__custom-file-upload {
 			@apply inline-block text-white font-semibold rounded-lg cursor-pointer transition ease-in-out duration-300;
 		}
 
 		&__select-settings {
-			@apply w-1/3 text-white;
+			@apply w-1/3;
 		}
 
 		#file-upload {

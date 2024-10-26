@@ -19,15 +19,20 @@ export default {
             colors: {
                 inherit: 'inherit',
                 'app-white': '#F4F5F8',
-                'app-blue': '#0075FF',
-                'app-gray': '#F0F0F0',
-                'app-gray_2': '#A5A5A5',
-                'app-gray_3': '#939599',
-                'app-gray_dark': '#AAACB0',
-                'app-red': '#FF0000',
-                'app-red_2': '#DB0000',
-                'app-light-blue': '#DEF1FD',
-                'app-green': '#00A02E'
+
+                // Темная тема
+                'dark-bg': '#1E1E2E',      // Основной фон
+                'dark-bg-secondary': '#27293D', // Вторичный фон
+                'dark-text': '#F8F8F2',        // Основной текст
+                'dark-text-secondary': '#C4C4C7', // Вторичный текст
+                'dark-border': '#44475A',      // Границы
+                'dark-accent': '#6272A4',      // Акцентный цвет
+                'dark-accent-hover': '#7086D6', // Ховер для акцентов
+                
+                // Успех, Ошибка, Предупреждение
+                'dark-success': '#50fa7b',
+                'dark-error': '#ff5555',
+                'dark-warning': '#f1fa8c',
             },
             fontSize: {
                 '2xs': ['10px', '13px'],
@@ -81,4 +86,3 @@ export default {
         require('@savvywombat/tailwindcss-grid-areas'),
     ],
 }
-

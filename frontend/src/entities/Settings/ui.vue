@@ -1,3 +1,10 @@
-<template><div></div></template>
+<template>
+	<div class="flex justify-center items-start w-full">
+		<AddingNewChannels />
+		<AddingPublicationTimeSettings />
+	</div>
+</template>
 
-<script setup lang="ts"></script>
+<script lang="ts" setup>
+	import { AddingNewChannels, AddingPublicationTimeSettings } from '@/widgets';
+</script>

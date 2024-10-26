@@ -1,6 +1,7 @@
 <template>
 	<v-app>
 		<v-navigation-drawer
+			v-if="!isHomePage"
 			v-model="drawer"
 			app
 		>
@@ -17,7 +18,8 @@
 				</v-list-item>
 			</v-list>
 		</v-navigation-drawer>
-		<v-app-bar app>
+
+		<v-app-bar v-if="!isHomePage" app>
 			<v-app-bar-nav-icon @click="drawer = !drawer">
 				<Icons
 					icon="MENU"
@@ -25,6 +27,7 @@
 				/>
 			</v-app-bar-nav-icon>
 		</v-app-bar>
+
 		<v-main>
 			<slot></slot>
 		</v-main>
@@ -32,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-	import { ref } from 'vue';
+	import { ref, computed } from 'vue';
 	import { useRouter } from 'vue-router';
 	import { Icons } from '@/shared';
 
@@ -47,11 +50,13 @@
 	const PAGES = [
 		{
 			title: 'Главная страница',
-			path: '/'
+			path: '/publishing-page'
 		},
 		{
 			title: 'Настройки',
-			path: '/'
-		}
+			path: '/settings'
+		},
 	];
+
+	const isHomePage = computed(() => router.currentRoute.value.path === '/');
 </script>

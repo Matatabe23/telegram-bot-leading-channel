@@ -2,7 +2,8 @@ import type { RouteRecordRaw } from 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
 import {
     Home,
-    PublishPage
+    PublishPage,
+    Settings
 } from '@/pages';
 
 const routes: RouteRecordRaw[] = [
@@ -14,6 +15,11 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/publishing-page',
         component: PublishPage
+    },
+
+    {
+        path: '/settings',
+        component: Settings
     },
 
     {
