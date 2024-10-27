@@ -3,6 +3,7 @@ export interface IAuth {
         name: string,
         password: string
     },
+    loading: boolean
 }
 
 export interface adminData {

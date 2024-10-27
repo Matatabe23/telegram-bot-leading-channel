@@ -1,13 +1,12 @@
 <template>
-	<div class="posts mx-auto w-11/12 min-w-[500px] min-h-[500px] relative">
-		<div class="posts__header flex justify-between mb-2.5">
-			<div class="posts__info mb-2.5">
+	<section class="w-11/12 relative mx-4">
+		<div class="flex flex-col md:flex-row gap-4 md:gap-0 justify-between mb-2.5">
+			<div class="mb-3 text-sm md:text-base">
 				<div v-if="totalCount">Всего постов: {{ totalCount }}</div>
 				<div v-if="lastPublishDate">Крайняя дата публикации: {{ lastPublishDate }}</div>
 			</div>
-			<div class="posts__select flex w-1/2 gap-2.5">
+			<div class="flex flex-col md:flex-row md:w-1/2 gap-2.5">
 				<v-select
-					clearable
 					label="Канал"
 					v-model="form.channel"
 					:items="formattedChannels"
@@ -15,7 +14,6 @@
 					@update:model-value="updateChannel"
 				></v-select>
 				<v-select
-					clearable
 					label="Статус просмотра"
 					v-model="form.watched"
 					:items="watchedOptions"
@@ -26,7 +24,6 @@
 		</div>
 
 		<div
-			class="posts__post"
 			v-for="post in postsList"
 			:key="post.id"
 		>
@@ -38,40 +35,24 @@
 		</div>
 
 		<div
-			class="posts__pagination flex justify-center items-center my-5"
+			class="flex justify-center items-center my-5"
 			v-if="postsList.length"
 		>
-			<button
-				@click="setPage(1)"
-				:disabled="form.currentPage === 1"
-				class="bg-gray-200 border border-gray-300 text-gray-800 py-2 px-3 mx-0.5 cursor-pointer transition-colors duration-300 hover:bg-gray-300 hover:text-gray-600 hover:border-gray-400 rounded disabled:opacity-60 disabled:cursor-not-allowed"
-			></button>
-			<button
-				v-for="pageNumber in visiblePages"
-				:key="pageNumber"
-				@click="setPage(pageNumber)"
-				:class="{
-					'bg-blue-500 text-white border-blue-500': pageNumber === form.currentPage
-				}"
-				class="bg-gray-200 border border-gray-300 text-gray-800 py-2 px-3 mx-0.5 cursor-pointer transition-colors duration-300 hover:bg-gray-300 hover:text-gray-600 hover:border-gray-400 rounded"
-			>
-				{{ pageNumber }}
-			</button>
-			<button
-				@click="setPage(lastPage)"
-				:disabled="form.currentPage === lastPage"
-				class="bg-gray-200 border border-gray-300 text-gray-800 py-2 px-3 mx-0.5 cursor-pointer transition-colors duration-300 hover:bg-gray-300 hover:text-gray-600 hover:border-gray-400 rounded disabled:opacity-60 disabled:cursor-not-allowed"
-			>
-				>>
-			</button>
+			<v-pagination
+				v-model="form.currentPage"
+				:length="lastPage"
+				:total-visible="isMd ? 7 : 3"
+				@update:model-value="setPage"
+			/>
+
 			<mainSelect
-				class="posts__select-watched mr-5"
+				class="mr-5"
 				:options="perPage"
 				v-model="form.postsPerPage"
 				@onChange="updatePostsPerPage"
 			/>
 		</div>
-	</div>
+	</section>
 </template>
 
 <script lang="ts" setup>
@@ -81,12 +62,14 @@
 	import { storeToRefs } from 'pinia';
 	import { PostCard, MainSelect } from '@/widgets';
 	import { watchedOptions, perPage } from '@/entities';
+	import { useAppStore } from '@/app/app.store';
 
 	const settingsStore = useSettings();
 	const { listChannels } = storeToRefs(settingsStore);
 	const toast = useToast();
 	const editorStore = usePosts();
 	const { postsList, totalCount, publishTime, form } = storeToRefs(editorStore);
+	const { isMd } = useAppStore();
 
 	const setPage = (page: number) => {
 		editorStore.setStateValueByKey('form', { ...form.value, currentPage: page });
@@ -136,26 +119,6 @@
 
 	const lastPage = computed(() => {
 		return Math.ceil(totalCount.value / form.value.postsPerPage);
-	});
-
-	const visiblePages = computed(() => {
-		const maxVisiblePages = 10; // Максимальное количество отображаемых страниц
-		const totalPages = Math.ceil(totalCount.value / form.value.postsPerPage);
-		let startPage = 1;
-		let endPage = totalPages;
-
-		if (totalPages > maxVisiblePages) {
-			const half = Math.floor(maxVisiblePages / 2);
-			startPage = Math.max(form.value.currentPage - half, 1);
-			endPage = startPage + maxVisiblePages - 1;
-
-			if (endPage > totalPages) {
-				endPage = totalPages;
-				startPage = endPage - maxVisiblePages + 1;
-			}
-		}
-
-		return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 	});
 
 	const lastPublishDate = computed(() => {

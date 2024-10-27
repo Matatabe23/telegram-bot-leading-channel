@@ -1,5 +1,5 @@
 <template>
-	<div class="publishing-panel flex flex-col w-full mb-12 p-4">
+	<section class="publishing-panel md:flex flex-col w-full mb-12 p-4 hidden">
 		<div class="border-2 rounded-2xl">
 			<div class="flex flex-wrap justify-center items-center gap-2 overflow-y-auto relative">
 				<div
@@ -18,12 +18,11 @@
 			<div
 				class="flex flex-col items-center justify-center gap-2 pt-4 border-t-3 border-gray-500"
 			>
-				<div class="flex justify-evenly mb-4 w-full">
+				<div class="grid gap-2 md:flex justify-evenly mb-4 w-full">
 					<v-btn
 						color="#5865f2"
 						variant="flat"
 						@click="selectFile"
-						class="text-white"
 					>
 						<input
 							id="file-upload"
@@ -35,7 +34,7 @@
 						/>
 						<label
 							for="file-upload"
-							class="publishing-panel__custom-file-upload text-white"
+							class="publishing-panel__custom-file-upload "
 						>
 							<i class="fas fa-upload"></i> Загрузить файлы
 						</label>
@@ -44,7 +43,6 @@
 						color="#5865f2"
 						variant="flat"
 						@click="selectFolder"
-						class="text-white"
 					>
 						<input
 							type="file"
@@ -54,7 +52,7 @@
 							@change="handleFolderSelection"
 							class="hidden"
 						/>
-						<label class="publishing-panel__custom-file-upload text-white">
+						<label class="publishing-panel__custom-file-upload">
 							<i class="fas fa-upload"></i> Загрузить несколько папок
 						</label>
 					</v-btn>
@@ -63,14 +61,13 @@
 						@click="publicationPost"
 						:disabled="state.form.useChannelList.length === 0"
 						color="#5865f2"
-						class="text-white"
 					>
 						Опубликовать
 					</v-btn>
 				</div>
 
-				<div class="flex w-full justify-evenly">
-					<div class="publishing-panel__select-settings">
+				<div class="flex flex-col md:flex-row justify-center gap-4 items-center w-full">
+					<div class="publishing-panel__select-settings w-full">
 						<v-select
 							label="Настройки"
 							:items="settingsSelectPublish"
@@ -79,7 +76,7 @@
 							v-model="state.settingsArray"
 						/>
 					</div>
-					<div class="publishing-panel__select-settings">
+					<div class="publishing-panel__select-settings w-full">
 						<v-select
 							label="Каналы для публикации"
 							:items="channelsListSelect"
@@ -97,7 +94,7 @@
 			:total="state.processLoader.total"
 			:loaded="state.processLoader.loaded"
 		/> -->
-	</div>
+	</section>
 </template>
 
 <script lang="ts" setup>
@@ -289,7 +286,7 @@
 		}
 
 		&__select-settings {
-			@apply w-1/3;
+			@apply w-full md:w-1/3;
 		}
 
 		#file-upload {

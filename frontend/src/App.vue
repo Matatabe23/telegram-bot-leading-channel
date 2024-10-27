@@ -18,11 +18,10 @@
 	const authStore = useAuth();
 	const { auth } = storeToRefs(authStore);
 
-
 	const getDataAdmin = async () => {
 		await authStore.checkDataWeb();
 		if (route.path === '/' && auth.value === true) {
-			await router.push('publishing-panel');
+			await router.push('publishing-page');
 		} else if (route.path !== '/' && auth.value === false) {
 			await router.push('/');
 		}

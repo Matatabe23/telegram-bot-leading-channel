@@ -1,8 +1,8 @@
 <template>
-	<section class="publishing-panel flex flex-col items-center w-full my-8">
+	<div class="publishing-panel flex flex-col items-center w-full my-8">
 		<PublishPostsPanel />
 		<PublishPostsList />
-	</section>
+	</div>
 </template>
 
 <script lang="ts" setup>

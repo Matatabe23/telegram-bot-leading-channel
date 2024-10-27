@@ -1,7 +1,7 @@
 <template>
-	<Settings />
+	<PostData />
 </template>
 
 <script lang="ts" setup>
-	import { Settings } from '@/entities';
+	import { PostData } from '@/entities';
 </script>

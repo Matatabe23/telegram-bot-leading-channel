@@ -3,7 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import {
     Home,
     PublishPage,
-    Settings
+    Settings,
+    PostData
 } from '@/pages';
 
 const routes: RouteRecordRaw[] = [
@@ -20,6 +21,11 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/settings',
         component: Settings
+    },
+    {
+        name: 'Пост',
+        path: '/post/:id',
+        component: PostData,
     },
 
     {

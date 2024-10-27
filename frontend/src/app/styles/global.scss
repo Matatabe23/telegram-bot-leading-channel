@@ -4,6 +4,7 @@
 
 html {
 	scroll-behavior: smooth;
+    @extend %custom-scroll;
 }
 
 %custom-scroll {
@@ -24,25 +25,4 @@ html {
 
 .custom-scroll {
 	@extend %custom-scroll;
-}
-
-.v-popper--theme-menu .v-popper {
-	&__inner {
-		background: white;
-		box-shadow: 0 0 12px 0 #00000026;
-		padding: 16px;
-		border-radius: 16px;
-	}
-
-	&__arrow-outer {
-		display: none;
-	}
-
-	&__arrow-inner {
-		display: none;
-	}
-}
-
-body{
-    @apply bg-dark-bg
 }
