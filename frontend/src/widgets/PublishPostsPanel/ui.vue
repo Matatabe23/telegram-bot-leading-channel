@@ -113,8 +113,8 @@
 	const toast = useToast();
 	const editorStore = usePosts();
 
-	const folderInput = ref('');
-	const fileInput = ref('');
+	const folderInput = ref<any>('');
+	const fileInput = ref<any>('');
 
 	const state: IPublish = reactive({
 		images: [],

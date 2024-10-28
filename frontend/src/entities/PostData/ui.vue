@@ -182,7 +182,7 @@
 		try {
 			if (state.checkListImage.length >= 1) {
 				editorStore.setStateValueByKey('isLoader', true);
-				await deleteSelectedImgs(state.checkListImage);
+				await deleteSelectedImgs(state.checkListImage as any);
 				openPostPanel();
 			}
 		} catch (e) {
