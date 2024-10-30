@@ -1,5 +1,5 @@
 <template>
-	<div class="flex justify-center items-start w-full">
+	<div class="md:flex justify-center items-start w-full">
 		<AddingNewChannels />
 		<AddingPublicationTimeSettings />
 	</div>

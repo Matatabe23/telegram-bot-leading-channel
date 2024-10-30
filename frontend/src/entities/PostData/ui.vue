@@ -1,60 +1,34 @@
 <template>
-	<section class="post-panel">
-		<div class="post-panel__buttons">
-			<v-btn
-				variant="flat"
-				@click="backPage"
-				color="#5865f2"
-				>Предыдущий пост</v-btn
-			>
-			<v-btn
-				variant="flat"
-				@click="delPost"
-				color="#5865f2"
-				>Удалить пост</v-btn
-			>
-			<v-btn
-				variant="flat"
-				@click="deleteSelectedImg"
-				color="#5865f2"
-				>Удалить выбранные изображения</v-btn
-			>
-			<div class="post-panel__select-channel">
-				<v-select
-					label="Каналы публикации"
-					:items="channelsListSelect"
-					multiple
-					variant="outlined"
-					v-model="state.form.useChannelList"
-					@update:model-value="updateChannelList"
-				></v-select>
-			</div>
-			<v-btn
-				variant="flat"
-				@click="nextPage"
-				color="#5865f2"
-				>Следующий пост</v-btn
-			>
-		</div>
+	<section class="w-full pb-32">
+		<PaginationPostData
+			:checkListImageLenght="state.checkListImage.length"
+			v-model:useChannelList="state.form.useChannelList"
+			@backPage="backPage"
+			@delPost="delPost"
+			@deleteSelectedImg="deleteSelectedImg"
+			@updateChannelList="updateChannelList"
+			@nextPage="nextPage"
+		/>
 
-		<div class="post-panel__img-list">
+		<div class="flex items-center justify-center flex-wrap gap-2 my-12">
 			<div
 				v-for="(photo, index) in state.images"
 				:key="index"
-				class="post-panel__img-item"
+				class="relative"
 			>
 				<img
 					:src="photo.img"
 					alt="Photo"
-					class="h-[58vh] w-[45vh] object-contain rounded-[15px]"
+					class="h-[58vh] w-[45vh] object-contain rounded-lg"
 					@load="checkImageLoaded"
 				/>
 				<v-checkbox
 					class="absolute top-2 right-2"
+					color="red"
+					hide-details
 					v-if="state.imagesToLoad < 1"
 					:model-value="state.checkListImage.some((checkId) => checkId.id === photo.id)"
 					@update:model-value="setValueSheckBox(photo)"
-					color="#5865f2"
 				/>
 			</div>
 		</div>
@@ -62,26 +36,23 @@
 </template>
 
 <script lang="ts" setup>
-	import { computed, onMounted, reactive } from 'vue';
+	import { onMounted, reactive } from 'vue';
 	import {
 		receivingPost,
 		deletePost,
 		changePage,
 		usePosts,
-		useSettings,
 		deleteSelectedImgs,
 		editPostLinkСhannels
 	} from '@/shared';
 	import { useRoute, useRouter } from 'vue-router';
 	import { useToast } from 'vue-toastification';
-	import { storeToRefs } from 'pinia';
+	import { PaginationPostData } from '@/widgets';
 
 	const route = useRoute();
 	const router = useRouter();
 	const toast = useToast();
 	const editorStore = usePosts();
-	const settingsStore = useSettings();
-	const { listChannels } = storeToRefs(settingsStore);
 
 	const state = reactive({
 		images: [],
@@ -192,16 +163,6 @@
 		}
 	};
 
-	const channelsListSelect = computed(() => {
-		if (!listChannels.value) return;
-		const channelsArray = listChannels.value.map((channel) => ({
-			title: channel.name,
-			value: channel.id
-		}));
-
-		return channelsArray;
-	});
-
 	const updateChannelList = async () => {
 		try {
 			await editPostLinkСhannels(Number(route.params.id), state.form.useChannelList);
@@ -214,48 +175,3 @@
 		openPostPanel();
 	});
 </script>
-
-<style lang="scss">
-	.post-panel {
-		width: 100%;
-
-		&__buttons {
-			display: flex;
-			justify-content: space-around;
-			align-items: center;
-			margin: 80px auto 0 auto;
-			border: 3px solid grey;
-			background-color: rgb(81, 86, 86);
-			border-radius: 15px;
-			width: 90%;
-			padding: 20px;
-			flex-wrap: wrap;
-			gap: 10px;
-		}
-
-		&__img-list {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			flex-wrap: wrap;
-			gap: 10px;
-			width: 100%;
-			margin: 50px 0;
-		}
-
-		&__select-channel {
-			min-width: 30%;
-			color: #fff;
-
-			.v-input__details {
-				min-height: 0;
-				padding: 0;
-				height: 0;
-			}
-		}
-
-		&__img-item {
-			position: relative;
-		}
-	}
-</style>

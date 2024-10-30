@@ -1,20 +1,22 @@
 <template>
-	<div class="adding-new-channels">
-		<div class="adding-new-channels__save-time">
-			<h3>Добавить новый канал</h3>
+	<div class="flex flex-col items-center text-center m-5">
+		<div class="bg-gray-800 text-white border border-gray-600 p-5 rounded-lg shadow-lg md:w-80">
+			<h3 class="text-lg font-bold">Добавить новый канал</h3>
 
-			<div class="adding-new-channels__form">
+			<div class="mt-4 space-y-4">
 				<v-text-field
 					clearable
 					label="Имя канала"
 					variant="outlined"
 					v-model="state.form.name"
+					class="w-full"
 				></v-text-field>
 				<v-text-field
 					clearable
 					label="айди чата"
 					variant="outlined"
 					v-model="state.form.chatId"
+					class="w-full"
 				></v-text-field>
 			</div>
 
@@ -22,13 +24,20 @@
 				color="#5865f2"
 				variant="flat"
 				@click="saveChannel"
+				class="mt-4 text-white bg-indigo-600 hover:bg-indigo-700"
 				>Сохранить</v-btn
 			>
-			<h3 v-if="listChannels.length">Список чатов</h3>
+
+			<h3
+				v-if="listChannels.length"
+				class="mt-6 text-lg font-bold"
+			>
+				Список чатов
+			</h3>
 			<div
-				class="adding-new-channels__list-channels"
 				v-for="channel in listChannels"
 				:key="channel.id"
+				class="mt-4 flex flex-col items-center gap-2 p-4 border border-gray-600 rounded-md bg-gray-700 text-white shadow-md w-full"
 			>
 				<div>Имя чата: {{ channel.name }}</div>
 				<div>Айди чата: {{ channel.chatId }}</div>
@@ -44,6 +53,7 @@
 					color="#5865f2"
 					variant="flat"
 					@click="delChannel(channel.id)"
+					class="text-white bg-indigo-600 hover:bg-indigo-700"
 					>Удалить</v-btn
 				>
 			</div>
@@ -129,46 +139,4 @@
 	);
 </script>
 
-<style lang="scss">
-	.adding-new-channels {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		flex-direction: column;
-		text-align: center;
-		margin: 20px;
-
-		&__save-time {
-			background-color: #2f2f2f;
-			color: #ffffff;
-			border: 1px solid #444;
-			padding: 20px;
-			border-radius: 10px;
-			box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-			width: 350px;
-		}
-
-		&__form {
-			margin-top: 15px;
-		}
-
-		&__list-channels {
-			display: flex;
-			flex-direction: column;
-			gap: 10px;
-			justify-content: space-between;
-			align-items: center;
-			margin-top: 10px;
-			border: 1px solid #444;
-			border-radius: 5px;
-			padding: 10px;
-			background-color: #333;
-			color: #fff;
-			box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-		}
-
-		button {
-			margin: 10px 0;
-		}
-	}
-</style>
+<style scoped></style>
