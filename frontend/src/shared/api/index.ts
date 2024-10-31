@@ -4,8 +4,8 @@ export * from './settingsAPI';
 
 import axios from 'axios';
 
-// const url = 'http://qugor.online:5000/'
-const url = 'http://localhost:5000/'
+const url = 'http://qugor.online:5000/'
+// const url = 'http://localhost:5000/'
 
 const $host = axios.create({
     baseURL: url

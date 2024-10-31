@@ -12,7 +12,8 @@
 		"lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
 		"format": "prettier --write src/",
 		"tauri:dev": "tauri dev",
-		"tauri:build": "tauri build"
+		"tauri:build": "tauri build",
+		"tauri": "tauri"
 	},
 	"dependencies": {
 		"@mdi/font": "^7.4.47",
@@ -30,6 +31,7 @@
 		"lodash.debounce": "^4.0.8",
 		"pinia": "^2.1.7",
 		"swiper": "^11.1.12",
+		"tauri": "^0.15.0",
 		"vee-validate": "^4.13.2",
 		"vue": "^3.4.29",
 		"vue-draggable-next": "^2.2.1",
