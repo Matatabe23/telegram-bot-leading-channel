@@ -36,7 +36,6 @@ export interface IPublishTime {
 }
 
 export interface IStoreStatePosts {
-    isLoader: boolean,
     postsList: IPosts[],
     totalCount: number,
     publishTime: IPublishTime[],

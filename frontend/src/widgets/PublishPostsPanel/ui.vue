@@ -23,6 +23,7 @@
 						color="#5865f2"
 						variant="flat"
 						@click="selectFile"
+						:loading="appStore.isLoading"
 					>
 						<input
 							id="file-upload"
@@ -34,7 +35,7 @@
 						/>
 						<label
 							for="file-upload"
-							class="publishing-panel__custom-file-upload "
+							class="publishing-panel__custom-file-upload"
 						>
 							<i class="fas fa-upload"></i> Загрузить файлы
 						</label>
@@ -43,6 +44,7 @@
 						color="#5865f2"
 						variant="flat"
 						@click="selectFolder"
+						:loading="appStore.isLoading"
 					>
 						<input
 							type="file"
@@ -61,6 +63,7 @@
 						@click="publicationPost"
 						:disabled="state.form.useChannelList.length === 0"
 						color="#5865f2"
+						:loading="appStore.isLoading"
 					>
 						Опубликовать
 					</v-btn>
@@ -74,6 +77,8 @@
 							multiple
 							variant="outlined"
 							v-model="state.settingsArray"
+							:disabled="appStore.isLoading"
+							:loading="appStore.isLoading"
 						/>
 					</div>
 					<div class="publishing-panel__select-settings w-full">
@@ -83,6 +88,7 @@
 							multiple
 							variant="outlined"
 							v-model="state.form.useChannelList"
+							:disabled="appStore.isLoading"
 						/>
 					</div>
 				</div>
@@ -105,10 +111,12 @@
 	import { usePosts } from '@/shared';
 	import { settingsSelectPublish } from '@/entities';
 	import { useSettings } from '@/shared';
+	import { useAppStore } from '@/app/app.store';
 	import { storeToRefs } from 'pinia';
 
 	const settingsStore = useSettings();
 	const { listChannels } = storeToRefs(settingsStore);
+	const appStore = useAppStore();
 
 	const toast = useToast();
 	const editorStore = usePosts();

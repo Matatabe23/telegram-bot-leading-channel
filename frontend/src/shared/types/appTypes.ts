@@ -3,7 +3,6 @@ export interface IAuth {
         name: string,
         password: string
     },
-    loading: boolean
 }
 
 export interface adminData {
@@ -12,7 +11,10 @@ export interface adminData {
     role: string
 }
 
-export interface IStoreState {
+export interface IAppStore {
     adminData: adminData | null,
-    auth: boolean
+    auth: boolean,
+    width: number,
+    height: number,
+    isLoading: boolean,
 }

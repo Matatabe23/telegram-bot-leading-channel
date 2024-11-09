@@ -10,7 +10,7 @@
 				variant="outlined"
 				v-model="state.auth.name"
 				class="w-full"
-				:disabled="state.loading"
+				:disabled="appStore.isLoading"
 			></v-text-field>
 			<v-text-field
 				type="password"
@@ -19,13 +19,13 @@
 				variant="outlined"
 				v-model="state.auth.password"
 				class="w-full"
-				:disabled="state.loading"
+				:disabled="appStore.isLoading"
 			></v-text-field>
 
 			<v-btn
 				variant="tonal"
 				@click="setlogin"
-				:loading="state.loading"
+				:loading="appStore.isLoading"
 				class="w-full"
 			>
 				Авторизоваться
@@ -36,35 +36,36 @@
 
 <script lang="ts" setup>
 	import { reactive } from 'vue';
-	import { IAuth } from '@/entities';
-	import { login, useAuth } from '@/shared';
+	import { IAuth, login, useSettings } from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { useRouter } from 'vue-router';
+	import { useAppStore } from '@/app/app.store';
 
 	const toast = useToast();
-	const editorStore = useAuth();
 	const router = useRouter();
+	const appStore = useAppStore();
+	const settingsStore = useSettings();
 
 	const state: IAuth = reactive({
 		auth: {
 			name: '',
 			password: ''
-		},
-		loading: false
+		}
 	});
 
 	const setlogin = async () => {
 		try {
 			const response: any = await login(state.auth.name, state.auth.password);
-			state.loading = true;
+			appStore.isLoading = false;
 
-			editorStore.setAdminData(response);
+			appStore.setAdminData(response);
+			await settingsStore.getListChannels();
 
 			router.push('/publishing-page');
 		} catch (e: any) {
 			toast.error(e.response.data.message);
 		} finally {
-			state.loading = false;
+			appStore.isLoading = false;
 		}
 	};
 </script>

@@ -41,18 +41,18 @@
 		receivingPost,
 		deletePost,
 		changePage,
-		usePosts,
 		deleteSelectedImgs,
 		editPostLinkСhannels
 	} from '@/shared';
 	import { useRoute, useRouter } from 'vue-router';
 	import { useToast } from 'vue-toastification';
 	import { PaginationPostData } from '@/widgets';
+	import { useAppStore } from '@/app/app.store';
 
 	const route = useRoute();
 	const router = useRouter();
 	const toast = useToast();
-	const editorStore = usePosts();
+	const appStore = useAppStore();
 
 	const state = reactive({
 		images: [],
@@ -66,7 +66,7 @@
 
 	const openPostPanel = async () => {
 		try {
-			editorStore.setStateValueByKey('isLoader', false);
+			appStore.isLoading = true;
 			state.form.useChannelList = [];
 			state.images = [];
 
@@ -80,14 +80,14 @@
 		} finally {
 			state.imagesToLoad = state.images.length;
 			if (state.imagesToLoad === 0) {
-				editorStore.setStateValueByKey('isLoader', false);
+				appStore.isLoading = false;
 			}
 		}
 	};
 
 	const switchPostPanel = async (who: string) => {
 		try {
-			editorStore.setStateValueByKey('isLoader', true);
+			appStore.isLoading = false;
 			state.form.useChannelList = [];
 			state.images = [];
 			const watched = localStorage.getItem('watched') || '';
@@ -104,7 +104,7 @@
 		} finally {
 			state.imagesToLoad = state.images.length;
 			if (state.imagesToLoad === 0) {
-				editorStore.setStateValueByKey('isLoader', false);
+				appStore.isLoading = false;
 			}
 		}
 	};
@@ -112,7 +112,7 @@
 	const checkImageLoaded = () => {
 		state.imagesToLoad--;
 		if (state.imagesToLoad === 0) {
-			editorStore.setStateValueByKey('isLoader', false);
+			appStore.isLoading = false;
 		}
 	};
 
@@ -121,14 +121,14 @@
 			if (!confirm('Вы уверены, что хотите удалить пост?')) {
 				return;
 			}
-			editorStore.setStateValueByKey('isLoader', true);
+			appStore.isLoading = true;
 			const result = await deletePost(Number(route.params.id));
 			nextPage();
 			toast.success(result);
 		} catch (e) {
 			toast.error(e.response.data.message);
 		} finally {
-			editorStore.setStateValueByKey('isLoader', false);
+			appStore.isLoading = false;
 		}
 	};
 
@@ -152,14 +152,15 @@
 	const deleteSelectedImg = async () => {
 		try {
 			if (state.checkListImage.length >= 1) {
-				editorStore.setStateValueByKey('isLoader', true);
+				appStore.isLoading = true;
 				await deleteSelectedImgs(state.checkListImage as any);
 				openPostPanel();
 			}
 		} catch (e) {
 			toast.error(e.response.data.message);
 		} finally {
-			editorStore.setStateValueByKey('isLoader', false);
+			appStore.isLoading = false;
+			state.checkListImage = [];
 		}
 	};
 

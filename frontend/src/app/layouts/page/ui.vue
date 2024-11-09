@@ -60,10 +60,11 @@
 <script setup lang="ts">
 	import { ref, computed } from 'vue';
 	import { useRouter } from 'vue-router';
-	import { Icons, useAuth } from '@/shared';
+	import { Icons } from '@/shared';
+	import { useAppStore } from '@/app/app.store';
 
 	const router = useRouter();
-	const authStore = useAuth();
+	const appStore = useAppStore();
 
 	const drawer = ref(false);
 
@@ -88,7 +89,7 @@
 	const exit = async () => {
 		localStorage.removeItem('admin');
 		localStorage.removeItem('token');
-		authStore.setStateValueByKey('auth', false);
+		appStore.auth = false;
 		await router.push('/');
 	};
 

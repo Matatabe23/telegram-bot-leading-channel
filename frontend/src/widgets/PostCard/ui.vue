@@ -11,12 +11,13 @@
 				<h2 class="hidden md:block text-lg font-normal mb-2 text-gray-800">
 					id: {{ props.post.id }}
 				</h2>
-                <div class="flex gap-2 flex-wrap md:flex-nowrap">
+				<div class="flex gap-2 flex-wrap md:flex-nowrap">
 					<v-btn
 						color="#5865f2"
 						variant="flat"
 						@click="emit('delete-post', props.post.id)"
 						class="w-full md:w-auto"
+						:loading="appStore.isLoading"
 						>Удалить</v-btn
 					>
 					<v-btn
@@ -24,6 +25,7 @@
 						variant="flat"
 						@click="router.push(`post/${props.post.id}`)"
 						class="w-full md:w-auto"
+						:loading="appStore.isLoading"
 						>Открыть</v-btn
 					>
 					<v-btn
@@ -31,6 +33,7 @@
 						variant="flat"
 						@click="emit('publish-instantly-post', props.post.id)"
 						class="w-full md:w-auto"
+						:loading="appStore.isLoading"
 						>Опубликовать</v-btn
 					>
 				</div>
@@ -43,8 +46,10 @@
 	import { defineProps } from 'vue';
 	import { useRouter } from 'vue-router';
 	import { IPosts } from '@/entities';
+	import { useAppStore } from '@/app/app.store';
 
 	const router = useRouter();
+	const appStore = useAppStore();
 
 	const props = defineProps<{
 		post: IPosts;

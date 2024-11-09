@@ -6,6 +6,7 @@
 			variant="flat"
 			@click="$emit('backPage')"
 			color="#5865f2"
+			:loading="appStore.isLoading"
 			><Icons
 				icon="ARROW_STROKE"
 				class="rotate-90"
@@ -14,6 +15,7 @@
 			variant="flat"
 			@click="$emit('delPost')"
 			color="#5865f2"
+			:loading="appStore.isLoading"
 			><Icons icon="TRASH"
 		/></v-btn>
 		<div class="min-w-[30%] text-white">
@@ -24,6 +26,8 @@
 				variant="outlined"
 				v-model="useChannelList"
 				@update:model-value="$emit('updateChannelList', $event)"
+				:disabled="appStore.isLoading"
+				:loading="appStore.isLoading"
 			></v-select>
 		</div>
 		<v-btn
@@ -31,12 +35,14 @@
 			@click="$emit('deleteSelectedImg')"
 			color="#5865f2"
 			:disabled="checkListImageLenght === 0"
+			:loading="appStore.isLoading"
 			><Icons icon="USER_DELETE"
 		/></v-btn>
 		<v-btn
 			variant="flat"
 			@click="$emit('nextPage')"
 			color="#5865f2"
+			:loading="appStore.isLoading"
 			><Icons
 				icon="ARROW_STROKE"
 				class="-rotate-90"
@@ -93,8 +99,10 @@
 <script lang="ts" setup>
 	import { computed } from 'vue';
 	import { Icons, useSettings } from '@/shared';
+	import { useAppStore } from '@/app/app.store';
 
 	const { listChannels } = useSettings();
+	const appStore = useAppStore();
 
 	defineProps<{
 		checkListImageLenght: number;

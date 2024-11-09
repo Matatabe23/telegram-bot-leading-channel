@@ -12,6 +12,8 @@
 					:items="formattedChannels"
 					variant="outlined"
 					@update:model-value="updateChannel"
+					:disabled="appStore.isLoading"
+					:loading="appStore.isLoading"
 				></v-select>
 				<v-select
 					label="Статус просмотра"
@@ -19,6 +21,8 @@
 					:items="watchedOptions"
 					variant="outlined"
 					@update:model-value="updateWatched"
+					:disabled="appStore.isLoading"
+					:loading="appStore.isLoading"
 				></v-select>
 			</div>
 		</div>
@@ -41,12 +45,14 @@
 			<v-pagination
 				v-model="form.currentPage"
 				:length="lastPage"
-				:total-visible="isMd ? 7 : 3"
+				:total-visible="appStore.isMd ? 7 : 3"
 				@update:model-value="setPage"
+				:disabled="appStore.isLoading"
+				class="text-xs"
 			/>
 
 			<mainSelect
-				class="mr-5"
+				class="mr-5 hidden md:block"
 				:options="perPage"
 				v-model="form.postsPerPage"
 				@onChange="updatePostsPerPage"
@@ -69,7 +75,7 @@
 	const toast = useToast();
 	const editorStore = usePosts();
 	const { postsList, totalCount, publishTime, form } = storeToRefs(editorStore);
-	const { isMd } = useAppStore();
+	const appStore = useAppStore();
 
 	const setPage = (page: number) => {
 		editorStore.setStateValueByKey('form', { ...form.value, currentPage: page });
@@ -90,14 +96,14 @@
 			if (!confirm('Вы уверены, что хотите удалить пост?')) {
 				return;
 			}
-			editorStore.setStateValueByKey('isLoader', true);
+			appStore.isLoading = true;
 			const result = await deletePost(id);
 			toast.success(result);
 			editorStore.getPosts();
 		} catch (e) {
 			toast.error(e.response.data.message);
 		} finally {
-			editorStore.setStateValueByKey('isLoader', false);
+			appStore.isLoading = false;
 		}
 	};
 
@@ -106,14 +112,14 @@
 			if (!confirm('Вы уверены, что хотите опубликовать пост?')) {
 				return;
 			}
-			editorStore.setStateValueByKey('isLoader', true);
+			appStore.isLoading = true;
 			const result = await publishInstantly(id);
 			toast.success(result);
 			editorStore.getPosts();
 		} catch (e: any) {
 			toast.error(e.response.data.message);
 		} finally {
-			editorStore.setStateValueByKey('isLoader', false);
+			appStore.isLoading = false;
 		}
 	};
 
