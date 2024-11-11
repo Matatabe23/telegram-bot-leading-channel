@@ -5,13 +5,13 @@ services:
     image: mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: - #Введите пароль
-      MYSQL_DATABASE: qugor_arts
+      MYSQL_ROOT_PASSWORD: // Пароль
+      MYSQL_DATABASE: //БД
     ports:
       - 3306:3306
-    command: --init-file /data/application/init.sql
+    command: --init-file /data/application/sql.ini
     volumes:
-        - ./init.sql:/data/application/init.sql
+      - ./sql.ini:/data/application/sql.ini
 
   phpmyadmin:
     image: phpmyadmin
@@ -22,16 +22,17 @@ services:
       - 3500:80
     environment:
       - PMA_ARBITRARY=1
+      - UPLOAD_LIMIT=300M
 
   bot:
     depends_on:
       - db
-    build: ./bot
+    build: ./bot-nest
     ports:
       - 5000:5000
 
-  admin-panel:
-    build: ./admin-panel
+  frontend:
+    build: ./frontend
     depends_on:
       - bot
     ports:

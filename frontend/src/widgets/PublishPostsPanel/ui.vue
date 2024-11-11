@@ -157,12 +157,11 @@
 
 	const publicationPost = async () => {
 		try {
+			appStore.isLoading = true;
 			if (!state.imagePost.length) {
 				toast.error('Некорректные данные');
 				return;
 			}
-
-			editorStore.setStateValueByKey('isLoader', true);
 
 			if (state.imagePost.length > 10) {
 				toast.error('Не более 10 медиафайлов!');
@@ -192,7 +191,7 @@
 		} catch (e: any) {
 			toast.error(e.response.data.message);
 		} finally {
-			editorStore.setStateValueByKey('isLoader', false);
+			appStore.isLoading = false;
 		}
 	};
 

@@ -5,6 +5,7 @@ export * from './settingsAPI';
 import axios from 'axios';
 
 const url = 'http://qugor.online:5000/'
+// const url = 'http://81.30.105.215:5000/'
 // const url = 'http://localhost:5000/'
 
 const $host = axios.create({
