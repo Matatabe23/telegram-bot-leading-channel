@@ -4,9 +4,9 @@ export * from './settingsAPI';
 
 import axios from 'axios';
 
-const url = 'http://qugor.online:5000/'
-// const url = 'http://81.30.105.215:5000/'
-// const url = 'http://localhost:5000/'
+// @ts-ignore
+const url = import.meta.env.VITE_APP_BACKEND_API_URL
+
 
 const $host = axios.create({
     baseURL: url
