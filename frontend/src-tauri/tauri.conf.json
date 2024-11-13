@@ -14,11 +14,9 @@
 			{
 				"title": "QugorArts",
 				"width": 1400,
-				"height": 800,
+				"height": 700,
 				"minWidth": 300,
 				"minHeight": 400,
-                "x": null,
-                "y": 0,
 				"resizable": true,
 				"fullscreen": false
 			}
