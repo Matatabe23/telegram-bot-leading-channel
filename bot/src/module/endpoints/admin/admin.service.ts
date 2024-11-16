@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Administrators } from 'src/module/db/models/administrators.repository';
 import { AdminDto } from './dto/admin.dto';
 import { TokenRepository } from 'src/module/service/token-service/token-service.repository';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService {
@@ -24,9 +25,13 @@ export class AdminService {
     const admin = await this.adminRepository.findOne({
       where: { name: lowerName },
     });
+
     if (!admin) throw new NotFoundException('Пользователь не найден');
-    if (admin.password !== password)
+
+    const isPasswordValid = await bcrypt.compare(password, admin.password);
+    if (!isPasswordValid)
       throw new UnauthorizedException('Указан неверный пароль');
+
     const resultDto = new AdminDto(admin.dataValues);
 
     const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
