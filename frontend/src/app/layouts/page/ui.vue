@@ -88,7 +88,8 @@
 
 	const exit = async () => {
 		localStorage.removeItem('admin');
-		localStorage.removeItem('token');
+		localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
 		appStore.auth = false;
 		await router.push('/');
 	};

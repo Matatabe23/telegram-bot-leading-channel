@@ -17,13 +17,13 @@ export class AuthGuard implements CanActivate {
     const authHeader = request.headers.authorization;
 
     if (!authHeader) {
-      throw new HttpException('Not Authorized', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Нету авторизации', HttpStatus.UNAUTHORIZED);
     }
 
     const token = authHeader.split(' ')[1];
 
     if (!token) {
-      throw new HttpException('Not Authorized', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Нету авторизации', HttpStatus.UNAUTHORIZED);
     }
 
     try {
@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
       request.authData = decoded;
       return true;
     } catch (e) {
-      throw new HttpException('Invalid Token', HttpStatus.UNAUTHORIZED);
+      throw new HttpException('Нету авторизации', HttpStatus.UNAUTHORIZED);
     }
   }
 }

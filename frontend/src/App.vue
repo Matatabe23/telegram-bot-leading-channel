@@ -45,8 +45,8 @@
 	onMounted(async () => {
 		try {
 			dataLoading.value = true;
-			await settingsStore.getListChannels();
 			await getDataAdmin();
+			await settingsStore.getListChannels();
 		} catch (e) {
 			toast.error(e.response.data.message);
 		} finally {

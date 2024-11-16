@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
@@ -9,17 +9,40 @@ export class TokenRepository {
     private readonly jwtService: JwtService,
   ) {}
 
-  generateToken(payload: any) {
+  generateToken(
+    payload: any,
+    tokenTime: string,
+    isRefreshToken: boolean = false,
+  ) {
     if (!payload) throw new Error('Payload is undefined');
-    if (this.configService.get('SECRET_KEY_ACCESS')) {
-      const accessToken = this.jwtService.sign(
-        { ...payload },
-        {
-          secret: this.configService.get('SECRET_KEY_ACCESS'),
-          expiresIn: '1d',
-        },
-      );
-      return accessToken;
+
+    const secretKey = isRefreshToken
+      ? this.configService.get('SECRET_KEY_REFRESH')
+      : this.configService.get('SECRET_KEY_ACCESS');
+
+    if (!secretKey) {
+      throw new Error('SECRET_KEY is not defined');
+    }
+
+    console.log(`Using secret: ${secretKey}`);
+
+    const token = this.jwtService.sign(
+      { ...payload },
+      {
+        secret: secretKey,
+        expiresIn: tokenTime,
+      },
+    );
+    return token;
+  }
+
+  validateRefreshToken(refreshToken: string) {
+    try {
+      const secret = this.configService.get('SECRET_KEY_REFRESH');
+      return this.jwtService.verify(refreshToken, { secret });
+    } catch (e) {
+      console.log(e);
+      throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
 }

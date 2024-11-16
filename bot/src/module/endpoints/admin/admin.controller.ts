@@ -1,8 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Req,
   Query,
   HttpException,
@@ -41,6 +39,21 @@ export class AdminController {
     try {
       const result = await this.adminService.checkDataWeb(request.authData.id);
       return result;
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('update-access-token')
+  async updateAccessToken(@Query('refreshToken') refreshToken: string) {
+    try {
+      return await this.adminService.updateAccessToken(refreshToken);
     } catch (e) {
       throw new HttpException(
         {

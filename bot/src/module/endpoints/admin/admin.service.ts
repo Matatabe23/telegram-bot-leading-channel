@@ -28,15 +28,44 @@ export class AdminService {
     if (admin.password !== password)
       throw new UnauthorizedException('Указан неверный пароль');
     const resultDto = new AdminDto(admin.dataValues);
-    const token = this.tokenRepository.generateToken(resultDto);
-    return { token, admin: { ...resultDto } };
+
+    const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
+    const refreshToken = this.tokenRepository.generateToken(
+      resultDto,
+      '7d',
+      true,
+    );
+
+    return { accessToken, refreshToken, admin: { ...resultDto } };
   }
 
   async checkDataWeb(id: number) {
     const admin = await this.adminRepository.findOne({ where: { id } });
     if (!admin) return;
     const resultDto = new AdminDto(admin);
-    const token = this.tokenRepository.generateToken({ ...resultDto });
-    return { token, admin: resultDto };
+    const accessToken = this.tokenRepository.generateToken(
+      { ...resultDto },
+      '15m',
+    );
+    return { accessToken, admin: resultDto };
+  }
+
+  async updateAccessToken(refreshToken: string) {
+    const decoded = this.tokenRepository.validateRefreshToken(refreshToken);
+
+    const admin = await this.adminRepository.findOne({
+      where: { id: decoded.id },
+    });
+
+    if (!admin) throw new NotFoundException('Пользователь не найден');
+    const resultDto = new AdminDto(admin.dataValues);
+    const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
+
+    const newRefreshToken = this.tokenRepository.generateToken(
+      resultDto,
+      '7d',
+      true,
+    );
+    return { accessToken, refreshToken: newRefreshToken, admin: resultDto };
   }
 }
