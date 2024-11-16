@@ -1,0 +1,82 @@
+version: "3.8"
+
+networks:
+    dev:
+
+
+services:
+    nginx:
+        image: nginx:stable-alpine
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - './nginx.conf:/etc/nginx/nginx.conf'
+            - '/etc/letsencrypt:/etc/letsencrypt'
+            - './data/certbot/www:/var/www/certbot'
+        depends_on:
+            - bot
+            - frontend
+        networks:
+            - dev
+        restart: always
+        env_file:
+            - .env
+
+    db:
+        image: mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+        ports:
+            - 3306:3306
+        command: --init-file /data/application/sql.ini
+        volumes:
+            - ./sql.ini:/data/application/sql.ini
+            - ./data/backups:/backups
+        networks:
+            - dev
+
+    phpmyadmin:
+        image: phpmyadmin
+        depends_on:
+            - db
+        restart: always
+        ports:
+            - 3500:80
+        environment:
+            - PMA_ARBITRARY=1
+            - UPLOAD_LIMIT=300M
+        networks:
+            - dev
+
+    bot:
+        depends_on:
+            - db
+        build:
+            context: ./bot
+        networks:
+            - dev
+
+    frontend:
+        build:
+            context: ./frontend
+        depends_on:
+            - bot
+        networks:
+            - dev
+
+    backup:
+        image: alpine:latest
+        volumes:
+            - ./data/backups:/backups
+        environment:
+            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+        entrypoint: >
+            sh -c "echo '0 3 * * * mysqldump -h db -u root -p$MYSQL_ROOT_PASSWORD ${MYSQL_DATABASE} > /backups/backup_$(date +\%F).sql' > /etc/crontabs/root && crond -f"
+        depends_on:
+            - db
+        networks:
+            - dev
+        restart: always

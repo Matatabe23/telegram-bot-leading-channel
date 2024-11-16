@@ -6,7 +6,6 @@ Main.db
 constENV.ts
 
 .vscode
-docker-compose.yml
 
 # Environment configuration
 .env
