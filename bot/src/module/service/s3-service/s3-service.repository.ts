@@ -20,13 +20,11 @@ export class S3Repository {
 		this.s3Client = new S3Client(getS3ClientConfig());
 	}
 
-	async uploadImageToS3(imagePath: any, postId: number): Promise<string> {
+	async uploadImageToS3(imagePath: any, nameFiles: string): Promise<string> {
 		return new Promise((resolve, reject) => {
-			const fileName = `${process.env.S3_FOLDER_SAVED}/${postId}/${Date.now()}.png`;
-
 			const params = {
 				Bucket: process.env.S3_BUCKET_NAME,
-				Key: fileName,
+				Key: nameFiles,
 				Body: imagePath.buffer,
 				ContentType: 'image/png',
 				ContentDisposition: 'inline'
@@ -36,7 +34,7 @@ export class S3Repository {
 			this.s3Client
 				.send(uploadCommand)
 				.then(() => {
-					resolve(fileName);
+					resolve(nameFiles);
 				})
 				.catch((err) => {
 					this.logger.error('Ошибка загрузки изображения:', err);

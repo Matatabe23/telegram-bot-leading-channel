@@ -31,7 +31,7 @@ export class PostsService {
 		private readonly fileRepository: FileRepository
 	) {}
 
-	async publication(files: any, waterMark: boolean, chatIdList: string[]) {
+	async publication(files: Express.Multer.File[], waterMark: boolean, chatIdList: string[]) {
 		if (chatIdList.length === 0 || chatIdList[0] === '')
 			throw new NotFoundException('Нету каналов для публикации');
 
@@ -52,7 +52,10 @@ export class PostsService {
 		const chatId = chatIds.map((item) => item?.dataValues.id);
 
 		for (const file of files) {
-			const url = await this.s3Repository.uploadImageToS3(file, postId);
+			const url = await this.s3Repository.uploadImageToS3(
+				file,
+				`${process.env.S3_FOLDER_SAVED}/${postId}/${Date.now()}.png`
+			);
 
 			await this.imageData.create({
 				image: url,

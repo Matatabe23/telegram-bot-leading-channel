@@ -9,6 +9,8 @@ export interface adminData {
     id: number,
     name: string,
     role: string
+    avatarUrl?: string,
+    telegramId?: string
 }
 
 export interface IAppStore {

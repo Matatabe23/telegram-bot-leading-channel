@@ -3,11 +3,13 @@ import { useWindowSize } from '@vueuse/core/index.cjs';
 import { adminData, checkDataWeb, IAppStore } from '@/shared';
 
 const parseDataForAdmin = ({
-    id, name, role
+    id, name, role, avatarUrl, telegramId
 }: adminData): adminData => ({
     id,
     name,
-    role
+    role,
+    avatarUrl,
+    telegramId
 });
 
 export const useAppStore = defineStore('app', {

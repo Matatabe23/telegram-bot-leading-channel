@@ -1,4 +1,4 @@
-import { $autHost, $host } from "@/shared";
+import { $autHost, $host, adminData } from "@/shared";
 import { jwtDecode } from "jwt-decode";
 
 // Функция для авторизации пользователя
@@ -46,3 +46,9 @@ export const updateAccessToken = async (refreshToken: string) => {
     localStorage.setItem('refreshToken', data.refreshToken);
     return data.accessToken;
 }
+
+export const updateDataAdmin = async (data: adminData) => {
+        const response = await $host.put('api/admin/update-data-admin', data);
+        return response.data;
+};
+

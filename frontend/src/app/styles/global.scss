@@ -26,3 +26,7 @@ html {
 .custom-scroll {
 	@extend %custom-scroll;
 }
+
+.x-ident {
+	@apply px-5 md:px-6 lg:px-[90px] xl:px-[180px];
+}

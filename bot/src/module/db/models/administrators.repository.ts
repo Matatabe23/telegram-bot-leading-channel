@@ -14,4 +14,10 @@ export class Administrators extends Model {
 
 	@Column({ defaultValue: EAdministratorRole.USER })
 	role: EAdministratorRole;
+
+	@Column({ allowNull: true })
+	avatarUrl: string;
+
+	@Column({ allowNull: true })
+	telegramId: string;
 }

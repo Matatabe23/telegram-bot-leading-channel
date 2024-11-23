@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Administrators } from 'src/module/db/models/administrators.repository';
 import { AdminDto } from './dto/admin.dto';
@@ -11,66 +7,72 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService {
-  constructor(
-    @InjectModel(Administrators)
-    private readonly adminRepository: typeof Administrators,
-    private readonly tokenRepository: TokenRepository,
-  ) {}
+	constructor(
+		@InjectModel(Administrators)
+		private readonly adminRepository: typeof Administrators,
+		private readonly tokenRepository: TokenRepository
+	) {}
 
-  async login(name: string, password: string) {
-    if (!name || !password)
-      throw new UnauthorizedException('Некорректные данные');
+	async login(name: string, password: string) {
+		if (!name || !password) throw new UnauthorizedException('Некорректные данные');
 
-    const lowerName = name.toLowerCase();
-    const admin = await this.adminRepository.findOne({
-      where: { name: lowerName },
-    });
+		const lowerName = name.toLowerCase();
+		const admin = await this.adminRepository.findOne({
+			where: { name: lowerName }
+		});
 
-    if (!admin) throw new NotFoundException('Пользователь не найден');
+		if (!admin) throw new NotFoundException('Пользователь не найден');
 
-    const isPasswordValid = await bcrypt.compare(password, admin.password);
-    if (!isPasswordValid)
-      throw new UnauthorizedException('Указан неверный пароль');
+		const isPasswordValid = await bcrypt.compare(password, admin.password);
+		if (!isPasswordValid) throw new UnauthorizedException('Указан неверный пароль');
 
-    const resultDto = new AdminDto(admin.dataValues);
+		const resultDto = new AdminDto(admin.dataValues);
 
-    const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
-    const refreshToken = this.tokenRepository.generateToken(
-      resultDto,
-      '7d',
-      true,
-    );
+		const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
+		const refreshToken = this.tokenRepository.generateToken(resultDto, '7d', true);
 
-    return { accessToken, refreshToken, admin: { ...resultDto } };
-  }
+		return { accessToken, refreshToken, admin: { ...resultDto } };
+	}
 
-  async checkDataWeb(id: number) {
-    const admin = await this.adminRepository.findOne({ where: { id } });
-    if (!admin) return;
-    const resultDto = new AdminDto(admin);
-    const accessToken = this.tokenRepository.generateToken(
-      { ...resultDto },
-      '15m',
-    );
-    return { accessToken, admin: resultDto };
-  }
+	async checkDataWeb(id: number) {
+		const admin = await this.adminRepository.findOne({ where: { id } });
+		if (!admin) return;
+		const resultDto = new AdminDto(admin);
+		console.log(resultDto);
+		const accessToken = this.tokenRepository.generateToken({ ...resultDto }, '15m');
+		return { accessToken, admin: resultDto };
+	}
 
-  async updateAccessToken(refreshToken: string) {
-    const decoded = this.tokenRepository.validateRefreshToken(refreshToken);
+	async updateAccessToken(refreshToken: string) {
+		const decoded = this.tokenRepository.validateRefreshToken(refreshToken);
 
-    const admin = await this.adminRepository.findOne({
-      where: { id: decoded.id },
-    });
+		const admin = await this.adminRepository.findOne({
+			where: { id: decoded.id }
+		});
 
-    if (!admin) throw new NotFoundException('Пользователь не найден');
-    const resultDto = new AdminDto(admin.dataValues);
-    const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
+		if (!admin) throw new NotFoundException('Пользователь не найден');
+		const resultDto = new AdminDto(admin.dataValues);
+		const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
 
-    const newRefreshToken = this.tokenRepository.generateToken(
-      resultDto,
-      '7d',
-      true,
-    );
-    return { accessToken, refreshToken: newRefreshToken, admin: resultDto };
-  }
+		const newRefreshToken = this.tokenRepository.generateToken(resultDto, '7d', true);
+		return { accessToken, refreshToken: newRefreshToken, admin: resultDto };
+	}
+
+	async updateDataAdmin(data: AdminDto) {
+		const admin = await this.adminRepository.findByPk(data.id);
+
+		if (!admin) {
+			throw new Error('Администратор не найден');
+		}
+
+		await admin.update({
+			name: data.name,
+			role: data.role,
+			password: data.password,
+			avatarUrl: data.avatarUrl,
+			telegramId: data.telegramId
+		});
+
+		return admin;
+	}
 }

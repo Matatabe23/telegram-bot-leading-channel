@@ -1,6 +1,7 @@
 export * from './adminAPI';
 export * from './postsAPI';
 export * from './settingsAPI';
+export * from './filesAPI';
 
 import axios from 'axios';
 

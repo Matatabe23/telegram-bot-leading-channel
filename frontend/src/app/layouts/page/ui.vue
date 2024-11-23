@@ -18,7 +18,6 @@
 				</v-list-item>
 			</v-list>
 		</v-navigation-drawer>
-
 		<v-app-bar
 			v-if="!isHomePage"
 			app
@@ -34,9 +33,10 @@
 					<template v-slot:activator="{ props }">
 						<v-avatar
 							v-bind="props"
-							image="https://sun9-64.userapi.com/impg/1kaKP8ZEEjhzn2saJaG0qgQby7LfjtCpm6ruSA/V2yI81E-7UE.jpg?size=2048x2048&quality=95&sign=06a6df80d15224f5d549a969713d4843&type=album"
+							:image="appStore.adminData.avatarUrl"
 						></v-avatar>
 					</template>
+                    
 
 					<v-list class="mt-2">
 						<v-list-item
@@ -70,7 +70,6 @@
 
 	const goTo = (path: string) => {
 		router.push(path);
-		drawer.value = false;
 	};
 
 	const PAGES = [
@@ -89,12 +88,16 @@
 	const exit = async () => {
 		localStorage.removeItem('admin');
 		localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+		localStorage.removeItem('refreshToken');
 		appStore.auth = false;
 		await router.push('/');
 	};
 
 	const MENU_LIST = [
+		{
+			title: 'Профиль',
+			function: () => router.push('/profile')
+		},
 		{
 			title: 'Выйти',
 			function: exit
