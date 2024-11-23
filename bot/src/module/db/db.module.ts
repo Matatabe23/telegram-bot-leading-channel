@@ -11,38 +11,38 @@ import { Channels } from './models/channels.repository';
 import { ChannelPosts } from './models/channel-posts.repository';
 
 @Module({
-  imports: [
-    SequelizeModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        dialect: 'mysql',
-        host: configService.get('dbHost'),
-        port: configService.get('dbPort'),
-        username: configService.get('dbUser'),
-        password: configService.get('dbPassword'),
-        database: configService.get('dbName'),
-        models: [
-          Administrators,
-          DataBasePosts,
-          ImageData,
-          RegularPublicationTime,
-          Channels,
-          ChannelPosts,
-        ],
-        autoLoadModels: true,
-        synchronize: true,
-      }),
-      inject: [ConfigService],
-    }),
-    SequelizeModule.forFeature([
-      Administrators,
-      DataBasePosts,
-      ImageData,
-      RegularPublicationTime,
-      Channels,
-      ChannelPosts,
-    ]),
-  ],
-  exports: [SequelizeModule],
+	imports: [
+		SequelizeModule.forRootAsync({
+			imports: [ConfigModule],
+			useFactory: async (configService: ConfigService) => ({
+				dialect: 'mysql',
+				host: configService.get('dbHost'),
+				port: configService.get('dbPort'),
+				username: configService.get('dbUser'),
+				password: configService.get('dbPassword'),
+				database: configService.get('dbName'),
+				models: [
+					Administrators,
+					DataBasePosts,
+					ImageData,
+					RegularPublicationTime,
+					Channels,
+					ChannelPosts
+				],
+				autoLoadModels: true,
+				synchronize: true
+			}),
+			inject: [ConfigService]
+		}),
+		SequelizeModule.forFeature([
+			Administrators,
+			DataBasePosts,
+			ImageData,
+			RegularPublicationTime,
+			Channels,
+			ChannelPosts
+		])
+	],
+	exports: [SequelizeModule]
 })
 export class DBModule {}

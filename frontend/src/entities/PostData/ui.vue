@@ -48,6 +48,7 @@
 	import { useToast } from 'vue-toastification';
 	import { PaginationPostData } from '@/widgets';
 	import { useAppStore } from '@/app/app.store';
+	import { EDirection } from './const';
 
 	const route = useRoute();
 	const router = useRouter();
@@ -98,9 +99,9 @@
 			state.form.useChannelList = response.channelsPost?.map((item) => item.id);
 			router.push(response.postId.toString());
 		} catch (e) {
-			router.push('/publishing-page');
-			localStorage.setItem('watched', '');
-			toast.error(e.response.data.message);
+				router.push('/publishing-page');
+				localStorage.setItem('watched', '');
+				toast.error(e.response.data.message);
 		} finally {
 			state.imagesToLoad = state.images.length;
 			if (state.imagesToLoad === 0) {
@@ -133,11 +134,11 @@
 	};
 
 	const backPage = async () => {
-		switchPostPanel('back');
+		switchPostPanel(EDirection.BACK);
 	};
 
 	const nextPage = async () => {
-		switchPostPanel('next');
+		switchPostPanel(EDirection.NEXT);
 	};
 
 	const setValueSheckBox = async (value: any) => {

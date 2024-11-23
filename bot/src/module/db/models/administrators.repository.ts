@@ -3,15 +3,15 @@ import { EAdministratorRole } from '../../../type/types';
 
 @Table
 export class Administrators extends Model {
-  @Column({ primaryKey: true, autoIncrement: true })
-  id: number;
+	@Column({ primaryKey: true, autoIncrement: true })
+	id: number;
 
-  @Column({ unique: true })
-  name: string;
+	@Column({ unique: true })
+	name: string;
 
-  @Column
-  password: string;
+	@Column
+	password: string;
 
-  @Column({ defaultValue: EAdministratorRole.USER })
-  role: EAdministratorRole;
+	@Column({ defaultValue: EAdministratorRole.USER })
+	role: EAdministratorRole;
 }

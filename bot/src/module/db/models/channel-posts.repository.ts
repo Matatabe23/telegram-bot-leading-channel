@@ -4,11 +4,11 @@ import { DataBasePosts } from './data-base-posts.repository';
 
 @Table
 export class ChannelPosts extends Model {
-  @ForeignKey(() => Channels)
-  @Column
-  channelId: number;
+	@ForeignKey(() => Channels)
+	@Column
+	channelId: number;
 
-  @ForeignKey(() => DataBasePosts)
-  @Column
-  postId: number;
+	@ForeignKey(() => DataBasePosts)
+	@Column
+	postId: number;
 }

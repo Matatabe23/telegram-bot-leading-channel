@@ -1,7 +1,9 @@
+import { EWatched } from "../PostData";
+
 export const watchedOptions = [
     { value: '', title: 'Нечего' },
-    { value: 'watched', title: 'Просмотренные' },
-    { value: 'unwatched', title: 'Не просмотренные' }
+    { value: EWatched.watched, title: 'Просмотренные' },
+    { value: EWatched.unwatched, title: 'Не просмотренные' }
 ];
 
 export const perPage = [

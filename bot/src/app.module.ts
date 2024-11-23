@@ -18,26 +18,26 @@ import { TGModule } from './module/service/tg-bot-service/tg-bot-service.module'
 import { RegularPublicationBotModule } from './module/service/regular-publication-bot-service/regular-publication-bot-service.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      load: [configuration],
-      isGlobal: true,
-    }),
-    DBModule,
+	imports: [
+		ConfigModule.forRoot({
+			load: [configuration],
+			isGlobal: true
+		}),
+		DBModule,
 
-    PostsModule,
-    AdminModule,
-    SettingsModule,
+		PostsModule,
+		AdminModule,
+		SettingsModule,
 
-    S3Module,
-    FileModule,
-    WaterMarkModule,
-    TokenModule,
-    RegularPublicationBotModule,
+		S3Module,
+		FileModule,
+		WaterMarkModule,
+		TokenModule,
+		RegularPublicationBotModule,
 
-    TGModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+		TGModule
+	],
+	controllers: [AppController],
+	providers: [AppService]
 })
 export class AppModule {}

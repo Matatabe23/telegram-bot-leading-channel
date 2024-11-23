@@ -15,125 +15,121 @@ import * as TelegramBot from 'node-telegram-bot-api';
 
 @Injectable()
 export class TGBotService {
-  private readonly logger = new Logger(TGBotService.name);
-  public bot: TelegramBot;
+	private readonly logger = new Logger(TGBotService.name);
+	public bot: TelegramBot;
 
-  constructor(
-    @InjectModel(DataBasePosts)
-    private readonly dataBasePosts: typeof DataBasePosts,
-    @InjectModel(ImageData)
-    private readonly imageData: typeof ImageData,
-    @InjectModel(Channels)
-    private readonly channels: typeof Channels,
-    @InjectModel(ChannelPosts)
-    private readonly channelPosts: typeof ChannelPosts,
-    private readonly fileRepository: FileRepository,
-    private readonly s3Repository: S3Repository,
-    private readonly waterMarkRepository: WaterMarkRepository,
-  ) {
-    this.bot = new TelegramBot(process.env.TELEGRAM_BOT_API_TOKEN, {
-      polling: true,
-    });
-  }
+	constructor(
+		@InjectModel(DataBasePosts)
+		private readonly dataBasePosts: typeof DataBasePosts,
+		@InjectModel(ImageData)
+		private readonly imageData: typeof ImageData,
+		@InjectModel(Channels)
+		private readonly channels: typeof Channels,
+		@InjectModel(ChannelPosts)
+		private readonly channelPosts: typeof ChannelPosts,
+		private readonly fileRepository: FileRepository,
+		private readonly s3Repository: S3Repository,
+		private readonly waterMarkRepository: WaterMarkRepository
+	) {
+		this.bot = new TelegramBot(process.env.TELEGRAM_BOT_API_TOKEN, {
+			polling: true
+		});
+	}
 
-  async sendMessageAtScheduledTime(timeData: { time: Date; chatId: string }) {
-    const postWithImages: any = await this.dataBasePosts.findOne({
-      include: [
-        {
-          model: Channels as any,
-          where: { chatId: timeData.chatId },
-          required: true,
-        },
-        { model: ImageData },
-      ],
-      order: [['id', 'ASC']],
-    });
+	async sendMessageAtScheduledTime(timeData: { time: Date; chatId: string }) {
+		const postWithImages: any = await this.dataBasePosts.findOne({
+			include: [
+				{
+					model: Channels as any,
+					where: { chatId: timeData.chatId },
+					required: true
+				},
+				{ model: ImageData }
+			],
+			order: [['id', 'ASC']]
+		});
 
-    if (!postWithImages) return;
+		if (!postWithImages) return;
 
-    const media: any = [];
-    for (const item of postWithImages.dataValues.images) {
-      try {
-        const result = await this.fileRepository.downloadFile(
-          `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`,
-        );
+		const media: any = [];
+		for (const item of postWithImages.dataValues.images) {
+			try {
+				const result = await this.fileRepository.downloadFile(
+					`${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`
+				);
 
-        const mediaBuffer = postWithImages.waterMark
-          ? await this.waterMarkRepository.addWatermark(result)
-          : result;
+				const mediaBuffer = postWithImages.waterMark
+					? await this.waterMarkRepository.addWatermark(result)
+					: result;
 
-        media.push({
-          type: 'photo',
-          media: mediaBuffer.buffer,
-          id: item.id,
-          caption: '#QugorArts',
-        });
-      } catch (error) {
-        this.logger.error('Ошибка при скачивании файла из S3:', error);
-        return;
-      }
-    }
+				media.push({
+					type: 'photo',
+					media: mediaBuffer.buffer,
+					id: item.id,
+					caption: '#QugorArts'
+				});
+			} catch (error) {
+				this.logger.error('Ошибка при скачивании файла из S3:', error);
+				return;
+			}
+		}
 
-    if (media.length > 10) {
-      this.logger.error('Слишком много медиафайлов');
-      return;
-    }
+		if (media.length > 10) {
+			this.logger.error('Слишком много медиафайлов');
+			return;
+		}
 
-    const deleteImage = async () => {
-      await Promise.all(
-        postWithImages.dataValues.images.map(async (item: any) => {
-          await this.imageData.destroy({ where: { id: item.id } });
-          this.s3Repository.deleteImageFromS3(item.image);
-        }),
-      );
-      await ChannelPosts.destroy({ where: { postId: postWithImages.id } });
-      await this.dataBasePosts.destroy({ where: { id: postWithImages.id } });
-    };
+		const deleteImage = async () => {
+			await Promise.all(
+				postWithImages.dataValues.images.map(async (item: any) => {
+					await this.imageData.destroy({ where: { id: item.id } });
+					this.s3Repository.deleteImageFromS3(item.image);
+				})
+			);
+			await ChannelPosts.destroy({ where: { postId: postWithImages.id } });
+			await this.dataBasePosts.destroy({ where: { id: postWithImages.id } });
+		};
 
-    if (postWithImages.dataValues.channels.length > 0) {
-      for (const element of postWithImages.dataValues.channels) {
-        if (element.chatId) {
-          await this.bot
-            .sendMediaGroup(element.chatId as string, media)
-            .then(() => deleteImage());
-        }
-      }
-    }
-  }
+		if (postWithImages.dataValues.channels.length > 0) {
+			for (const element of postWithImages.dataValues.channels) {
+				if (element.chatId) {
+					await this.bot
+						.sendMediaGroup(element.chatId as string, media)
+						.then(() => deleteImage());
+				}
+			}
+		}
+	}
 
-  async instantPublicationPosts(
-    files: any,
-    chatId: string,
-    waterMark?: boolean,
-  ) {
-    return new Promise(async (resolve, reject) => {
-      const media: any = [];
-      if (files.length > 10) {
-        console.error('Слишком много медиафайлов');
-        reject(new Error('Слишком много медиафайлов'));
-        return;
-      }
+	async instantPublicationPosts(files: any, chatId: string, waterMark?: boolean) {
+		return new Promise(async (resolve, reject) => {
+			const media: any = [];
+			if (files.length > 10) {
+				console.error('Слишком много медиафайлов');
+				reject(new Error('Слишком много медиафайлов'));
+				return;
+			}
 
-      for (const file of files) {
-        const mediaBuffer = waterMark
-          ? await this.waterMarkRepository.addWatermark(file)
-          : file;
+			for (const file of files) {
+				const mediaBuffer = waterMark
+					? await this.waterMarkRepository.addWatermark(file)
+					: file;
 
-        const mediaBlock = {
-          type: 'photo',
-          media: mediaBuffer.buffer,
-          caption: '#QugorArts',
-        };
-        media.push(mediaBlock);
-      }
+				const mediaBlock = {
+					type: 'photo',
+					media: mediaBuffer.buffer,
+					caption: '#QugorArts'
+				};
+				media.push(mediaBlock);
+			}
 
-      try {
-        await this.bot.sendMediaGroup(chatId as string, media);
-        resolve(true);
-      } catch (error: any) {
-        console.error('Ошибка при отправке сообщения:', error);
-        reject(error);
-      }
-    });
-  }
+			try {
+				await this.bot.sendMediaGroup(chatId as string, media);
+				resolve(true);
+			} catch (error: any) {
+				console.error('Ошибка при отправке сообщения:', error);
+				reject(error);
+			}
+		});
+	}
 }
