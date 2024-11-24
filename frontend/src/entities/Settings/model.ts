@@ -8,14 +8,14 @@ export interface IListChannels {
 }
 
 export interface IStateStoreSettings {
-    listChannels: IListChannels[]
+    listChannels: IListChannels[],
+    listRoles: IGetListRoles[]
 }
 
-export interface IGetListChannels {
+export interface IGetListRoles {
     id: number,
     name: string,
-    chatId: string,
-    settings: string,
+    permissions: string[],
     createdAt: string,
     updatedAt: string
 }
@@ -25,8 +25,15 @@ export interface IStateChannels {
         name: string,
         chatId: string,
 
-        listChannels: IGetListChannels[]
+        listChannels: IListChannels[]
     }
+}
+
+export interface IStateRoles {
+    form: {
+        name: string,
+    },
+    listRoles: IGetListRoles[]
 }
 
 export enum IEditChannelType {

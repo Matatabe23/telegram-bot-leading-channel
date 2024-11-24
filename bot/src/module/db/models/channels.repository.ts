@@ -1,5 +1,5 @@
 import { Column, Model, Table, HasMany, BelongsToMany } from 'sequelize-typescript';
-import { RegularPublicationTime } from './regularPublicationTime.repository';
+import { RegularPublicationTime } from './regular-publication-time.repository';
 import { DataBasePosts } from './data-base-posts.repository';
 import { ChannelPosts } from './channel-posts.repository';
 

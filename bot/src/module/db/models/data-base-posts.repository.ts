@@ -1,5 +1,5 @@
 import { Column, Model, Table, HasMany, BelongsToMany } from 'sequelize-typescript';
-import { ImageData } from './imageData.repository';
+import { ImageData } from './image-data.repository';
 import { Channels } from './channels.repository';
 import { ChannelPosts } from './channel-posts.repository';
 

@@ -5,7 +5,7 @@ import { FileRepository } from 'src/module/service/file-service/file-service.rep
 import { S3Repository } from 'src/module/service/s3-service/s3-service.repository';
 
 import { DataBasePosts } from 'src/module/db/models/data-base-posts.repository';
-import { ImageData } from 'src/module/db/models/imageData.repository';
+import { ImageData } from 'src/module/db/models/image-data.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
 import { ChannelPosts } from 'src/module/db/models/channel-posts.repository';
 

@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as moment from 'moment-timezone';
 import * as schedule from 'node-schedule';
-import { RegularPublicationTime } from 'src/module/db/models/regularPublicationTime.repository';
+import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
 import { TGBotService } from '../tg-bot-service/tg-bot-service.repository';
 

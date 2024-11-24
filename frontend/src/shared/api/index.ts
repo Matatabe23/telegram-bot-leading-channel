@@ -2,6 +2,7 @@ export * from './adminAPI';
 export * from './postsAPI';
 export * from './settingsAPI';
 export * from './filesAPI';
+export * from './rolesAPI';
 
 import axios from 'axios';
 

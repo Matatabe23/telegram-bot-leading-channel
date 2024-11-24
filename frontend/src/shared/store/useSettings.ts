@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
 import { IStateStoreSettings } from '@/entities';
-import { getListChannel } from '@/shared'
+import { getListChannel, getListRoles } from '@/shared'
 
 export const useSettings = defineStore('useSettings', {
     state: (): IStateStoreSettings => ({
         listChannels: [],
+        listRoles: []
     }),
 
     actions: {
@@ -15,6 +16,10 @@ export const useSettings = defineStore('useSettings', {
 
         async getListChannels() {
             this.listChannels = await getListChannel()
+        },
+
+        async getListRoles() {
+            this.listRoles = await getListRoles()
         }
 
 

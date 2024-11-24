@@ -17,6 +17,7 @@ import { TokenModule } from './module/service/token-service/token-service.module
 import { TGModule } from './module/service/tg-bot-service/tg-bot-service.module';
 import { RegularPublicationBotModule } from './module/service/regular-publication-bot-service/regular-publication-bot-service.module';
 import { FilesModule } from './module/endpoints/files/files.module';
+import { RolesModule } from './module/endpoints/roles/roles.module';
 
 @Module({
 	imports: [
@@ -30,6 +31,7 @@ import { FilesModule } from './module/endpoints/files/files.module';
 		AdminModule,
 		SettingsModule,
 		FilesModule,
+		RolesModule,
 
 		S3Module,
 		FileModule,

@@ -47,8 +47,9 @@
 			dataLoading.value = true;
 			await getDataAdmin();
 			await settingsStore.getListChannels();
+            await settingsStore.getListRoles();
 		} catch (e) {
-			toast.error(e.response.data.message);
+			toast.error(e.response.data.message || e.response);
 		} finally {
 			dataLoading.value = false;
 		}
