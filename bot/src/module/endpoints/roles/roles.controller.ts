@@ -7,6 +7,7 @@ import {
 	HttpStatus,
 	Param,
 	Post,
+	Put,
 	UseGuards
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
@@ -52,8 +53,23 @@ export class RolesController {
 	@UseGuards(AuthGuard)
 	async deleteRole(@Param('id') id: number) {
 		try {
-			console.log(id);
 			return this.rolesService.deleteRole(id);
+		} catch (e) {
+			throw new HttpException(
+				{
+					status: HttpStatus.INTERNAL_SERVER_ERROR,
+					message: e.message
+				},
+				HttpStatus.INTERNAL_SERVER_ERROR
+			);
+		}
+	}
+
+	@Put('update-permissions/:id')
+	@UseGuards(AuthGuard)
+	async updatePermissions(@Param('id') id: number, @Body('permissions') permissions: string) {
+		try {
+			return this.rolesService.updatePermissions(id, permissions);
 		} catch (e) {
 			throw new HttpException(
 				{

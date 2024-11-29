@@ -1,8 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import { RegularPublicationTime } from './module/db/models/regular-publication-time.repository';
+import { Channels } from './module/db/models/channels.repository';
+import { InjectModel } from '@nestjs/sequelize';
+import { RolesSettings } from './module/db/models/roles-settings.repository';
+import { EPermissions, PERMISSIONS_LIST } from './const/const';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+	constructor(
+		@InjectModel(Channels)
+		private readonly channels: typeof Channels,
+		@InjectModel(RolesSettings)
+		private readonly rolesSettings: typeof RolesSettings
+	) {}
+
+	async getMainInfo() {
+		const listChannel = await this.channels.findAll({
+			include: [
+				{
+					model: RegularPublicationTime
+				}
+			]
+		});
+		const listRoles = await this.rolesSettings.findAll();
+
+		return {
+			listChannel,
+			listRoles,
+			EPermissions,
+			PERMISSIONS_LIST
+		};
+	}
 }

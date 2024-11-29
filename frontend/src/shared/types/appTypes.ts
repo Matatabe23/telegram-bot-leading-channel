@@ -19,4 +19,9 @@ export interface IAppStore {
     width: number,
     height: number,
     isLoading: boolean,
+    permissions: any,
+    PERMISSIONS_LIST: {
+        title: string,
+        value:string
+    }[]
 }

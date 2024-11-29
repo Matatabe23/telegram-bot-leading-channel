@@ -38,7 +38,6 @@ export class AdminService {
 		const admin = await this.adminRepository.findOne({ where: { id } });
 		if (!admin) return;
 		const resultDto = new AdminDto(admin);
-		console.log(resultDto);
 		const accessToken = this.tokenRepository.generateToken({ ...resultDto }, '15m');
 		return { accessToken, admin: resultDto };
 	}

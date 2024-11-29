@@ -6,8 +6,8 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { RegularPublicationBotModule } from 'src/module/service/regular-publication-bot-service/regular-publication-bot-service.module';
 
 @Module({
-  imports: [DBModule, RegularPublicationBotModule],
-  controllers: [SettingsController],
-  providers: [SettingsService, AuthGuard],
+	imports: [DBModule, RegularPublicationBotModule],
+	controllers: [SettingsController],
+	providers: [SettingsService, AuthGuard]
 })
 export class SettingsModule {}

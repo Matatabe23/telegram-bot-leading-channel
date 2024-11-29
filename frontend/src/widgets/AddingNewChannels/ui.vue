@@ -64,7 +64,7 @@
 <script lang="ts" setup>
 	import { reactive, watch } from 'vue';
 	import { addingNewChannels, deleteChannel, editChannel, useSettings } from '@/shared';
-	import { IStateChannels, IEditChannelType, IGetListChannels } from '@/entities';
+	import { IStateChannels, IEditChannelType, IListChannels } from '@/entities';
 	import { useToast } from 'vue-toastification';
 	import { storeToRefs } from 'pinia';
 
@@ -111,7 +111,7 @@
 		settingsStore.getListChannels();
 	};
 
-	const updateDefaultChannel = async (channel: IGetListChannels, type: IEditChannelType) => {
+	const updateDefaultChannel = async (channel: IListChannels, type: IEditChannelType) => {
 		try {
 			const settings = channel.settings.length > 0 ? [...channel.settings.split(',')] : [];
 

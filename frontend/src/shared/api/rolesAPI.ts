@@ -14,3 +14,8 @@ export const deleteRole = async (id: number) => {
     const { data } = await $autHost.delete(`api/roles/delete-role/${id}`);
     return data;
 }
+
+export const updatePermissions = async (id: number, permissions: string) => {
+    const { data } = await $autHost.put(`api/roles/update-permissions/${id}`, {permissions});
+    return data;
+}

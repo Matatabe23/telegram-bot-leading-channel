@@ -48,6 +48,7 @@ export class TGBotService {
 			],
 			order: [['id', 'ASC']]
 		});
+		console.log(postWithImages);
 
 		if (!postWithImages) return;
 

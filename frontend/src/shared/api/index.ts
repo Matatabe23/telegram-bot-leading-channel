@@ -6,6 +6,11 @@ export * from './rolesAPI';
 
 import axios from 'axios';
 
+export const getMainInfo = async () => {
+    const { data } = await $autHost.get('api/main-info');
+    return data;
+}
+
 // @ts-ignore
 const url = import.meta.env.VITE_APP_BACKEND_API_URL
 

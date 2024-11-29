@@ -5,7 +5,8 @@ import {
     PublishPage,
     Settings,
     PostData,
-    Profile
+    Profile,
+    Roles
 } from '@/pages';
 
 const routes: RouteRecordRaw[] = [
@@ -31,6 +32,10 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/profile',
         component: Profile,
+    },
+    {
+        path: '/roles',
+        component: Roles,
     },
 
     {

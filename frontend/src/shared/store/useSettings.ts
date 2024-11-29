@@ -5,7 +5,7 @@ import { getListChannel, getListRoles } from '@/shared'
 export const useSettings = defineStore('useSettings', {
     state: (): IStateStoreSettings => ({
         listChannels: [],
-        listRoles: []
+        listRoles: [],
     }),
 
     actions: {
@@ -19,7 +19,11 @@ export const useSettings = defineStore('useSettings', {
         },
 
         async getListRoles() {
-            this.listRoles = await getListRoles()
+            const listRoles = await getListRoles()
+            this.listRoles = listRoles.map((role) => ({
+				...role,
+				permissions: role.permissions ? role.permissions.split(',') : []
+			}));
         }
 
 

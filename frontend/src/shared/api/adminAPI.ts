@@ -48,7 +48,7 @@ export const updateAccessToken = async (refreshToken: string) => {
 }
 
 export const updateDataAdmin = async (data: adminData) => {
-        const response = await $host.put('api/admin/update-data-admin', data);
-        return response.data;
+    const response = await $host.put('api/admin/update-data-admin', data);
+    return response.data;
 };
 

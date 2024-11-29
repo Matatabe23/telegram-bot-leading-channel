@@ -47,7 +47,7 @@ export class PostsController {
 		}
 	}
 
-	@Put('editPostLinkChannels')
+	@Put('edit-post-link-channels')
 	@UseGuards(AuthGuard)
 	async editPostLinkChannels(@Body() body: { postId: number; channelIds: number[] }) {
 		try {
@@ -66,7 +66,7 @@ export class PostsController {
 		}
 	}
 
-	@Post('instantPublicationPosts')
+	@Post('instant-publication-posts')
 	@UseGuards(AuthGuard)
 	@UseInterceptors(FilesInterceptor('files[]'))
 	async instantPublicationPosts(
@@ -108,7 +108,6 @@ export class PostsController {
 
 			return result;
 		} catch (e) {
-			console.log(e, 'qugor');
 			throw new HttpException(
 				{
 					status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -119,7 +118,7 @@ export class PostsController {
 		}
 	}
 
-	@Delete('deletePost/:id')
+	@Delete('delete-post/:id')
 	@UseGuards(AuthGuard)
 	async deletePost(@Param('id') id: number) {
 		try {
@@ -136,7 +135,7 @@ export class PostsController {
 		}
 	}
 
-	@Post('publishInstantly/:id')
+	@Post('publish-instantly/:id')
 	@UseGuards(AuthGuard)
 	async publishInstantly(@Param('id') id: number) {
 		try {
@@ -153,7 +152,7 @@ export class PostsController {
 		}
 	}
 
-	@Get('receivingPost/:id')
+	@Get('receiving-post/:id')
 	@UseGuards(AuthGuard)
 	async receivingPost(@Param('id') id: number) {
 		try {
@@ -170,7 +169,7 @@ export class PostsController {
 		}
 	}
 
-	@Get('changePage/:id')
+	@Get('change-page/:id')
 	@UseGuards(AuthGuard)
 	async changePage(
 		@Param('id') id: number,
@@ -192,7 +191,7 @@ export class PostsController {
 		}
 	}
 
-	@Get('deleteSelectedImgs')
+	@Get('delete-selected-imgs')
 	@UseGuards(AuthGuard)
 	async deleteSelectedImgs(@Query() query: { idList: IImageBlock[] }) {
 		try {

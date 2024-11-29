@@ -21,7 +21,7 @@
 	import { RouterView } from 'vue-router';
 	import { PageLayout } from './app/layouts';
 	import { useRouter, useRoute } from 'vue-router';
-	import { useSettings } from '@/shared';
+	import { getMainInfo, useSettings } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
 	import { useToast } from 'vue-toastification';
 
@@ -46,8 +46,15 @@
 		try {
 			dataLoading.value = true;
 			await getDataAdmin();
-			await settingsStore.getListChannels();
-            await settingsStore.getListRoles();
+			const mainInfo = await getMainInfo();
+
+			settingsStore.listRoles = mainInfo.listRoles.map((role) => ({
+				...role,
+				permissions: role.permissions ? role.permissions.split(',') : []
+			}));
+			settingsStore.listChannels = mainInfo.listChannel;
+			appStore.permissions = mainInfo.EPermissions;
+			appStore.PERMISSIONS_LIST = mainInfo.PERMISSIONS_LIST;
 		} catch (e) {
 			toast.error(e.response.data.message || e.response);
 		} finally {

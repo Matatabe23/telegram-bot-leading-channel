@@ -9,7 +9,7 @@ export interface IListChannels {
 
 export interface IStateStoreSettings {
     listChannels: IListChannels[],
-    listRoles: IGetListRoles[]
+    listRoles: IGetListRoles[],
 }
 
 export interface IGetListRoles {

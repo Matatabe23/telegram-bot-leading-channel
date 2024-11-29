@@ -8,6 +8,6 @@ export class RolesSettings extends Model {
 	@Column({ unique: true })
 	name: string;
 
-	@Column({ type: 'JSON' })
-	permissions: string[];
+	@Column
+	permissions: string;
 }

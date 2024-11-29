@@ -1,32 +1,30 @@
-import { EAdministratorRole, IAdministratorRole } from '../type/types';
+export enum EPermissions {
+	EDIT_ROLES = 'edit_roles', // Редактировать роли
+	EDIT_USERS = 'edit_users', // Редактировать пользователей
+	PUBLISH_POSTS = 'publish_posts', // Публиковать посты
+	DELETE_POSTS = 'delete_posts', // Удалять посты
+	MARK_POST_VIEWED = 'mark_post_viewed' // Делать отметку, что пост просмотрен
+}
 
-export const roles: IAdministratorRole[] = [
+export const PERMISSIONS_LIST = [
 	{
-		id: 1,
-		nameRole: EAdministratorRole.DEVELOPER,
-		publisherPanelAccess: true,
-		usersPanelAccess: true,
-		AdminslistAccess: true,
-		ChangeInfo: [
-			EAdministratorRole.DEVELOPER,
-			EAdministratorRole.ADMIN,
-			EAdministratorRole.MODERATOR
-		]
+		title: 'Редактировать роли',
+		value: EPermissions.EDIT_ROLES
 	},
 	{
-		id: 3,
-		nameRole: EAdministratorRole.ADMIN,
-		publisherPanelAccess: true,
-		usersPanelAccess: true,
-		AdminslistAccess: false,
-		ChangeInfo: [EAdministratorRole.MODERATOR]
+		title: 'Редактировать пользователей',
+		value: EPermissions.EDIT_USERS
 	},
 	{
-		id: 4,
-		nameRole: EAdministratorRole.MODERATOR,
-		publisherPanelAccess: false,
-		usersPanelAccess: true,
-		AdminslistAccess: false,
-		ChangeInfo: []
+		title: 'Публиковать посты',
+		value: EPermissions.PUBLISH_POSTS
+	},
+	{
+		title: 'Удалять посты',
+		value: EPermissions.DELETE_POSTS
+	},
+	{
+		title: 'Делать отметку, что пост просмотрен',
+		value: EPermissions.MARK_POST_VIEWED
 	}
 ];

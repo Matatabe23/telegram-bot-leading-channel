@@ -19,6 +19,8 @@ export const useAppStore = defineStore('app', {
         width: 0,
         height: 0,
         isLoading: false,
+        permissions: null,
+        PERMISSIONS_LIST: []
     }),
 
     getters: {

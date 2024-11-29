@@ -45,4 +45,22 @@ export class RolesService {
 			throw new Error(error.message || 'Не удалось удалить роль');
 		}
 	}
+
+	// Обновление прав роли
+	async updatePermissions(id: number, permissions: string) {
+		try {
+			const role = await this.rolesSettings.findByPk(id);
+			if (!role) {
+				throw new Error('Роль не найдена');
+			}
+
+			await role.update({ permissions });
+
+			return 'Права роли обновлены';
+		} catch (error) {
+			console.log(error);
+			console.error('Ошибка при обновлении прав роли:', error);
+			throw new Error(error.message || 'Не удалось обновить права роли');
+		}
+	}
 }

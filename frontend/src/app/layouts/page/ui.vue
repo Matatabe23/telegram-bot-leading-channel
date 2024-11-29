@@ -80,7 +80,11 @@
 		{
 			title: 'Настройки',
 			path: '/settings'
-		}
+		},
+        {
+			title: 'Роли',
+			path: '/roles'
+		},
 	];
 
 	const isHomePage = computed(() => router.currentRoute.value.path === '/');

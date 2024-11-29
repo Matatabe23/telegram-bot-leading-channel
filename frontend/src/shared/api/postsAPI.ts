@@ -20,7 +20,7 @@ export const instantPublicationPosts = async (files: FileList, waterMark: boolea
     }
     formData.append('waterMark', waterMark.toString());
     formData.append('chatIdList', chatIdList.join(','));
-    const { data } = await $autHost.post('api/posts/instantPublicationPosts', formData);
+    const { data } = await $autHost.post('api/posts/instant-publication-posts', formData);
     return data;
 }
 
@@ -30,31 +30,31 @@ export const receiving = async (page: number, pageSize: number, watched?: string
 }
 
 export const deletePost = async (id: number) => {
-    const { data } = await $autHost.delete(`api/posts/deletePost/${id}`);
+    const { data } = await $autHost.delete(`api/posts/delete-post/${id}`);
     return data;
 }
 
 export const publishInstantly = async (id: number) => {
-    const { data } = await $autHost.post(`api/posts/publishInstantly/${id}`);
+    const { data } = await $autHost.post(`api/posts/publish-instantly/${id}`);
     return data;
 }
 
 export const receivingPost = async (id: number) => {
-    const { data } = await $autHost.get(`api/posts/receivingPost/${id}`);
+    const { data } = await $autHost.get(`api/posts/receiving-post/${id}`);
     return data;
 }
 
 export const changePage = async (id: number, where: string, watched: string, channel?: string) => {
-    const { data } = await $autHost.get(`api/posts/changePage/${id}`, { params: { where, watched, channel } });
+    const { data } = await $autHost.get(`api/posts/change-page/${id}`, { params: { where, watched, channel } });
     return data;
 }
 
 export const deleteSelectedImgs = async (idList: IImageBlock) => {
-    const { data } = await $autHost.get(`api/posts/deleteSelectedImgs`, { params: { idList } });
+    const { data } = await $autHost.get(`api/posts/delete-selected-imgs`, { params: { idList } });
     return data;
 }
 
 export const editPostLinkСhannels = async (postId: number, channelIds?: number[]) => {
-    const { data } = await $autHost.put(`api/posts/editPostLinkChannels`, { postId, channelIds });
+    const { data } = await $autHost.put(`api/posts/edit-post-link-channels`, { postId, channelIds });
     return data;
 }
