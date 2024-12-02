@@ -7,8 +7,8 @@ import { FileModule } from '../file-service/file-service.module';
 import { WaterMarkModule } from '../water-mark-service/water-mark-service.module';
 
 @Module({
-  imports: [ConfigModule, DBModule, S3Module, FileModule, WaterMarkModule],
-  providers: [TGBotService],
-  exports: [TGBotService],
+	imports: [ConfigModule, DBModule, S3Module, FileModule, WaterMarkModule],
+	providers: [TGBotService],
+	exports: [TGBotService]
 })
 export class TGModule {}

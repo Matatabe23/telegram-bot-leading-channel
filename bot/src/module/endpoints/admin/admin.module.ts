@@ -6,8 +6,8 @@ import { DBModule } from 'src/module/db/db.module';
 import { AuthGuard } from 'src/guards/auth.guard';
 
 @Module({
-  imports: [DBModule, TokenModule],
-  controllers: [AdminController],
-  providers: [AdminService, AuthGuard],
+	imports: [DBModule, TokenModule],
+	controllers: [AdminController],
+	providers: [AdminService, AuthGuard]
 })
 export class AdminModule {}

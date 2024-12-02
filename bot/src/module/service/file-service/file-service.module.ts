@@ -4,8 +4,8 @@ import { FileRepository } from './file-service.repository';
 
 @Global()
 @Module({
-  imports: [ConfigModule],
-  providers: [FileRepository],
-  exports: [FileRepository],
+	imports: [ConfigModule],
+	providers: [FileRepository],
+	exports: [FileRepository]
 })
 export class FileModule {}

@@ -9,8 +9,8 @@ import { TGModule } from 'src/module/service/tg-bot-service/tg-bot-service.modul
 import { FileModule } from 'src/module/service/file-service/file-service.module';
 
 @Module({
-  imports: [DBModule, WaterMarkModule, S3Module, TGModule, FileModule],
-  controllers: [PostsController],
-  providers: [PostsService, AuthGuard],
+	imports: [DBModule, WaterMarkModule, S3Module, TGModule, FileModule],
+	controllers: [PostsController],
+	providers: [PostsService, AuthGuard]
 })
 export class PostsModule {}

@@ -77,13 +77,17 @@
 			title: 'Главная страница',
 			path: '/publishing-page'
 		},
-		{
-			title: 'Настройки',
-			path: '/settings'
+        {
+			title: 'Аккаунты',
+			path: '/users'
 		},
         {
 			title: 'Роли',
 			path: '/roles'
+		},
+        {
+			title: 'Настройки',
+			path: '/settings'
 		},
 	];
 

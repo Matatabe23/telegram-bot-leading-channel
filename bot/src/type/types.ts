@@ -10,22 +10,6 @@ export interface IAdminDto {
 	password?: string;
 }
 
-export enum EAdministratorRole {
-	DEVELOPER = 'developer',
-	ADMIN = 'admin',
-	MODERATOR = 'moderator',
-	USER = 'user'
-}
-
-export interface IAdministratorRole {
-	id: number;
-	nameRole: EAdministratorRole;
-	publisherPanelAccess: boolean;
-	usersPanelAccess: boolean;
-	AdminslistAccess: boolean;
-	ChangeInfo: string[];
-}
-
 export interface IImageBlock {
 	id: number;
 	image: string;

@@ -30,43 +30,58 @@
 					</div>
 				</div>
 			</div>
-			<v-btn
-				variant="flat"
-				color="#5865f2"
-                @click="updateAdminData"
-				:loading="appStore.isLoading"
-                class="md:mt-4 md:w-[20%]"
-				>Сохранить
-			</v-btn>
+			<div class="md:flex grid gap-3">
+				<v-btn
+					variant="flat"
+					color="#5865f2"
+					@click="updateAdminData"
+					:loading="appStore.isLoading"
+					class="md:mt-4 md:w-[20%]"
+					>Сохранить
+				</v-btn>
+				<v-btn
+					variant="flat"
+					color="#5865f2"
+					@click="isModelUpdatePassword = true"
+					:loading="appStore.isLoading"
+					class="md:mt-4 md:w-[30%]"
+					>Изменить пароль
+				</v-btn>
+			</div>
 		</div>
 	</section>
+
+	<ModalUpdatePassword
+		v-if="isModelUpdatePassword"
+		@close="isModelUpdatePassword = false"
+	/>
 </template>
 
 <script lang="ts" setup>
-	import { EditAvatar } from '@/widgets';
+	import { EditAvatar, ModalUpdatePassword } from '@/widgets';
 	import { useAppStore } from '@/app/app.store';
 	import { ref, watch } from 'vue';
 	import { adminData, updateDataAdmin } from '@/shared';
-    import { useToast } from 'vue-toastification';
+	import { useToast } from 'vue-toastification';
 
-    
 	const appStore = useAppStore();
-    const toast = useToast();
+	const toast = useToast();
 
 	const adminDataLocal = ref<adminData>(JSON.parse(JSON.stringify(appStore.adminData)));
+	const isModelUpdatePassword = ref(false);
 
-    const updateAdminData = () => {
-        try{
-            appStore.isLoading = true
-            updateDataAdmin(adminDataLocal.value)
+	const updateAdminData = () => {
+		try {
+			appStore.isLoading = true;
+			updateDataAdmin(adminDataLocal.value);
 
-            toast.success('Данные обновлены успешно');
-        }catch(e){
-            toast.error(e.response.data);
-        }finally{
-            appStore.isLoading = false
-        }
-    }
+			toast.success('Данные обновлены успешно');
+		} catch (e) {
+			toast.error(e.response.data);
+		} finally {
+			appStore.isLoading = false;
+		}
+	};
 
 	watch(
 		() => appStore.adminData,

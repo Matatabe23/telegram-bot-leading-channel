@@ -71,7 +71,6 @@
 	import { IStateRoles } from '@/entities';
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
-	import debounce from 'lodash/debounce';
 
 	const settingsStore = useSettings();
 	const toast = useToast();

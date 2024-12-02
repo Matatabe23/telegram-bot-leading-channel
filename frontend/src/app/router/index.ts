@@ -6,7 +6,8 @@ import {
     Settings,
     PostData,
     Profile,
-    Roles
+    Roles,
+    Users
 } from '@/pages';
 
 const routes: RouteRecordRaw[] = [
@@ -36,6 +37,10 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/roles',
         component: Roles,
+    },
+    {
+        path: '/users',
+        component: Users,
     },
 
     {

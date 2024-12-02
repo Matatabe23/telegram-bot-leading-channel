@@ -127,7 +127,7 @@
 			await editChannel(channel.id, settings);
 			settingsStore.getListChannels();
 		} catch (e) {
-			console.error(e);
+			//
 		}
 	};
 

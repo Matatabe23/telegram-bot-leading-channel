@@ -1,6 +1,12 @@
 import { $autHost, $host, adminData } from "@/shared";
 import { jwtDecode } from "jwt-decode";
 
+// Создание нового пользователя
+export const createUser = async (name: string, password: string) => {
+    const response = await $autHost.post('api/admin/create-user', { name, password });
+    return response.data;
+};
+
 // Функция для авторизации пользователя
 export const login = async (name: string, password: string) => {
     const { data } = await $host.get('api/admin/login', { params: { name, password } });
@@ -47,8 +53,29 @@ export const updateAccessToken = async (refreshToken: string) => {
     return data.accessToken;
 }
 
+// Обновление информации
 export const updateDataAdmin = async (data: adminData) => {
-    const response = await $host.put('api/admin/update-data-admin', data);
+    const response = await $autHost.put('api/admin/update-data-admin', data);
+    return response.data;
+};
+
+// Список юзеров
+export const getUsersList = async (page: number, limit: number) => {
+    const response = await $autHost.get('api/admin/get-users-list', {
+        params: { page, limit },
+    });
+    return response.data;
+};
+
+//Удалить пользователя
+export const deleteUser = async (id: number) => {
+    const response = await $autHost.delete(`api/admin/delete-post/${id}`);
+    return response.data;
+};
+
+// Обновление пароля
+export const updatePassword = async (oldPassword: string, newPassword: string) => {
+    const response = await $autHost.put('api/admin/update-password', {oldPassword, newPassword});
     return response.data;
 };
 

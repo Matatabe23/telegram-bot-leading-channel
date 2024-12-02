@@ -1,5 +1,4 @@
 import { Column, Model, Table } from 'sequelize-typescript';
-import { EAdministratorRole } from '../../../type/types';
 
 @Table
 export class Administrators extends Model {
@@ -12,8 +11,8 @@ export class Administrators extends Model {
 	@Column
 	password: string;
 
-	@Column({ defaultValue: EAdministratorRole.USER })
-	role: EAdministratorRole;
+	@Column
+	role: string;
 
 	@Column({ allowNull: true })
 	avatarUrl: string;

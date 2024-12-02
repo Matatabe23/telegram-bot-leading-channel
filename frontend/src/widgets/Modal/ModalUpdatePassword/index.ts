@@ -1,0 +1,1 @@
+export { default as ModalUpdatePassword } from './ui.vue';

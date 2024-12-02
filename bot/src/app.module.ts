@@ -18,6 +18,7 @@ import { TGModule } from './module/service/tg-bot-service/tg-bot-service.module'
 import { RegularPublicationBotModule } from './module/service/regular-publication-bot-service/regular-publication-bot-service.module';
 import { FilesModule } from './module/endpoints/files/files.module';
 import { RolesModule } from './module/endpoints/roles/roles.module';
+import { InitDataModule } from './module/service/init-data-service/init-data-service.module';
 
 @Module({
 	imports: [
@@ -38,6 +39,7 @@ import { RolesModule } from './module/endpoints/roles/roles.module';
 		WaterMarkModule,
 		TokenModule,
 		RegularPublicationBotModule,
+		InitDataModule,
 
 		TGModule
 	],

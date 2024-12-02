@@ -5,18 +5,18 @@ import { TokenRepository } from './token-service.repository';
 
 @Global()
 @Module({
-  imports: [
-    ConfigModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('SECRET_KEY_ACCESS'),
-        signOptions: { expiresIn: '1d' },
-      }),
-      inject: [ConfigService],
-    }),
-  ],
-  providers: [TokenRepository],
-  exports: [TokenRepository, JwtModule],
+	imports: [
+		ConfigModule,
+		JwtModule.registerAsync({
+			imports: [ConfigModule],
+			useFactory: async (configService: ConfigService) => ({
+				secret: configService.get('SECRET_KEY_ACCESS'),
+				signOptions: { expiresIn: '1d' }
+			}),
+			inject: [ConfigService]
+		})
+	],
+	providers: [TokenRepository],
+	exports: [TokenRepository, JwtModule]
 })
 export class TokenModule {}

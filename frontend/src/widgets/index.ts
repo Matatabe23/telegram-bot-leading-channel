@@ -6,3 +6,5 @@ export * from './AddingNewChannels'
 export * from './AddingPublicationTimeSettings'
 export * from './PaginationPostData'
 export * from './EditAvatar'
+
+export * from './Modal'

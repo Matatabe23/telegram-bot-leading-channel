@@ -48,7 +48,10 @@ export class TGBotService {
 			],
 			order: [['id', 'ASC']]
 		});
-		console.log(postWithImages);
+
+		const chatInfo = await this.channels.findOne({
+			where: { chatId: timeData.chatId }
+		});
 
 		if (!postWithImages) return;
 
@@ -80,15 +83,30 @@ export class TGBotService {
 			return;
 		}
 
-		const deleteImage = async () => {
-			await Promise.all(
-				postWithImages.dataValues.images.map(async (item: any) => {
-					await this.imageData.destroy({ where: { id: item.id } });
-					this.s3Repository.deleteImageFromS3(item.image);
-				})
-			);
-			await ChannelPosts.destroy({ where: { postId: postWithImages.id } });
-			await this.dataBasePosts.destroy({ where: { id: postWithImages.id } });
+		const deletePost = async () => {
+			const channelPosts = await ChannelPosts.findAll({
+				where: {
+					postId: postWithImages.dataValues.id
+				}
+			});
+
+			if (channelPosts.length > 1) {
+				await ChannelPosts.destroy({
+					where: {
+						channelId: chatInfo.dataValues.id,
+						postId: postWithImages.dataValues.id
+					}
+				});
+			} else {
+				await Promise.all(
+					postWithImages.dataValues.images.map(async (item: any) => {
+						await this.imageData.destroy({ where: { id: item.id } });
+						this.s3Repository.deleteImageFromS3(item.image);
+					})
+				);
+				await ChannelPosts.destroy({ where: { postId: postWithImages.id } });
+				await this.dataBasePosts.destroy({ where: { id: postWithImages.id } });
+			}
 		};
 
 		if (postWithImages.dataValues.channels.length > 0) {
@@ -96,7 +114,7 @@ export class TGBotService {
 				if (element.chatId) {
 					await this.bot
 						.sendMediaGroup(element.chatId as string, media)
-						.then(() => deleteImage());
+						.then(() => deletePost());
 				}
 			}
 		}

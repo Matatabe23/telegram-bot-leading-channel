@@ -3,23 +3,23 @@ import { json, urlencoded } from 'express'; // Импортируем middleware
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule);
 
-  // Устанавливаем лимит размера тела запроса до 100 MB
-  app.use(json({ limit: '100mb' }));
-  app.use(urlencoded({ limit: '100mb', extended: true }));
+	// Устанавливаем лимит размера тела запроса до 100 MB
+	app.use(json({ limit: '100mb' }));
+	app.use(urlencoded({ limit: '100mb', extended: true }));
 
-  // Разрешаем все CORS-запросы
-  app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Authorization',
-  });
+	// Разрешаем все CORS-запросы
+	app.enableCors({
+		origin: '*',
+		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+		allowedHeaders: 'Content-Type, Authorization'
+	});
 
-  // Глобальный префикс
-  app.setGlobalPrefix('api');
+	// Глобальный префикс
+	app.setGlobalPrefix('api');
 
-  // Запуск приложения
-  await app.listen(process.env.APP_PORT);
+	// Запуск приложения
+	await app.listen(process.env.APP_PORT);
 }
 bootstrap();

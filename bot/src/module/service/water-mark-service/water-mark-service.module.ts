@@ -4,8 +4,8 @@ import { WaterMarkRepository } from './water-mark-service.repository';
 
 @Global()
 @Module({
-  imports: [ConfigModule],
-  providers: [WaterMarkRepository],
-  exports: [WaterMarkRepository],
+	imports: [ConfigModule],
+	providers: [WaterMarkRepository],
+	exports: [WaterMarkRepository]
 })
 export class WaterMarkModule {}
