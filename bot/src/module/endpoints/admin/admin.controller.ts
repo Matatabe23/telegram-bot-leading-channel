@@ -16,6 +16,8 @@ import { AdminService } from './admin.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { AdminDto } from './dto/admin.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
+import { EPermissions } from 'src/const/const';
 
 @Controller('admin')
 export class AdminController {
@@ -23,6 +25,7 @@ export class AdminController {
 
 	@Post('create-user')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
 	async createUser(@Body() createUserDto: { name: string; password: string }) {
 		try {
 			const { name, password } = createUserDto;
@@ -106,6 +109,7 @@ export class AdminController {
 
 	@Get('get-users-list')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
 	async getUsersList(@Query('page') page: number, @Query('limit') limit: number) {
 		try {
 			return await this.adminService.getUsersList(Number(page), Number(limit));
@@ -122,6 +126,7 @@ export class AdminController {
 
 	@Delete('delete-post/:id')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
 	async deleteUser(@Param('id') id: number) {
 		try {
 			return await this.adminService.deleteUser(Number(id));

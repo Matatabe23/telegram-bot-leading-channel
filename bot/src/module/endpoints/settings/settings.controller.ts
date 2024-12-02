@@ -15,6 +15,8 @@ import {
 import { Response } from 'express';
 import { SettingsService } from './settings.service';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
+import { EPermissions } from 'src/const/const';
 
 @Controller('settings')
 export class SettingsController {
@@ -22,6 +24,7 @@ export class SettingsController {
 
 	@Post('addingPublicationTime')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
 	async addingPublicationTime(@Body() body, @Res() res: Response) {
 		try {
 			const { hour, minute, channelId } = body;
@@ -44,6 +47,7 @@ export class SettingsController {
 
 	@Get('getListRegularPublicationTimes')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
 	async getListRegularPublicationTimes(
 		@Query('channelId') channelId: string,
 		@Res() res: Response
@@ -64,6 +68,7 @@ export class SettingsController {
 
 	@Delete('deleteItemPublicationTimes/:id')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
 	async deleteItemPublicationTimes(@Param('id') id: string, @Res() res: Response) {
 		try {
 			const result = await this.settingsService.deleteItemPublicationTimes(id);
@@ -81,6 +86,7 @@ export class SettingsController {
 
 	@Post('addingNewChannels')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
 	async addingNewChannels(@Body() body, @Res() res: Response) {
 		try {
 			const { name, chatId } = body;
@@ -99,6 +105,7 @@ export class SettingsController {
 
 	@Get('getListChannel')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
 	async getListChannel(@Res() res: Response) {
 		try {
 			const list = await this.settingsService.getListChannel();
@@ -116,6 +123,7 @@ export class SettingsController {
 
 	@Delete('deleteChannel/:id')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
 	async deleteChannel(@Param('id') id: string, @Res() res: Response) {
 		try {
 			const result = await this.settingsService.deleteChannel(id);
@@ -132,6 +140,8 @@ export class SettingsController {
 	}
 
 	@Put('editChannel')
+	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
 	async editChannel(@Body() body, @Res() res: Response) {
 		try {
 			const { id, settings } = body;

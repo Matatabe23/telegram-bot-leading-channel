@@ -12,6 +12,8 @@ import {
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
+import { EPermissions } from 'src/const/const';
 
 @Controller('roles')
 export class RolesController {
@@ -19,6 +21,7 @@ export class RolesController {
 
 	@Post('create-role')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
 	async createNewRole(@Body() body: { nameRole: string }) {
 		try {
 			return this.rolesService.createNewRole(body.nameRole);
@@ -35,6 +38,7 @@ export class RolesController {
 
 	@Get('get-roles')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
 	async getRoles() {
 		try {
 			return this.rolesService.getRoles();
@@ -51,6 +55,7 @@ export class RolesController {
 
 	@Delete('delete-role/:id')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
 	async deleteRole(@Param('id') id: number) {
 		try {
 			return this.rolesService.deleteRole(id);
@@ -67,6 +72,7 @@ export class RolesController {
 
 	@Put('update-permissions/:id')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
 	async updatePermissions(@Param('id') id: number, @Body('permissions') permissions: string) {
 		try {
 			return this.rolesService.updatePermissions(id, permissions);

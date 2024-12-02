@@ -17,6 +17,8 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { PostsService } from './posts.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { IImageBlock } from 'src/type/types';
+import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
+import { EPermissions } from 'src/const/const';
 
 @Controller('posts')
 export class PostsController {
@@ -24,6 +26,7 @@ export class PostsController {
 
 	@Post('publication')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
 	@UseInterceptors(FilesInterceptor('files[]'))
 	async publication(
 		@UploadedFiles() files: Express.Multer.File[],
@@ -49,6 +52,7 @@ export class PostsController {
 
 	@Put('edit-post-link-channels')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_POSTS))
 	async editPostLinkChannels(@Body() body: { postId: number; channelIds: number[] }) {
 		try {
 			const { postId, channelIds } = body;
@@ -68,6 +72,7 @@ export class PostsController {
 
 	@Post('instant-publication-posts')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
 	@UseInterceptors(FilesInterceptor('files[]'))
 	async instantPublicationPosts(
 		@UploadedFiles() files: Express.Multer.File[],
@@ -120,6 +125,7 @@ export class PostsController {
 
 	@Delete('delete-post/:id')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.DELETE_POSTS))
 	async deletePost(@Param('id') id: number) {
 		try {
 			const result = await this.postsService.deletePost(id);
@@ -137,6 +143,7 @@ export class PostsController {
 
 	@Post('publish-instantly/:id')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
 	async publishInstantly(@Param('id') id: number) {
 		try {
 			const result = await this.postsService.publishInstantly(id);
@@ -193,6 +200,7 @@ export class PostsController {
 
 	@Get('delete-selected-imgs')
 	@UseGuards(AuthGuard)
+	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.DELETE_POSTS))
 	async deleteSelectedImgs(@Query() query: { idList: IImageBlock[] }) {
 		try {
 			const { idList } = query;
