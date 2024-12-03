@@ -1,3 +1,6 @@
+import { useAppStore } from "@/app/app.store";
+import { useSettings } from "../store";
+
 export const bodyLock = (boolean: boolean) => {
     if (boolean) {
         document.body.classList.remove('overflow-hidden');
@@ -9,3 +12,11 @@ export const bodyLock = (boolean: boolean) => {
         document.body.style.paddingRight = `5px`;
     }
 };
+
+export const checkPermissions = (permission: string): boolean => {
+    const rolePermissions = useSettings().listRoles.find(
+        item => item.name === useAppStore().adminData.role
+    );
+    return rolePermissions?.permissions?.includes(permission) ?? false;
+};
+

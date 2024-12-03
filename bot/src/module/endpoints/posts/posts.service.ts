@@ -178,7 +178,8 @@ export class PostsService {
 					through: { attributes: [] },
 					where: channel ? { id: channel } : undefined
 				}
-			]
+			],
+			distinct: true
 		});
 
 		return { posts: updatedPosts, totalCount, publishTime: list };
@@ -261,7 +262,7 @@ export class PostsService {
 		return 'Пост успешно опубликован';
 	}
 
-	async receivingPost(id: number) {
+	async receivingPost(id: number, updateWatch?: boolean) {
 		const post = await this.dataBasePosts.findByPk(id, {
 			include: [{ model: Channels }, { model: ImageData }]
 		});
@@ -276,7 +277,9 @@ export class PostsService {
 			};
 		});
 
-		await post.update({ watched: true });
+		if (updateWatch) {
+			await post.update({ watched: true });
+		}
 
 		return { imageList, channelsPost: post.dataValues.channels };
 	}
@@ -285,6 +288,7 @@ export class PostsService {
 		let whereCondition: {
 			watched?: boolean;
 		} = {};
+		console.log(watched);
 		if (watched === 'watched') {
 			whereCondition = { ...whereCondition, watched: true };
 		} else if (watched === 'unwatched') {

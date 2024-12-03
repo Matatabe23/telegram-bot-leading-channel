@@ -19,6 +19,7 @@ import { RegularPublicationBotModule } from './module/service/regular-publicatio
 import { FilesModule } from './module/endpoints/files/files.module';
 import { RolesModule } from './module/endpoints/roles/roles.module';
 import { InitDataModule } from './module/service/init-data-service/init-data-service.module';
+import { HelpersModule } from './module/service/helpers/helpers.module';
 
 @Module({
 	imports: [
@@ -40,6 +41,7 @@ import { InitDataModule } from './module/service/init-data-service/init-data-ser
 		TokenModule,
 		RegularPublicationBotModule,
 		InitDataModule,
+		HelpersModule,
 
 		TGModule
 	],

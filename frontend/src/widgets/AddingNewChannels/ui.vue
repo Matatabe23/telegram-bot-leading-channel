@@ -67,11 +67,13 @@
 	import { IStateChannels, IEditChannelType, IListChannels } from '@/entities';
 	import { useToast } from 'vue-toastification';
 	import { storeToRefs } from 'pinia';
+	import { useAppStore } from '@/app/app.store';
 
 	const settingsStore = useSettings();
 	const { listChannels } = storeToRefs(settingsStore);
 
 	const toast = useToast();
+	const appStore = useAppStore();
 
 	defineEmits<{
 		'get-list': [];
@@ -101,14 +103,21 @@
 				state.form.chatId = '';
 			}
 		} catch (e: any) {
-			toast.error(e.response.data);
+			toast.error(e.response.data.message);
 		}
 	};
 
 	const delChannel = async (id: number) => {
-		const result = await deleteChannel(id);
-		toast.success(result);
-		settingsStore.getListChannels();
+		try {
+            appStore.isLoading = false
+			const result = await deleteChannel(id);
+			toast.success(result);
+			await settingsStore.getListChannels();
+		} catch (e) {
+			toast.error(e.response.data.message);
+		} finally {
+            appStore.isLoading = false
+		}
 	};
 
 	const updateDefaultChannel = async (channel: IListChannels, type: IEditChannelType) => {
@@ -127,7 +136,7 @@
 			await editChannel(channel.id, settings);
 			settingsStore.getListChannels();
 		} catch (e) {
-			//
+			toast.error(e.response.data.message);
 		}
 	};
 
@@ -138,5 +147,3 @@
 		}
 	);
 </script>
-
-<style scoped></style>

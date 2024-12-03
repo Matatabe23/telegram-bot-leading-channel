@@ -56,10 +56,11 @@
 	const setlogin = async () => {
 		try {
 			const response: any = await login(state.auth.name, state.auth.password);
-			appStore.isLoading = false;
+			appStore.isLoading = true;
 
-			appStore.setAdminData(response);
+			await appStore.setAdminData(response);
 			await settingsStore.getListChannels();
+            await appStore.getInfo()
 
 			router.push('/publishing-page');
 		} catch (e: any) {

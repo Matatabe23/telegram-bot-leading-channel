@@ -13,6 +13,7 @@
 				</h2>
 				<div class="flex gap-2 flex-wrap md:flex-nowrap">
 					<v-btn
+						v-if="checkPermissions(appStore.permissions?.DELETE_POSTS)"
 						color="#5865f2"
 						variant="flat"
 						@click="emit('delete-post', props.post.id)"
@@ -29,6 +30,7 @@
 						>Открыть</v-btn
 					>
 					<v-btn
+						v-if="checkPermissions(appStore.permissions?.PUBLISH_POSTS)"
 						color="#5865f2"
 						variant="flat"
 						@click="emit('publish-instantly-post', props.post.id)"
@@ -47,6 +49,7 @@
 	import { useRouter } from 'vue-router';
 	import { IPosts } from '@/entities';
 	import { useAppStore } from '@/app/app.store';
+	import { checkPermissions } from '@/shared';
 
 	const router = useRouter();
 	const appStore = useAppStore();

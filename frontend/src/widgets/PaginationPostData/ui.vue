@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="hidden w-2/3 m-4 md:flex justify-around items-center bg-gray-600 rounded-2xl p-2 flex-wrap gap-2 mx-auto"
+		class="hidden w-2/3 m-4 md:flex justify-around items-center bg-gray-600 rounded-2xl p-2 flex-wrap gap-2 mx-auto min-h-[70px]"
 	>
 		<v-btn
 			variant="flat"
@@ -12,6 +12,7 @@
 				class="rotate-90"
 		/></v-btn>
 		<v-btn
+			v-if="checkPermissions(appStore.permissions?.DELETE_POSTS)"
 			variant="flat"
 			@click="$emit('delPost')"
 			color="#5865f2"
@@ -20,6 +21,7 @@
 		/></v-btn>
 		<div class="min-w-[30%] text-white">
 			<v-select
+				v-if="checkPermissions(appStore.permissions?.EDIT_POSTS)"
 				label="Каналы публикации"
 				:items="channelsListSelect"
 				multiple
@@ -31,6 +33,7 @@
 			></v-select>
 		</div>
 		<v-btn
+			v-if="checkPermissions(appStore.permissions?.DELETE_POSTS)"
 			variant="flat"
 			@click="$emit('deleteSelectedImg')"
 			color="#5865f2"
@@ -98,7 +101,7 @@
 
 <script lang="ts" setup>
 	import { computed } from 'vue';
-	import { Icons, useSettings } from '@/shared';
+	import { Icons, useSettings, checkPermissions } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
 
 	const { listChannels } = useSettings();

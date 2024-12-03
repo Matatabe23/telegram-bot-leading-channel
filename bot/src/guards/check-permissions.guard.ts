@@ -36,7 +36,7 @@ export class CheckPermissionsGuard implements CanActivate {
 
 		const requiredPermissions = await this.getRolePermissions(user.role);
 
-		if (requiredPermissions) {
+		if (!requiredPermissions || !this.permission || !requiredPermissions.permissions) {
 			throw new HttpException('У вас нет необходимых разрешений', HttpStatus.FORBIDDEN);
 		}
 
@@ -49,7 +49,8 @@ export class CheckPermissionsGuard implements CanActivate {
 		return true;
 	}
 
-	private async getRolePermissions(role) {
-		return await this.rolesSettings.findOne({ where: { name: role } });
+	private async getRolePermissions(role: string) {
+		const result = await this.rolesSettings.findOne({ where: { name: role } });
+		return result.dataValues;
 	}
 }

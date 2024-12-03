@@ -42,7 +42,7 @@
 						<td class="border border-gray-200 px-4 py-2">
 							<v-select
 								label="Права"
-								:items="appStore.PERMISSIONS_LIST"
+								:items="appStore.permissions_LIST"
 								multiple
 								variant="outlined"
 								v-model="role.permissions"

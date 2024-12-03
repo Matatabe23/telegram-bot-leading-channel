@@ -7,7 +7,7 @@
 		>
 			<v-list>
 				<v-list-item
-					v-for="page in PAGES"
+					v-for="page in visiblePages"
 					:key="page.title"
 					link
 					@click="goTo(page.path)"
@@ -36,7 +36,6 @@
 							:image="appStore.adminData.avatarUrl"
 						></v-avatar>
 					</template>
-                    
 
 					<v-list class="mt-2">
 						<v-list-item
@@ -60,7 +59,7 @@
 <script setup lang="ts">
 	import { ref, computed } from 'vue';
 	import { useRouter } from 'vue-router';
-	import { Icons } from '@/shared';
+	import { checkPermissions, Icons } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
 
 	const router = useRouter();
@@ -75,23 +74,29 @@
 	const PAGES = [
 		{
 			title: 'Главная страница',
-			path: '/publishing-page'
+			path: '/publishing-page',
+			visible: true 
 		},
-        {
+		{
 			title: 'Аккаунты',
-			path: '/users'
+			path: '/users',
+			visible: checkPermissions(appStore.permissions?.EDIT_USERS)
 		},
-        {
+		{
 			title: 'Роли',
-			path: '/roles'
+			path: '/roles',
+			visible: checkPermissions(appStore.permissions?.EDIT_ROLES)
 		},
-        {
+		{
 			title: 'Настройки',
-			path: '/settings'
-		},
+			path: '/settings',
+			visible: checkPermissions(appStore.permissions?.CREATE_CHANNEL) || checkPermissions(appStore.permissions?.SET_PUBLICATION_TIME)
+		}
 	];
 
 	const isHomePage = computed(() => router.currentRoute.value.path === '/');
+    const visiblePages = computed(() => PAGES.filter(page => page.visible));
+
 
 	const exit = async () => {
 		localStorage.removeItem('admin');

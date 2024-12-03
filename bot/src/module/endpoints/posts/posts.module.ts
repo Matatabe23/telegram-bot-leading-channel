@@ -7,9 +7,10 @@ import { S3Module } from 'src/module/service/s3-service/s3-service.module';
 import { DBModule } from 'src/module/db/db.module';
 import { TGModule } from 'src/module/service/tg-bot-service/tg-bot-service.module';
 import { FileModule } from 'src/module/service/file-service/file-service.module';
+import { HelpersModule } from 'src/module/service/helpers/helpers.module';
 
 @Module({
-	imports: [DBModule, WaterMarkModule, S3Module, TGModule, FileModule],
+	imports: [DBModule, WaterMarkModule, S3Module, TGModule, FileModule, HelpersModule],
 	controllers: [PostsController],
 	providers: [PostsService, AuthGuard]
 })

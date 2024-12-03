@@ -105,7 +105,6 @@ export class SettingsController {
 
 	@Get('getListChannel')
 	@UseGuards(AuthGuard)
-	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
 	async getListChannel(@Res() res: Response) {
 		try {
 			const list = await this.settingsService.getListChannel();

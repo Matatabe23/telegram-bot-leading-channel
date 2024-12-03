@@ -11,7 +11,8 @@ import {
 	Get,
 	Query,
 	Delete,
-	Param
+	Param,
+	Req
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { PostsService } from './posts.service';
@@ -19,10 +20,14 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { IImageBlock } from 'src/type/types';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/const/const';
+import { HelpersRepository } from 'src/module/service/helpers/helpers.repository';
 
 @Controller('posts')
 export class PostsController {
-	constructor(private readonly postsService: PostsService) {}
+	constructor(
+		private readonly postsService: PostsService,
+		private readonly helpersRepository: HelpersRepository
+	) {}
 
 	@Post('publication')
 	@UseGuards(AuthGuard)
@@ -161,9 +166,13 @@ export class PostsController {
 
 	@Get('receiving-post/:id')
 	@UseGuards(AuthGuard)
-	async receivingPost(@Param('id') id: number) {
+	async receivingPost(@Req() request: any, @Param('id') id: number) {
 		try {
-			const result = await this.postsService.receivingPost(id);
+			const isPermissions = await this.helpersRepository.checkPermissions(
+				request.authData.role,
+				EPermissions.MARK_POST_VIEWED
+			);
+			const result = await this.postsService.receivingPost(id, isPermissions);
 			return result;
 		} catch (e) {
 			throw new HttpException(

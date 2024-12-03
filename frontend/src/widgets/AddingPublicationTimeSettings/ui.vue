@@ -106,7 +106,7 @@
 				state.minute = '0';
 			}
 		} catch (e: any) {
-			toast.error(e.response.data);
+			toast.error(e.response.data.message);
 		}
 	};
 
