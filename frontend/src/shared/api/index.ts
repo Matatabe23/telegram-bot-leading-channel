@@ -7,7 +7,7 @@ export * from './rolesAPI';
 import axios from 'axios';
 
 export const getMainInfo = async () => {
-    const { data } = await $autHost.get('api/main-info');
+    const { data } = await $autHost.get('main-info');
     return data;
 }
 

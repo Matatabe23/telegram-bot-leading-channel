@@ -9,7 +9,7 @@ export const publication = async (files: FileList, waterMark: boolean, chatIdLis
     }
     formData.append('waterMark', waterMark.toString());
     formData.append('chatIdList', chatIdList.join(','));
-    const { data } = await $autHost.post('api/posts/publication', formData);
+    const { data } = await $autHost.post('posts/publication', formData);
     return data;
 }
 
@@ -20,41 +20,41 @@ export const instantPublicationPosts = async (files: FileList, waterMark: boolea
     }
     formData.append('waterMark', waterMark.toString());
     formData.append('chatIdList', chatIdList.join(','));
-    const { data } = await $autHost.post('api/posts/instant-publication-posts', formData);
+    const { data } = await $autHost.post('posts/instant-publication-posts', formData);
     return data;
 }
 
 export const receiving = async (page: number, pageSize: number, watched?: string, channel?: string) => {
-    const { data } = await $autHost.get('api/posts/receiving', { params: { page, pageSize, watched, channel } });
+    const { data } = await $autHost.get('posts/receiving', { params: { page, pageSize, watched, channel } });
     return data;
 }
 
 export const deletePost = async (id: number) => {
-    const { data } = await $autHost.delete(`api/posts/delete-post/${id}`);
+    const { data } = await $autHost.delete(`posts/delete-post/${id}`);
     return data;
 }
 
 export const publishInstantly = async (id: number) => {
-    const { data } = await $autHost.post(`api/posts/publish-instantly/${id}`);
+    const { data } = await $autHost.post(`posts/publish-instantly/${id}`);
     return data;
 }
 
 export const receivingPost = async (id: number) => {
-    const { data } = await $autHost.get(`api/posts/receiving-post/${id}`);
+    const { data } = await $autHost.get(`posts/receiving-post/${id}`);
     return data;
 }
 
 export const changePage = async (id: number, where: string, watched: string, channel?: string) => {
-    const { data } = await $autHost.get(`api/posts/change-page/${id}`, { params: { where, watched, channel } });
+    const { data } = await $autHost.get(`posts/change-page/${id}`, { params: { where, watched, channel } });
     return data;
 }
 
 export const deleteSelectedImgs = async (idList: IImageBlock) => {
-    const { data } = await $autHost.get(`api/posts/delete-selected-imgs`, { params: { idList } });
+    const { data } = await $autHost.get(`posts/delete-selected-imgs`, { params: { idList } });
     return data;
 }
 
 export const editPostLinkСhannels = async (postId: number, channelIds?: number[]) => {
-    const { data } = await $autHost.put(`api/posts/edit-post-link-channels`, { postId, channelIds });
+    const { data } = await $autHost.put(`posts/edit-post-link-channels`, { postId, channelIds });
     return data;
 }

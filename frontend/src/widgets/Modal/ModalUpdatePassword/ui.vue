@@ -14,14 +14,14 @@
 				:disabled="appStore.isLoading"
 			/>
 			<v-text-field
-				label="Старый пароль"
+				label="Новый пароль"
 				class="w-full"
 				v-model="newPassword"
 				variant="outlined"
 				type="password"
 				:loading="appStore.isLoading"
 				:disabled="appStore.isLoading"
-			></v-text-field>
+			/>
 			<v-text-field
 				label="Повторение пароля"
 				class="w-full"
@@ -30,7 +30,7 @@
 				type="password"
 				:loading="appStore.isLoading"
 				:disabled="appStore.isLoading"
-			></v-text-field>
+			/>
 		</div>
 		<v-btn
 			variant="flat"

@@ -17,7 +17,7 @@ async function bootstrap() {
 	});
 
 	// Глобальный префикс
-	app.setGlobalPrefix('api');
+	app.setGlobalPrefix('');
 
 	// Запуск приложения
 	await app.listen(process.env.APP_PORT);

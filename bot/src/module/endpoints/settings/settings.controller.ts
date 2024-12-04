@@ -22,7 +22,7 @@ import { EPermissions } from 'src/const/const';
 export class SettingsController {
 	constructor(private readonly settingsService: SettingsService) {}
 
-	@Post('addingPublicationTime')
+	@Post('adding-publication-time')
 	@UseGuards(AuthGuard)
 	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
 	async addingPublicationTime(@Body() body, @Res() res: Response) {
@@ -45,7 +45,7 @@ export class SettingsController {
 		}
 	}
 
-	@Get('getListRegularPublicationTimes')
+	@Get('get-list-regular-publication-times')
 	@UseGuards(AuthGuard)
 	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
 	async getListRegularPublicationTimes(
@@ -66,7 +66,7 @@ export class SettingsController {
 		}
 	}
 
-	@Delete('deleteItemPublicationTimes/:id')
+	@Delete('delete-item-publication-times/:id')
 	@UseGuards(AuthGuard)
 	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
 	async deleteItemPublicationTimes(@Param('id') id: string, @Res() res: Response) {
@@ -84,7 +84,7 @@ export class SettingsController {
 		}
 	}
 
-	@Post('addingNewChannels')
+	@Post('adding-new-channels')
 	@UseGuards(AuthGuard)
 	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
 	async addingNewChannels(@Body() body, @Res() res: Response) {
@@ -103,7 +103,7 @@ export class SettingsController {
 		}
 	}
 
-	@Get('getListChannel')
+	@Get('get-list-channel')
 	@UseGuards(AuthGuard)
 	async getListChannel(@Res() res: Response) {
 		try {
@@ -120,7 +120,7 @@ export class SettingsController {
 		}
 	}
 
-	@Delete('deleteChannel/:id')
+	@Delete('delete-channel/:id')
 	@UseGuards(AuthGuard)
 	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
 	async deleteChannel(@Param('id') id: string, @Res() res: Response) {
@@ -138,7 +138,7 @@ export class SettingsController {
 		}
 	}
 
-	@Put('editChannel')
+	@Put('edit-channel')
 	@UseGuards(AuthGuard)
 	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
 	async editChannel(@Body() body, @Res() res: Response) {

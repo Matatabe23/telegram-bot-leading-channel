@@ -16,7 +16,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 export class FilesController {
 	constructor(private readonly filesService: FilesService) {}
 
-	@Post('upload-filesTo-s3')
+	@Post('upload-files-to-s3')
 	@UseGuards(AuthGuard)
 	@UseInterceptors(FilesInterceptor('files[]'))
 	async uploadFilesToS3(
