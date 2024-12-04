@@ -9,8 +9,9 @@ export class HelpersRepository {
 
 	async checkPermissions(role: string, permission: EPermissions) {
 		const requiredPermissions = await this.rolesSettings.findOne({ where: { name: role } });
-		console.log(requiredPermissions.dataValues.permissions);
-		if (!requiredPermissions.dataValues.permissions) return false;
-		return requiredPermissions.dataValues.permissions.includes(permission);
+		if (requiredPermissions?.permissions) {
+			return requiredPermissions?.permissions.includes(permission);
+		}
+		return false;
 	}
 }

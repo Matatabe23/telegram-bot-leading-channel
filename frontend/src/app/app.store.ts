@@ -60,7 +60,6 @@ export const useAppStore = defineStore('app', {
 
         async getInfo()  {
             try {
-                console.log(this.auth)
                 if (this.auth !== true) return;
                 const mainInfo = await getMainInfo();
                 const settingsStore = (await import('@/shared')).useSettings();

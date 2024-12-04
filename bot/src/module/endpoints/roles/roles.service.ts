@@ -58,7 +58,6 @@ export class RolesService {
 
 			return 'Права роли обновлены';
 		} catch (error) {
-			console.log(error);
 			console.error('Ошибка при обновлении прав роли:', error);
 			throw new Error(error.message || 'Не удалось обновить права роли');
 		}

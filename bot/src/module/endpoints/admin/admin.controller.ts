@@ -29,7 +29,6 @@ export class AdminController {
 	async createUser(@Body() createUserDto: { name: string; password: string }) {
 		try {
 			const { name, password } = createUserDto;
-			console.log(name, password);
 			const result = await this.adminService.createUser(name, password);
 			return result;
 		} catch (e) {

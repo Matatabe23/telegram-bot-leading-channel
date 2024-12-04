@@ -20,8 +20,6 @@ export class TokenRepository {
 			throw new Error('SECRET_KEY is not defined');
 		}
 
-		console.log(`Using secret: ${secretKey}`);
-
 		const token = this.jwtService.sign(
 			{ ...payload },
 			{
@@ -37,7 +35,6 @@ export class TokenRepository {
 			const secret = this.configService.get('SECRET_KEY_REFRESH');
 			return this.jwtService.verify(refreshToken, { secret });
 		} catch (e) {
-			console.log(e);
 			throw new UnauthorizedException('Invalid or expired refresh token');
 		}
 	}

@@ -288,7 +288,6 @@ export class PostsService {
 		let whereCondition: {
 			watched?: boolean;
 		} = {};
-		console.log(watched);
 		if (watched === 'watched') {
 			whereCondition = { ...whereCondition, watched: true };
 		} else if (watched === 'unwatched') {

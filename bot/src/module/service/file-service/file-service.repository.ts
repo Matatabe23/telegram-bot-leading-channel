@@ -48,7 +48,6 @@ export class FileRepository {
 		try {
 			const filePath = path.join(this.imageFolder, file);
 			await fs.promises.unlink(filePath);
-			console.log('Файл успешно удален:', file);
 			return true;
 		} catch (error) {
 			console.error('Ошибка при удалении файла:', error);
