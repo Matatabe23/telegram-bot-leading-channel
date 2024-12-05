@@ -1,11 +1,11 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { FileRepository } from './file-service.repository';
+import { S3Repository } from './s3.repository';
 
 @Global()
 @Module({
 	imports: [ConfigModule],
-	providers: [FileRepository],
-	exports: [FileRepository]
+	providers: [S3Repository],
+	exports: [S3Repository]
 })
-export class FileModule {}
+export class S3Module {}

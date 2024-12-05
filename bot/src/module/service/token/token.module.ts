@@ -1,7 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { TokenRepository } from './token-service.repository';
+import { TokenRepository } from './token.repository';
 
 @Global()
 @Module({

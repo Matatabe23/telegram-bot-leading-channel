@@ -1,6 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { WaterMarkRepository } from './water-mark-service.repository';
+import { WaterMarkRepository } from './water-mark.repository';
 
 @Global()
 @Module({

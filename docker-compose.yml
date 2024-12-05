@@ -67,16 +67,3 @@ services:
         networks:
             - dev
 
-    backup:
-        image: alpine:latest
-        volumes:
-            - ./data/backups:/backups
-        environment:
-            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-        entrypoint: >
-            sh -c "echo '0 3 * * * mysqldump -h db -u root -p$MYSQL_ROOT_PASSWORD ${MYSQL_DATABASE} > /backups/backup_$(date +\%F).sql' > /etc/crontabs/root && crond -f"
-        depends_on:
-            - db
-        networks:
-            - dev
-        restart: always

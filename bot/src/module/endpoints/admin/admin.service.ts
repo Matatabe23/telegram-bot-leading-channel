@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { InjectModel } from '@nestjs/sequelize';
 import { Administrators } from 'src/module/db/models/administrators.repository';
 import { AdminDto } from './dto/admin.dto';
-import { TokenRepository } from 'src/module/service/token-service/token-service.repository';
+import { TokenRepository } from 'src/module/service/token/token.repository';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()

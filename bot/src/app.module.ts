@@ -10,15 +10,15 @@ import { PostsModule } from './module/endpoints/posts/posts.module';
 import { AdminModule } from './module/endpoints/admin/admin.module';
 import { SettingsModule } from './module/endpoints/settings/settings.module';
 
-import { S3Module } from './module/service/s3-service/s3-service.module';
-import { FileModule } from './module/service/file-service/file-service.module';
-import { WaterMarkModule } from './module/service/water-mark-service/water-mark-service.module';
-import { TokenModule } from './module/service/token-service/token-service.module';
-import { TGModule } from './module/service/tg-bot-service/tg-bot-service.module';
-import { RegularPublicationBotModule } from './module/service/regular-publication-bot-service/regular-publication-bot-service.module';
+import { S3Module } from './module/service/s3/s3.module';
+import { FileModule } from './module/service/files/files.module';
+import { WaterMarkModule } from './module/service/water-mark/water-mark.module';
+import { TokenModule } from './module/service/token/token.module';
+import { TGModule } from './module/service/tg-bot/tg-bot.module';
+import { RegularPublicationBotModule } from './module/service/regular-publication-bot/regular-publication-bot.module';
 import { FilesModule } from './module/endpoints/files/files.module';
 import { RolesModule } from './module/endpoints/roles/roles.module';
-import { InitDataModule } from './module/service/init-data-service/init-data-service.module';
+import { InitDataModule } from './module/service/init-data/init-data.module';
 import { HelpersModule } from './module/service/helpers/helpers.module';
 
 @Module({

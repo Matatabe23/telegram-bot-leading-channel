@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { WaterMarkModule } from 'src/module/service/water-mark-service/water-mark-service.module';
-import { S3Module } from 'src/module/service/s3-service/s3-service.module';
+import { WaterMarkModule } from 'src/module/service/water-mark/water-mark.module';
+import { S3Module } from 'src/module/service/s3/s3.module';
 import { DBModule } from 'src/module/db/db.module';
-import { TGModule } from 'src/module/service/tg-bot-service/tg-bot-service.module';
-import { FileModule } from 'src/module/service/file-service/file-service.module';
+import { TGModule } from 'src/module/service/tg-bot/tg-bot.module';
+import { FileModule } from 'src/module/service/files/files.module';
 import { HelpersModule } from 'src/module/service/helpers/helpers.module';
 
 @Module({

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { RegularPublicationBotRepository } from 'src/module/service/regular-publication-bot-service/regular-publication-bot-service.repository';
+import { RegularPublicationBotRepository } from 'src/module/service/regular-publication-bot/regular-publication-bot.repository';
 
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Channels } from 'src/module/db/models/channels.repository';

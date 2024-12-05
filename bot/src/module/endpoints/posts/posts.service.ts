@@ -4,13 +4,13 @@ import { DataBasePosts } from 'src/module/db/models/data-base-posts.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
 import { ImageData } from 'src/module/db/models/image-data.repository';
 import { ChannelPosts } from 'src/module/db/models/channel-posts.repository';
-import { WaterMarkRepository } from 'src/module/service/water-mark-service/water-mark-service.repository';
-import { S3Repository } from 'src/module/service/s3-service/s3-service.repository';
-import { TGBotService } from 'src/module/service/tg-bot-service/tg-bot-service.repository';
+import { WaterMarkRepository } from 'src/module/service/water-mark/water-mark.repository';
+import { S3Repository } from 'src/module/service/s3/s3.repository';
+import { TGBotService } from 'src/module/service/tg-bot/tg-bot.repository';
 import { IImageBlock } from 'src/type/types';
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Op, Order } from 'sequelize';
-import { FileRepository } from 'src/module/service/file-service/file-service.repository';
+import { FileRepository } from 'src/module/service/files/files.repository';
 
 @Injectable()
 export class PostsService {

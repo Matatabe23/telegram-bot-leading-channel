@@ -1,8 +1,8 @@
-export * from './adminAPI';
-export * from './postsAPI';
-export * from './settingsAPI';
-export * from './filesAPI';
-export * from './rolesAPI';
+export * from './admin';
+export * from './posts';
+export * from './settings';
+export * from './files';
+export * from './roles';
 
 import axios from 'axios';
 

@@ -1,8 +1,8 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { InitDataRepository } from './init-data-service.repository';
+import { InitDataRepository } from './init-data.repository';
 import { DBModule } from 'src/module/db/db.module';
-import { TGModule } from '../tg-bot-service/tg-bot-service.module';
+import { TGModule } from '../tg-bot/tg-bot.module';
 
 @Global()
 @Module({
