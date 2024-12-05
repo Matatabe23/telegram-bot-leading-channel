@@ -31,4 +31,8 @@ export class AppService {
 			PERMISSIONS_LIST
 		};
 	}
+
+	getHello(): string {
+		return 'Hello World!';
+	}
 }

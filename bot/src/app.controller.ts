@@ -6,9 +6,14 @@ import { AuthGuard } from './guards/auth.guard';
 export class AppController {
 	constructor(private readonly appService: AppService) {}
 
+	@Get()
+	getHello(): string {
+		return this.appService.getHello();
+	}
+
 	@Get('main-info')
 	@UseGuards(AuthGuard)
-	getHello() {
+	getMainInfo() {
 		return this.appService.getMainInfo();
 	}
 }
