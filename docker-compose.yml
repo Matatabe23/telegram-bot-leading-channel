@@ -29,6 +29,8 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_ADMIN_USER}
+            MYSQL_PASSWORD: ${MYSQL_ADMIN_PASSWORD}
         ports:
             - 3306:3306
         command: --init-file /data/application/sql.ini

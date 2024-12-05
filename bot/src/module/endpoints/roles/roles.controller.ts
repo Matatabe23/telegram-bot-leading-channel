@@ -20,8 +20,7 @@ export class RolesController {
 	constructor(private readonly rolesService: RolesService) {}
 
 	@Post('create-role')
-	@UseGuards(AuthGuard)
-	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
+	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
 	async createNewRole(@Body() body: { nameRole: string }) {
 		try {
 			return this.rolesService.createNewRole(body.nameRole);
@@ -37,8 +36,7 @@ export class RolesController {
 	}
 
 	@Get('get-roles')
-	@UseGuards(AuthGuard)
-	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
+	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
 	async getRoles() {
 		try {
 			return this.rolesService.getRoles();
@@ -54,8 +52,7 @@ export class RolesController {
 	}
 
 	@Delete('delete-role/:id')
-	@UseGuards(AuthGuard)
-	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
+	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
 	async deleteRole(@Param('id') id: number) {
 		try {
 			return this.rolesService.deleteRole(id);
@@ -71,8 +68,7 @@ export class RolesController {
 	}
 
 	@Put('update-permissions/:id')
-	@UseGuards(AuthGuard)
-	@UseGuards(CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
+	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
 	async updatePermissions(@Param('id') id: number, @Body('permissions') permissions: string) {
 		try {
 			return this.rolesService.updatePermissions(id, permissions);

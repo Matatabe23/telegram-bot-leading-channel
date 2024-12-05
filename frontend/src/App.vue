@@ -33,6 +33,14 @@
 
 	const getDataAdmin = async () => {
 		await appStore.checkDataWeb();
+
+		setInterval(
+			async () => {
+				await appStore.checkDataWeb();
+			},
+			10 * 60 * 1000
+		);
+        
 		if (route.path === '/' && appStore.auth === true) {
 			await router.push('/publishing-page');
 		} else if (route.path !== '/' && appStore.auth === false) {
