@@ -8,7 +8,7 @@
 				clearable
 				label="Логин"
 				variant="outlined"
-				v-model="state.auth.name"
+				v-model="name"
 				class="w-full"
 				:disabled="appStore.isLoading"
 			></v-text-field>
@@ -17,7 +17,7 @@
 				clearable
 				label="Пароль"
 				variant="outlined"
-				v-model="state.auth.password"
+				v-model="password"
 				class="w-full"
 				:disabled="appStore.isLoading"
 			></v-text-field>
@@ -35,8 +35,8 @@
 </template>
 
 <script lang="ts" setup>
-	import { reactive } from 'vue';
-	import { IAuth, login, useSettings } from '@/shared';
+	import { ref } from 'vue';
+	import { login, useSettings } from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { useRouter } from 'vue-router';
 	import { useAppStore } from '@/app/app.store';
@@ -46,16 +46,12 @@
 	const appStore = useAppStore();
 	const settingsStore = useSettings();
 
-	const state: IAuth = reactive({
-		auth: {
-			name: '',
-			password: ''
-		}
-	});
+    const name = ref('')
+    const password = ref('')
 
 	const setlogin = async () => {
 		try {
-			const response: any = await login(state.auth.name, state.auth.password);
+			const response: any = await login(name.value, password.value);
 			appStore.isLoading = true;
 
 			await appStore.setAdminData(response);
@@ -63,7 +59,7 @@
             await appStore.getInfo()
 
 			router.push('/publishing-page');
-		} catch (e: any) {
+		} catch (e) {
 			toast.error(e.response.data.message);
 		} finally {
 			appStore.isLoading = false;

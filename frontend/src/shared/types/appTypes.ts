@@ -1,10 +1,3 @@
-export interface IAuth {
-    auth: {
-        name: string,
-        password: string
-    },
-}
-
 export interface adminData {
     id: number,
     name: string,
