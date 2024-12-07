@@ -14,8 +14,6 @@ import Toast, { toastOptions } from '@/shared/plugins/toast';
 const app = createApp(App);
 const pinia = createPinia();
 
-// app.config.errorHandler = () => router.push('/not-found');
-
 app.use(FloatingVue)
     .use(pinia)
     .use(router)

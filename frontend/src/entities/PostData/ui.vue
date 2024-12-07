@@ -150,7 +150,7 @@
 		try {
 			if (checkListImage.value.length >= 1) {
 				appStore.isLoading = true;
-				await deleteSelectedImgs(checkListImage as any);
+				await deleteSelectedImgs(checkListImage.value as any);
 				openPostPanel();
 			}
 		} catch (e) {
