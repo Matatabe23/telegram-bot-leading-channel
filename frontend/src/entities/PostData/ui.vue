@@ -93,6 +93,7 @@
 			const response = await changePage(Number(route.params.id), who, watched, channel);
 			images.value = response.imageList;
 			useChannelList.value = response.channelsPost?.map((item) => item.id);
+            checkListImage.value = []
 			router.push(response.postId.toString());
 		} catch (e) {
 			router.push('/publishing-page');

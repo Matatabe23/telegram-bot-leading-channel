@@ -70,7 +70,7 @@ export const useAppStore = defineStore('app', {
                 }));
                 settingsStore.listChannels = mainInfo.listChannel;
                 this.permissions = mainInfo.EPermissions;
-                this.permissions_LIST = mainInfo.PERMISSIONS_LIST;
+                this.PERMISSIONS_LIST = mainInfo.PERMISSIONS_LIST;
             } catch (e) {
                 toast.error(e.response.data.message || e.response);
             }

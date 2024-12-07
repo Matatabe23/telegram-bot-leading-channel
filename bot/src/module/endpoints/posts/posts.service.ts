@@ -7,7 +7,7 @@ import { ChannelPosts } from 'src/module/db/models/channel-posts.repository';
 import { WaterMarkRepository } from 'src/module/service/water-mark/water-mark.repository';
 import { S3Repository } from 'src/module/service/s3/s3.repository';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.repository';
-import { IImageBlock } from 'src/type/types';
+import { IImageBlock } from 'src/types/types';
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Op, Order } from 'sequelize';
 import { FileRepository } from 'src/module/service/files/files.repository';
