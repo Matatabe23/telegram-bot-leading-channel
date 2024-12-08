@@ -9,6 +9,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getS3ClientConfig } from 'src/config/s3.config';
 import { ConfigService } from '@nestjs/config';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class S3Repository {
@@ -21,26 +22,26 @@ export class S3Repository {
 	}
 
 	async uploadImageToS3(imagePath: any, nameFiles: string): Promise<string> {
-		return new Promise((resolve, reject) => {
+		try {
+			const webpFileName = nameFiles.replace(/\.[^/.]+$/, '.webp');
+			const webpBuffer = await sharp(imagePath.buffer).webp({ quality: 80 }).toBuffer();
+
 			const params = {
 				Bucket: process.env.S3_BUCKET_NAME,
-				Key: nameFiles,
-				Body: imagePath.buffer,
-				ContentType: 'image/png',
+				Key: webpFileName,
+				Body: webpBuffer,
+				ContentType: 'image/webp',
 				ContentDisposition: 'inline'
 			};
 
 			const uploadCommand = new PutObjectCommand(params);
-			this.s3Client
-				.send(uploadCommand)
-				.then(() => {
-					resolve(nameFiles);
-				})
-				.catch((err) => {
-					this.logger.error('Ошибка загрузки изображения:', err);
-					reject(err);
-				});
-		});
+
+			await this.s3Client.send(uploadCommand);
+			return webpFileName;
+		} catch (err) {
+			this.logger.error('Ошибка загрузки изображения:', err);
+			throw err;
+		}
 	}
 
 	async deleteImageFromS3(imageUrl: string): Promise<void> {

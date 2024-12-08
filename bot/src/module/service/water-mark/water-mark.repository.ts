@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Jimp from 'jimp';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class WaterMarkRepository {
@@ -15,7 +16,15 @@ export class WaterMarkRepository {
 		size: number;
 	}) {
 		try {
-			const image = await Jimp.read(file.buffer);
+			let inputBuffer: Buffer;
+			if (file.mimetype === 'image/webp') {
+				inputBuffer = await sharp(file.buffer).png().toBuffer();
+			} else {
+				inputBuffer = file.buffer;
+			}
+
+			const image = await Jimp.read(inputBuffer);
+
 			let watermark = await Jimp.read('src/assets/image/waterMark.png');
 			watermark = watermark.resize(
 				watermark.bitmap.width / 1.5,
@@ -36,7 +45,8 @@ export class WaterMarkRepository {
 			return {
 				...file,
 				buffer: outputBuffer,
-				size: outputBuffer.length
+				size: outputBuffer.length,
+				mimetype: Jimp.MIME_PNG
 			};
 		} catch (err) {
 			console.error('Произошла ошибка:', err);
