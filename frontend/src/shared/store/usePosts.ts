@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { IStoreStatePosts } from '@/entities';
 import { receiving } from '@/shared';
 
+
 export const usePosts = defineStore('posts', {
     state: (): IStoreStatePosts => ({
         postsList: [],
@@ -24,10 +25,11 @@ export const usePosts = defineStore('posts', {
         async getPosts() {
             try {
                 const posts = await receiving(this.form.currentPage, this.form.postsPerPage, this.form.watched, this.form.channel);
+                // console.log(Math.ceil(posts.totalCount / this.form.postsPerPage))
                 this.postsList = posts.posts;
                 this.totalCount = posts.totalCount;
                 this.publishTime = posts.publishTime;
-            } catch (e: any) { 
+            } catch (e: any) {
                 //
             }
         }

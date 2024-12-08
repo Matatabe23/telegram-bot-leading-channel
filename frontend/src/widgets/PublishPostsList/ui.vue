@@ -69,6 +69,7 @@
 	import { PostCard, MainSelect } from '@/widgets';
 	import { watchedOptions, perPage } from '@/entities';
 	import { useAppStore } from '@/app/app.store';
+	import { useRoute, useRouter } from 'vue-router';
 
 	const settingsStore = useSettings();
 	const { listChannels } = storeToRefs(settingsStore);
@@ -76,9 +77,12 @@
 	const editorStore = usePosts();
 	const { postsList, totalCount, publishTime, form } = storeToRefs(editorStore);
 	const appStore = useAppStore();
+	const route = useRoute();
+	const router = useRouter();
 
 	const setPage = (page: number) => {
 		editorStore.setStateValueByKey('form', { ...form.value, currentPage: page });
+		router.push({ name: 'publishingPage', query: { ...route.query, page } });
 		editorStore.getPosts();
 	};
 
@@ -152,11 +156,17 @@
 		editorStore.getPosts();
 	};
 
-	onMounted(() => {
+	onMounted(async () => {
 		const watched = localStorage.getItem('watched') || '';
 		const channel = localStorage.getItem('channel') || '';
-		editorStore.setStateValueByKey('form', { ...form.value, watched, channel });
-		editorStore.getPosts();
+		const currentPage = parseInt(route.query.page as string, 10) || 1;
+
+		await editorStore.setStateValueByKey('form', { ...form.value, watched, channel, currentPage });
+		await editorStore.getPosts();
+
+		if (editorStore.postsList.length === 0) {
+			await setPage(lastPage.value)
+		}
 	});
 
 	const formattedChannels = computed(() => {

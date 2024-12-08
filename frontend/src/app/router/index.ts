@@ -18,7 +18,9 @@ const routes: RouteRecordRaw[] = [
 
     {
         path: '/publishing-page',
-        component: PublishPage
+        name: 'publishingPage',
+        component: PublishPage,
+        props: (route) => ({ page: route.query.page || 1 })
     },
 
     {
