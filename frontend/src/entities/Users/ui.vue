@@ -31,11 +31,15 @@
 					>
 						<td class="border border-gray-200 px-4 py-2">{{ user.id }}</td>
 						<td class="border border-gray-200 px-4 py-2">
-							<img
-								:src="user.avatarUrl"
-								class="rounded-full"
-							/>
+							<div class="w-16 h-16 mx-auto">
+								<img
+									:src="user.avatarUrl"
+									alt="User Avatar"
+									class="rounded-full w-full h-full object-cover mx-auto"
+								/>
+							</div>
 						</td>
+
 						<td class="border border-gray-200 px-4 py-2">{{ user.name }}</td>
 						<td class="border border-gray-200 px-4 py-2">
 							<v-select

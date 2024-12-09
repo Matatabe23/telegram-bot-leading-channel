@@ -58,12 +58,12 @@ export const useAppStore = defineStore('app', {
             this.height = height.value;
         },
 
-        async getInfo()  {
+        async getInfo() {
             try {
                 if (this.auth !== true) return;
                 const mainInfo = await getMainInfo();
                 const settingsStore = (await import('@/shared')).useSettings();
-    
+
                 settingsStore.listRoles = mainInfo.listRoles.map((role) => ({
                     ...role,
                     permissions: role.permissions ? role.permissions.split(',') : []
@@ -71,6 +71,16 @@ export const useAppStore = defineStore('app', {
                 settingsStore.listChannels = mainInfo.listChannel;
                 this.permissions = mainInfo.EPermissions;
                 this.PERMISSIONS_LIST = mainInfo.PERMISSIONS_LIST;
+
+                const useChannel = localStorage.getItem('useChannelList');
+                const useListChannels = useChannel ? JSON.parse(useChannel).split(',') : [];
+                const updatedChannels = useListChannels.filter(channelId => mainInfo.listChannel.some(channel => channel.chatId === channelId));
+
+                if (updatedChannels.length > 0) {
+                    localStorage.setItem('useChannelList', JSON.stringify(updatedChannels.join(',')));
+                } else {
+                    localStorage.removeItem('useChannelList');
+                }
             } catch (e) {
                 toast.error(e.response.data.message || e.response);
             }

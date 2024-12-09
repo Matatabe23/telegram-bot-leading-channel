@@ -81,8 +81,8 @@
 	const router = useRouter();
 
 	const setPage = (page: number) => {
-		editorStore.setStateValueByKey('form', { ...form.value, currentPage: page });
-		router.push({ name: 'publishingPage', query: { ...route.query, page } });
+		editorStore.setStateValueByKey('form', { ...form.value, currentPage: page === 0 ? 1 : page });
+		router.push({ name: 'publishingPage', query: { ...route.query, page: page === 0 ? 1 : page } });
 		editorStore.getPosts();
 	};
 
@@ -144,16 +144,24 @@
 		return lastPostDate.toLocaleDateString();
 	});
 
-	const updateWatched = (value: string) => {
+	const updateWatched = async (value: string) => {
 		localStorage.setItem('watched', value);
-		editorStore.setStateValueByKey('form', { ...form.value, watched: value });
-		editorStore.getPosts();
+		await editorStore.setStateValueByKey('form', { ...form.value, watched: value });
+		await editorStore.getPosts();
+
+		if (editorStore.postsList.length === 0) {
+			await setPage(lastPage.value);
+		}
 	};
 
-	const updateChannel = (value: string) => {
+	const updateChannel = async (value: string) => {
 		localStorage.setItem('channel', value);
-		editorStore.setStateValueByKey('form', { ...form.value, channel: value });
-		editorStore.getPosts();
+		await editorStore.setStateValueByKey('form', { ...form.value, channel: value });
+		await editorStore.getPosts();
+
+		if (editorStore.postsList.length === 0) {
+			await setPage(lastPage.value);
+		}
 	};
 
 	onMounted(async () => {
@@ -161,11 +169,16 @@
 		const channel = localStorage.getItem('channel') || '';
 		const currentPage = parseInt(route.query.page as string, 10) || 1;
 
-		await editorStore.setStateValueByKey('form', { ...form.value, watched, channel, currentPage });
+		await editorStore.setStateValueByKey('form', {
+			...form.value,
+			watched,
+			channel,
+			currentPage
+		});
 		await editorStore.getPosts();
 
 		if (editorStore.postsList.length === 0) {
-			await setPage(lastPage.value)
+			await setPage(lastPage.value);
 		}
 	});
 
