@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
 import { MUST_BE_NUMBER, MUST_BE_STRING } from 'src/const/errorConst';
 
-export class AdminDto {
+export class UsersDto {
 	@IsNotEmpty()
 	@IsNumber({}, { message: MUST_BE_NUMBER })
 	id: number;
@@ -26,11 +26,11 @@ export class AdminDto {
 	@IsNumber({}, { message: MUST_BE_NUMBER })
 	telegramId?: number;
 
-	constructor(admin: any) {
-		this.id = admin.id;
-		this.name = admin.name;
-		this.role = admin.role;
-		this.avatarUrl = admin.avatarUrl;
-		this.telegramId = admin.telegramId;
+	constructor(user: any) {
+		this.id = user.id;
+		this.name = user.name;
+		this.role = user.role;
+		this.avatarUrl = user.avatarUrl;
+		this.telegramId = user.telegramId;
 	}
 }

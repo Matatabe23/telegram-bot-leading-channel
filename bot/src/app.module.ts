@@ -7,7 +7,7 @@ import { AppService } from './app.service';
 import { DBModule } from './module/db/db.module';
 
 import { PostsModule } from './module/endpoints/posts/posts.module';
-import { AdminModule } from './module/endpoints/admin/admin.module';
+import { UsersModule } from './module/endpoints/users/users.module';
 import { SettingsModule } from './module/endpoints/settings/settings.module';
 
 import { S3Module } from './module/service/s3/s3.module';
@@ -30,7 +30,7 @@ import { HelpersModule } from './module/service/helpers/helpers.module';
 		DBModule,
 
 		PostsModule,
-		AdminModule,
+		UsersModule,
 		SettingsModule,
 		FilesModule,
 		RolesModule,

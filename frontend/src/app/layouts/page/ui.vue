@@ -33,7 +33,7 @@
 					<template v-slot:activator="{ props }">
 						<v-avatar
 							v-bind="props"
-							:image="appStore.adminData.avatarUrl"
+							:image="appStore.userData.avatarUrl"
 						></v-avatar>
 					</template>
 
@@ -99,7 +99,7 @@
 
 
 	const exit = async () => {
-		localStorage.removeItem('admin');
+		localStorage.removeItem('user');
 		localStorage.removeItem('accessToken');
 		localStorage.removeItem('refreshToken');
 		appStore.auth = false;

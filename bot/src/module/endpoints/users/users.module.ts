@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { AdminController } from './admin.controller';
+import { UsersService } from './users.service';
+import { UsersController } from './users.controller';
 import { TokenModule } from 'src/module/service/token/token.module';
 import { DBModule } from 'src/module/db/db.module';
 import { AuthGuard } from 'src/guards/auth.guard';
 
 @Module({
 	imports: [DBModule, TokenModule],
-	controllers: [AdminController],
-	providers: [AdminService, AuthGuard]
+	controllers: [UsersController],
+	providers: [UsersService, AuthGuard]
 })
-export class AdminModule {}
+export class UsersModule {}

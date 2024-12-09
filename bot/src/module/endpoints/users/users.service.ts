@@ -1,15 +1,15 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Administrators } from 'src/module/db/models/administrators.repository';
-import { AdminDto } from './dto/admin.dto';
+import { Users } from 'src/module/db/models/users.repository';
+import { UsersDto } from './dto/user.dto';
 import { TokenRepository } from 'src/module/service/token/token.repository';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class AdminService {
+export class UsersService {
 	constructor(
-		@InjectModel(Administrators)
-		private readonly adminRepository: typeof Administrators,
+		@InjectModel(Users)
+		private readonly usersRepository: typeof Users,
 		private readonly tokenRepository: TokenRepository
 	) {}
 
@@ -20,7 +20,7 @@ export class AdminService {
 
 		const lowerName = name.toLowerCase();
 
-		const existingUser = await this.adminRepository.findOne({
+		const existingUser = await this.usersRepository.findOne({
 			where: { name: lowerName }
 		});
 		if (existingUser) {
@@ -29,7 +29,7 @@ export class AdminService {
 
 		const hashedPassword = await bcrypt.hash(password, 10);
 
-		const newUser = await this.adminRepository.create({
+		const newUser = await this.usersRepository.create({
 			name: name,
 			password: hashedPassword,
 			role: null,
@@ -52,54 +52,54 @@ export class AdminService {
 		if (!name || !password) throw new UnauthorizedException('Некорректные данные');
 
 		const lowerName = name.toLowerCase();
-		const admin = await this.adminRepository.findOne({
+		const user = await this.usersRepository.findOne({
 			where: { name: lowerName }
 		});
 
-		if (!admin) throw new NotFoundException('Пользователь не найден');
+		if (!user) throw new NotFoundException('Пользователь не найден');
 
-		const isPasswordValid = await bcrypt.compare(password, admin.password);
+		const isPasswordValid = await bcrypt.compare(password, user.password);
 		if (!isPasswordValid) throw new UnauthorizedException('Указан неверный пароль');
 
-		const resultDto = new AdminDto(admin.dataValues);
+		const resultDto = new UsersDto(user.dataValues);
 
 		const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
 		const refreshToken = this.tokenRepository.generateToken(resultDto, '7d', true);
 
-		return { accessToken, refreshToken, admin: { ...resultDto } };
+		return { accessToken, refreshToken, user: { ...resultDto } };
 	}
 
 	async checkDataWeb(id: number) {
-		const admin = await this.adminRepository.findOne({ where: { id } });
-		if (!admin) return;
-		const resultDto = new AdminDto(admin);
+		const user = await this.usersRepository.findOne({ where: { id } });
+		if (!user) return;
+		const resultDto = new UsersDto(user);
 		const accessToken = this.tokenRepository.generateToken({ ...resultDto }, '15m');
-		return { accessToken, admin: resultDto };
+		return { accessToken, user: resultDto };
 	}
 
 	async updateAccessToken(refreshToken: string) {
 		const decoded = this.tokenRepository.validateRefreshToken(refreshToken);
 
-		const admin = await this.adminRepository.findOne({
+		const user = await this.usersRepository.findOne({
 			where: { id: decoded.id }
 		});
 
-		if (!admin) throw new NotFoundException('Пользователь не найден');
-		const resultDto = new AdminDto(admin.dataValues);
+		if (!user) throw new NotFoundException('Пользователь не найден');
+		const resultDto = new UsersDto(user.dataValues);
 		const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
 
 		const newRefreshToken = this.tokenRepository.generateToken(resultDto, '7d', true);
-		return { accessToken, refreshToken: newRefreshToken, admin: resultDto };
+		return { accessToken, refreshToken: newRefreshToken, user: resultDto };
 	}
 
-	async updateDataAdmin(data: AdminDto) {
-		const admin = await this.adminRepository.findByPk(data.id);
+	async updateDataUsers(data: UsersDto) {
+		const user = await this.usersRepository.findByPk(data.id);
 
-		if (!admin) {
+		if (!user) {
 			throw new Error('Администратор не найден');
 		}
 
-		await admin.update({
+		await user.update({
 			name: data.name,
 			role: data.role,
 			password: data.password,
@@ -107,7 +107,7 @@ export class AdminService {
 			telegramId: data.telegramId
 		});
 
-		return admin;
+		return user;
 	}
 
 	async getUsersList(page: number, limit: number) {
@@ -116,7 +116,7 @@ export class AdminService {
 
 		const offset = (page - 1) * limit;
 
-		const { rows: users, count: totalItems } = await this.adminRepository.findAndCountAll({
+		const { rows: users, count: totalItems } = await this.usersRepository.findAndCountAll({
 			offset,
 			limit,
 			attributes: ['id', 'name', 'role', 'avatarUrl', 'telegramId'],
@@ -132,7 +132,7 @@ export class AdminService {
 	}
 
 	async deleteUser(id: number) {
-		const user = await this.adminRepository.findByPk(id);
+		const user = await this.usersRepository.findByPk(id);
 		if (!user) {
 			throw new NotFoundException('Пользователь не найден');
 		}
@@ -146,16 +146,16 @@ export class AdminService {
 		if (!oldPassword || !newPassword) {
 			throw new UnauthorizedException('Старый и новый пароли должны быть указаны');
 		}
-		const admin = await this.adminRepository.findByPk(id);
-		if (!admin) {
+		const user = await this.usersRepository.findByPk(id);
+		if (!user) {
 			throw new NotFoundException('Пользователь не найден');
 		}
-		const isOldPasswordValid = await bcrypt.compare(oldPassword, admin.password);
+		const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
 		if (!isOldPasswordValid) {
 			throw new UnauthorizedException('Старый пароль неверный');
 		}
 		const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-		await admin.update({ password: hashedNewPassword });
+		await user.update({ password: hashedNewPassword });
 		return 'Пароль успешно обновлен';
 	}
 }

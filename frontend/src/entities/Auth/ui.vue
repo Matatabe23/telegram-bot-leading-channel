@@ -54,7 +54,7 @@
 			const response: any = await login(name.value, password.value);
 			appStore.isLoading = true;
 
-			await appStore.setAdminData(response);
+			await appStore.setUserData(response);
 			await settingsStore.getListChannels();
             await appStore.getInfo()
 

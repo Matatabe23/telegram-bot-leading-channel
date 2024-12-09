@@ -28,7 +28,6 @@ const routes: RouteRecordRaw[] = [
         component: Settings
     },
     {
-        name: 'Пост',
         path: '/post/:id',
         component: PostData,
     },

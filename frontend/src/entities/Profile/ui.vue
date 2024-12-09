@@ -5,7 +5,7 @@
 		>
 			<div class="md:flex items-center gap-8 justify-center w-full">
 				<EditAvatar
-					v-model="adminDataLocal.avatarUrl"
+					v-model="userDataLocal.avatarUrl"
 					:fileName="`avatar/${Date.now()}`"
 					class="h-24 w-24 md:h-48 md:w-48"
 				/>
@@ -14,7 +14,7 @@
 						<v-text-field
 							label="Логин"
 							variant="outlined"
-							v-model="adminDataLocal.name"
+							v-model="userDataLocal.name"
 							class="w-full"
 							:loading="appStore.isLoading"
 							:disabled="appStore.isLoading"
@@ -22,7 +22,7 @@
 						<v-select
 							class="w-full"
 							label="Роль"
-							v-model="adminDataLocal.role"
+							v-model="userDataLocal.role"
 							variant="outlined"
 							:loading="appStore.isLoading"
 							:disabled="true"
@@ -34,7 +34,7 @@
 				<v-btn
 					variant="flat"
 					color="#5865f2"
-					@click="updateAdminData"
+					@click="updateUserData"
 					:loading="appStore.isLoading"
 					class="md:mt-4 md:w-[20%]"
 					>Сохранить
@@ -61,19 +61,19 @@
 	import { EditAvatar, ModalUpdatePassword } from '@/widgets';
 	import { useAppStore } from '@/app/app.store';
 	import { ref, watch } from 'vue';
-	import { adminData, updateDataAdmin } from '@/shared';
+	import { userData, updateDataUser } from '@/shared';
 	import { useToast } from 'vue-toastification';
 
 	const appStore = useAppStore();
 	const toast = useToast();
 
-	const adminDataLocal = ref<adminData>(JSON.parse(JSON.stringify(appStore.adminData)));
+	const userDataLocal = ref<userData>(JSON.parse(JSON.stringify(appStore.userData)));
 	const isModelUpdatePassword = ref(false);
 
-	const updateAdminData = () => {
+	const updateUserData = () => {
 		try {
 			appStore.isLoading = true;
-			updateDataAdmin(adminDataLocal.value);
+			updateDataUser(userDataLocal.value);
 
 			toast.success('Данные обновлены успешно');
 		} catch (e) {
@@ -84,9 +84,9 @@
 	};
 
 	watch(
-		() => appStore.adminData,
+		() => appStore.userData,
 		(val) => {
-			adminDataLocal.value = val;
+			userDataLocal.value = val;
 		},
 		{ deep: true, immediate: true }
 	);

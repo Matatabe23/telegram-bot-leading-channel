@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
 import { useWindowSize } from '@vueuse/core/index.cjs';
-import { adminData, checkDataWeb, getMainInfo, IAppStore } from '@/shared';
+import { userData, checkDataWeb, getMainInfo, IAppStore } from '@/shared';
 import { useToast } from 'vue-toastification';
 
 const toast = useToast();
 
-const parseDataForAdmin = ({
+const parseDataForUser = ({
     id, name, role, avatarUrl, telegramId
-}: adminData): adminData => ({
+}: userData): userData => ({
     id,
     name,
     role,
@@ -17,7 +17,7 @@ const parseDataForAdmin = ({
 
 export const useAppStore = defineStore('app', {
     state: (): IAppStore => ({
-        adminData: null,
+        userData: null,
         auth: false,
         width: 0,
         height: 0,
@@ -40,15 +40,15 @@ export const useAppStore = defineStore('app', {
         async checkDataWeb() {
             try {
                 const response: any = await checkDataWeb()
-                this.adminData = parseDataForAdmin(response)
+                this.userData = parseDataForUser(response)
                 this.auth = true;
             } catch (e) {
                 //
             }
         },
 
-        setAdminData(adminData: adminData) {
-            this.adminData = parseDataForAdmin(adminData)
+        setUserData(userData: userData) {
+            this.userData = parseDataForUser(userData)
             this.auth = true;
         },
 

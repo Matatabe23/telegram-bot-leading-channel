@@ -31,7 +31,7 @@
 
 	const dataLoading = ref(true);
 
-	const getDataAdmin = async () => {
+	const getDataUser = async () => {
 		await appStore.checkDataWeb();
 
 		setInterval(
@@ -51,7 +51,7 @@
 	onMounted(async () => {
 		try {
 			dataLoading.value = true;
-			await getDataAdmin();
+			await getDataUser();
 			await appStore.getInfo();
 		} catch (e) {
 			toast.error(e.response.data.message || e.response);

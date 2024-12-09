@@ -1,4 +1,4 @@
-import { adminData } from "@/shared";
+import { userData } from "@/shared";
 
 export interface IStateUsers {
     form: {
@@ -7,6 +7,6 @@ export interface IStateUsers {
     currentPage: number,
     totalItems: number,
     totalPages: number,
-    usersList: adminData[],
+    usersList: userData[],
     isModalCreateUser: boolean
 }

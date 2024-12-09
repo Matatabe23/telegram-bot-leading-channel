@@ -1,4 +1,4 @@
-export interface adminData {
+export interface userData {
     id: number,
     name: string,
     role: string
@@ -7,7 +7,7 @@ export interface adminData {
 }
 
 export interface IAppStore {
-    adminData: adminData | null,
+    userData: userData | null,
     auth: boolean,
     width: number,
     height: number,

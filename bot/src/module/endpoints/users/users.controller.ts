@@ -12,23 +12,23 @@ import {
 	Delete,
 	Param
 } from '@nestjs/common';
-import { AdminService } from './admin.service';
+import { UsersService } from './users.service';
 import { AuthGuard } from 'src/guards/auth.guard';
-import { AdminDto } from './dto/admin.dto';
+import { UsersDto } from './dto/user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/const/const';
 
-@Controller('admin')
-export class AdminController {
-	constructor(private readonly adminService: AdminService) {}
+@Controller('user')
+export class UsersController {
+	constructor(private readonly userService: UsersService) {}
 
 	@Post('create-user')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
 	async createUser(@Body() createUserDto: { name: string; password: string }) {
 		try {
 			const { name, password } = createUserDto;
-			const result = await this.adminService.createUser(name, password);
+			const result = await this.userService.createUser(name, password);
 			return result;
 		} catch (e) {
 			throw new HttpException(
@@ -44,7 +44,7 @@ export class AdminController {
 	@Get('login')
 	async login(@Query('name') name: string, @Query('password') password: string) {
 		try {
-			const result = await this.adminService.login(name, password);
+			const result = await this.userService.login(name, password);
 			return result;
 		} catch (e) {
 			throw new HttpException(
@@ -61,7 +61,7 @@ export class AdminController {
 	@UseGuards(AuthGuard)
 	async checkDataWeb(@Req() request: any) {
 		try {
-			const result = await this.adminService.checkDataWeb(request.authData.id);
+			const result = await this.userService.checkDataWeb(request.authData.id);
 			return result;
 		} catch (e) {
 			throw new HttpException(
@@ -77,7 +77,7 @@ export class AdminController {
 	@Get('update-access-token')
 	async updateAccessToken(@Query('refreshToken') refreshToken: string) {
 		try {
-			return await this.adminService.updateAccessToken(refreshToken);
+			return await this.userService.updateAccessToken(refreshToken);
 		} catch (e) {
 			throw new HttpException(
 				{
@@ -89,11 +89,11 @@ export class AdminController {
 		}
 	}
 
-	@Put('update-data-admin')
+	@Put('update-data-user')
 	@UseGuards(AuthGuard)
-	async updateDataAdmin(@Body() data: AdminDto) {
+	async updateDataUsers(@Body() data: UsersDto) {
 		try {
-			return await this.adminService.updateDataAdmin(data);
+			return await this.userService.updateDataUsers(data);
 		} catch (e) {
 			throw new HttpException(
 				{
@@ -109,7 +109,7 @@ export class AdminController {
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
 	async getUsersList(@Query('page') page: number, @Query('limit') limit: number) {
 		try {
-			return await this.adminService.getUsersList(Number(page), Number(limit));
+			return await this.userService.getUsersList(Number(page), Number(limit));
 		} catch (e) {
 			throw new HttpException(
 				{
@@ -125,7 +125,7 @@ export class AdminController {
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
 	async deleteUser(@Param('id') id: number) {
 		try {
-			return await this.adminService.deleteUser(Number(id));
+			return await this.userService.deleteUser(Number(id));
 		} catch (e) {
 			throw new HttpException(
 				{
@@ -143,7 +143,7 @@ export class AdminController {
 		const { oldPassword, newPassword } = updatePasswordDto;
 
 		try {
-			return await this.adminService.updatePassword(
+			return await this.userService.updatePassword(
 				request.authData.id,
 				oldPassword,
 				newPassword

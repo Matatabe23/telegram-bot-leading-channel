@@ -15,7 +15,7 @@ export const bodyLock = (boolean: boolean) => {
 
 export const checkPermissions = (permission: string): boolean => {
     const rolePermissions = useSettings().listRoles.find(
-        item => item.name === useAppStore().adminData.role
+        item => item.name === useAppStore().userData.role
     );
     return rolePermissions?.permissions?.includes(permission) ?? false;
 };

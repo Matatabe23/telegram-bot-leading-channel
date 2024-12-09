@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 
 // Импортируем модели
-import { Administrators } from './models/administrators.repository';
+import { Users } from './models/users.repository';
 import { DataBasePosts } from './models/data-base-posts.repository';
 import { ImageData } from './models/image-data.repository';
 import { RegularPublicationTime } from './models/regular-publication-time.repository';
@@ -12,7 +12,7 @@ import { ChannelPosts } from './models/channel-posts.repository';
 import { RolesSettings } from './models/roles-settings.repository';
 
 const dbList = [
-	Administrators,
+	Users,
 	DataBasePosts,
 	ImageData,
 	RegularPublicationTime,

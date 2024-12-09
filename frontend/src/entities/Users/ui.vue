@@ -90,7 +90,7 @@
 
 <script lang="ts" setup>
 	import { computed, onMounted, reactive } from 'vue';
-	import { adminData, deleteUser, getUsersList, updateDataAdmin, useSettings } from '@/shared';
+	import { userData, deleteUser, getUsersList, updateDataUser, useSettings } from '@/shared';
 	import { IStateUsers } from '@/entities';
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
@@ -137,10 +137,10 @@
 		getUsers();
 	};
 
-	const updateDataUsers = async (value: adminData) => {
+	const updateDataUsers = async (value: userData) => {
 		try {
 			appStore.isLoading = true;
-			await updateDataAdmin(value);
+			await updateDataUser(value);
 			toast.success('Успешное обновление пользователя');
 		} catch (e) {
 			toast.error(e.response.data.message);

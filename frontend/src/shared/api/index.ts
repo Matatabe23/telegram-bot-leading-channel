@@ -1,4 +1,4 @@
-export * from './admin';
+export * from './users';
 export * from './posts';
 export * from './settings';
 export * from './files';

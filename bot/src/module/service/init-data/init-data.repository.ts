@@ -1,4 +1,4 @@
-import { Administrators } from 'src/module/db/models/administrators.repository';
+import { Users } from 'src/module/db/models/users.repository';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
@@ -8,8 +8,8 @@ import { EPermissions } from 'src/const/const';
 @Injectable()
 export class InitDataRepository implements OnModuleInit {
 	constructor(
-		@InjectModel(Administrators)
-		private readonly administrators: typeof Administrators,
+		@InjectModel(Users)
+		private readonly users: typeof Users,
 		@InjectModel(RolesSettings)
 		private readonly rolesSettings: typeof RolesSettings
 	) {}
@@ -24,7 +24,7 @@ export class InitDataRepository implements OnModuleInit {
 		const name = process.env.DEFAULT_USER_NAME;
 		const password = process.env.DEFAULT_USER_PASSWORD;
 
-		const existingUser = await this.administrators.findOne({
+		const existingUser = await this.users.findOne({
 			where: { name: lowerName }
 		});
 
@@ -32,7 +32,7 @@ export class InitDataRepository implements OnModuleInit {
 
 		const hashedPassword = await bcrypt.hash(password, 10);
 
-		await this.administrators.create({
+		await this.users.create({
 			name: name,
 			password: hashedPassword,
 			role: process.env.DEFAULT_ROLE,
