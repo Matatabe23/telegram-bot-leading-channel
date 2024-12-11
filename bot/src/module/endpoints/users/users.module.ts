@@ -4,9 +4,10 @@ import { UsersController } from './users.controller';
 import { TokenModule } from 'src/module/service/token/token.module';
 import { DBModule } from 'src/module/db/db.module';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { TGModule } from 'src/module/service/tg-bot/tg-bot.module';
 
 @Module({
-	imports: [DBModule, TokenModule],
+	imports: [DBModule, TokenModule, TGModule],
 	controllers: [UsersController],
 	providers: [UsersService, AuthGuard]
 })

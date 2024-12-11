@@ -39,26 +39,13 @@
 					class="md:mt-4 md:w-[20%]"
 					>Сохранить
 				</v-btn>
-				<v-btn
-					variant="flat"
-					color="#5865f2"
-					@click="isModelUpdatePassword = true"
-					:loading="appStore.isLoading"
-					class="md:mt-4 md:w-[30%]"
-					>Изменить пароль
-				</v-btn>
 			</div>
 		</div>
 	</section>
-
-	<ModalUpdatePassword
-		v-if="isModelUpdatePassword"
-		@close="isModelUpdatePassword = false"
-	/>
 </template>
 
 <script lang="ts" setup>
-	import { EditAvatar, ModalUpdatePassword } from '@/widgets';
+	import { EditAvatar } from '@/widgets';
 	import { useAppStore } from '@/app/app.store';
 	import { ref, watch } from 'vue';
 	import { userData, updateDataUser } from '@/shared';
@@ -68,7 +55,6 @@
 	const toast = useToast();
 
 	const userDataLocal = ref<userData>(JSON.parse(JSON.stringify(appStore.userData)));
-	const isModelUpdatePassword = ref(false);
 
 	const updateUserData = () => {
 		try {

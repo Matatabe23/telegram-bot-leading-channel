@@ -4,13 +4,15 @@ import { Users } from 'src/module/db/models/users.repository';
 import { UsersDto } from './dto/user.dto';
 import { TokenRepository } from 'src/module/service/token/token.repository';
 import * as bcrypt from 'bcrypt';
+import { TGBotService } from 'src/module/service/tg-bot/tg-bot.repository';
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectModel(Users)
 		private readonly usersRepository: typeof Users,
-		private readonly tokenRepository: TokenRepository
+		private readonly tokenRepository: TokenRepository,
+		private readonly tGBotService: TGBotService
 	) {}
 
 	async createUser(name: string, password: string) {
@@ -48,8 +50,8 @@ export class UsersService {
 		};
 	}
 
-	async login(name: string, password: string) {
-		if (!name || !password) throw new UnauthorizedException('Некорректные данные');
+	async login(name: string) {
+		if (!name) throw new UnauthorizedException('Некорректные данные');
 
 		const lowerName = name.toLowerCase();
 		const user = await this.usersRepository.findOne({
@@ -57,9 +59,12 @@ export class UsersService {
 		});
 
 		if (!user) throw new NotFoundException('Пользователь не найден');
+		if (!user.isTeamMember) throw new NotFoundException('Вы не участник команды');
 
-		const isPasswordValid = await bcrypt.compare(password, user.password);
-		if (!isPasswordValid) throw new UnauthorizedException('Указан неверный пароль');
+		const isVerification = await this.tGBotService.requestLoginConfirmation(
+			Number(user.telegramId)
+		);
+		if (!isVerification) throw new NotFoundException('Отказано во входе');
 
 		const resultDto = new UsersDto(user.dataValues);
 
@@ -71,7 +76,7 @@ export class UsersService {
 
 	async checkDataWeb(id: number) {
 		const user = await this.usersRepository.findOne({ where: { id } });
-		if (!user) return;
+		if (!user || !user.isTeamMember) return;
 		const resultDto = new UsersDto(user);
 		const accessToken = this.tokenRepository.generateToken({ ...resultDto }, '15m');
 		return { accessToken, user: resultDto };
@@ -102,9 +107,9 @@ export class UsersService {
 		await user.update({
 			name: data.name,
 			role: data.role,
-			password: data.password,
 			avatarUrl: data.avatarUrl,
-			telegramId: data.telegramId
+			telegramId: data.telegramId,
+			isTeamMember: data.isTeamMember
 		});
 
 		return user;
@@ -119,7 +124,7 @@ export class UsersService {
 		const { rows: users, count: totalItems } = await this.usersRepository.findAndCountAll({
 			offset,
 			limit,
-			attributes: ['id', 'name', 'role', 'avatarUrl', 'telegramId'],
+			attributes: ['id', 'name', 'role', 'avatarUrl', 'telegramId', 'isTeamMember'],
 			order: [['id', 'ASC']]
 		});
 
@@ -140,22 +145,5 @@ export class UsersService {
 		await user.destroy();
 
 		return 'Пользователь успешно удален';
-	}
-
-	async updatePassword(id: number, oldPassword: string, newPassword: string) {
-		if (!oldPassword || !newPassword) {
-			throw new UnauthorizedException('Старый и новый пароли должны быть указаны');
-		}
-		const user = await this.usersRepository.findByPk(id);
-		if (!user) {
-			throw new NotFoundException('Пользователь не найден');
-		}
-		const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
-		if (!isOldPasswordValid) {
-			throw new UnauthorizedException('Старый пароль неверный');
-		}
-		const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-		await user.update({ password: hashedNewPassword });
-		return 'Пароль успешно обновлен';
 	}
 }

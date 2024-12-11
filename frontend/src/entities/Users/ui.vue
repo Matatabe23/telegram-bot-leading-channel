@@ -1,14 +1,5 @@
 <template>
 	<div class="x-ident mt-4">
-		<v-btn
-			variant="flat"
-			@click="state.isModalCreateUser = true"
-			class="mb-4"
-			color="#5865f2"
-			:loading="appStore.isLoading"
-		>
-			Создать нового пользователя
-		</v-btn>
 		<!-- Таблица -->
 		<div class="overflow-x-auto custom-scroll">
 			<table class="table-auto w-full border-collapse border border-gray-200 min-w-[1000px]">
@@ -20,6 +11,9 @@
 						<th class="border border-gray-200 px-4 py-2 text-left w-[30%]">Роль</th>
 						<th class="border border-gray-200 px-4 py-2 text-left w-[10%]">
 							Телеграмм
+						</th>
+						<th class="border border-gray-200 px-4 py-2 text-left w-[10%]">
+							Участник команды?
 						</th>
 						<th class="border border-gray-200 px-4 py-2 text-left w-[20%]">Действия</th>
 					</tr>
@@ -55,6 +49,14 @@
 						</td>
 						<td class="border border-gray-200 px-4 py-2">{{ user.telegramId }}</td>
 						<td class="border border-gray-200 px-4 py-2">
+							<VSwitch
+								hide-details
+								@change="updateIsTeamMember(user)"
+								:model-value="user.isTeamMember"
+							>
+							</VSwitch>
+						</td>
+						<td class="border border-gray-200 px-4 py-2">
 							<v-btn
 								variant="flat"
 								class="mb-4"
@@ -80,12 +82,6 @@
 			class="text-xs"
 		/>
 	</div>
-
-	<ModalCreateUser
-		v-if="state.isModalCreateUser"
-		@close="state.isModalCreateUser = false"
-		@update-list="getUsers()"
-	/>
 </template>
 
 <script lang="ts" setup>
@@ -94,7 +90,6 @@
 	import { IStateUsers } from '@/entities';
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
-	import { ModalCreateUser } from '@/widgets';
 
 	const settingsStore = useSettings();
 	const toast = useToast();
@@ -107,8 +102,7 @@
 		currentPage: 1,
 		totalItems: 0,
 		totalPages: 0,
-		usersList: [],
-		isModalCreateUser: false
+		usersList: []
 	});
 
 	const listRoles = computed(() => {
@@ -155,6 +149,22 @@
 			await deleteUser(id);
 			await getUsers();
 			toast.success('Успешное удаление пользователя');
+		} catch (e) {
+			toast.error(e.response.data.message);
+		} finally {
+			appStore.isLoading = false;
+		}
+	};
+
+	const updateIsTeamMember = async (value: userData) => {
+		try {
+			appStore.isLoading = true;
+			await updateDataUser({
+				...value,
+				isTeamMember: !value.isTeamMember
+			});
+			await getUsers();
+			toast.success('Успешное обновление пользователя');
 		} catch (e) {
 			toast.error(e.response.data.message);
 		} finally {

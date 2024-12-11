@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
-import { MUST_BE_NUMBER, MUST_BE_STRING } from 'src/const/errorConst';
+import { IsNotEmpty, IsOptional, IsString, IsNumber, IsBoolean } from 'class-validator';
+import { MUST_BE_BOOLEAN, MUST_BE_NUMBER, MUST_BE_STRING } from 'src/const/errorConst';
 
 export class UsersDto {
 	@IsNotEmpty()
@@ -16,15 +16,15 @@ export class UsersDto {
 
 	@IsOptional()
 	@IsString({ message: MUST_BE_STRING })
-	password?: string;
-
-	@IsOptional()
-	@IsString({ message: MUST_BE_STRING })
 	avatarUrl?: string;
 
 	@IsOptional()
 	@IsNumber({}, { message: MUST_BE_NUMBER })
 	telegramId?: number;
+
+	@IsOptional()
+	@IsBoolean({ message: MUST_BE_BOOLEAN })
+	isTeamMember?: boolean;
 
 	constructor(user: any) {
 		this.id = user.id;
@@ -32,5 +32,6 @@ export class UsersDto {
 		this.role = user.role;
 		this.avatarUrl = user.avatarUrl;
 		this.telegramId = user.telegramId;
+		this.isTeamMember = user.isTeamMember;
 	}
 }

@@ -8,5 +8,4 @@ export interface IStateUsers {
     totalItems: number,
     totalPages: number,
     usersList: userData[],
-    isModalCreateUser: boolean
 }

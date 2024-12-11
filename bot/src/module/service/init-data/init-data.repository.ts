@@ -16,7 +16,6 @@ export class InitDataRepository implements OnModuleInit {
 
 	async onModuleInit() {
 		this.createDefaultRole();
-		this.createDefaultUser();
 	}
 
 	async createDefaultUser() {
@@ -38,7 +37,8 @@ export class InitDataRepository implements OnModuleInit {
 			role: process.env.DEFAULT_ROLE,
 			avatarUrl:
 				'https://steamuserimages-a.akamaihd.net/ugc/1708538690062820758/000B5BFAFEA88146C04CC6C04630270AA2AD04D7/?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true',
-			telegramId: null
+			telegramId: null,
+			isTeamMember: true
 		});
 	}
 

@@ -8,10 +8,10 @@ export class Users extends Model {
 	@Column({ unique: true })
 	name: string;
 
-	@Column
+	@Column({})
 	password: string;
 
-	@Column
+	@Column({})
 	role: string;
 
 	@Column({ allowNull: true })
@@ -19,4 +19,7 @@ export class Users extends Model {
 
 	@Column({ allowNull: true })
 	telegramId: string;
+
+	@Column({ defaultValue: false })
+	isTeamMember: boolean;
 }

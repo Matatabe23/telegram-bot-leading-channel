@@ -3,7 +3,8 @@ export interface userData {
     name: string,
     role: string
     avatarUrl?: string,
-    telegramId?: string
+    telegramId?: string,
+    isTeamMember?: boolean
 }
 
 export interface IAppStore {

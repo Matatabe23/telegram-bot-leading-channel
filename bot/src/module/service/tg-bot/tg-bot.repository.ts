@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import * as TelegramBot from 'node-telegram-bot-api';
+
+import { createTelegramBot } from 'src/config/telegram.config';
 
 import { FileRepository } from 'src/module/service/files/files.repository';
 import { S3Repository } from 'src/module/service/s3/s3.repository';
@@ -10,8 +13,7 @@ import { Channels } from 'src/module/db/models/channels.repository';
 import { ChannelPosts } from 'src/module/db/models/channel-posts.repository';
 
 import { WaterMarkRepository } from '../water-mark/water-mark.repository';
-
-import * as TelegramBot from 'node-telegram-bot-api';
+import { Users } from 'src/module/db/models/users.repository';
 
 @Injectable()
 export class TGBotService {
@@ -19,6 +21,8 @@ export class TGBotService {
 	public bot: TelegramBot;
 
 	constructor(
+		@InjectModel(Users)
+		private readonly users: typeof Users,
 		@InjectModel(DataBasePosts)
 		private readonly dataBasePosts: typeof DataBasePosts,
 		@InjectModel(ImageData)
@@ -31,16 +35,61 @@ export class TGBotService {
 		private readonly s3Repository: S3Repository,
 		private readonly waterMarkRepository: WaterMarkRepository
 	) {
-		this.bot = new TelegramBot(process.env.TELEGRAM_BOT_API_TOKEN, {
-			polling: true
+		this.bot = createTelegramBot();
+		this.initializeMessageHandlers();
+	}
+
+	private initializeMessageHandlers() {
+		this.bot.on('message', async (msg: TelegramBot) => {
+			const chatId = msg.chat.id;
+			const text = msg.text;
+			console.log(msg);
+
+			this.logger.log(`Получено сообщение из чата ${chatId}: ${text}`);
+			console.log(msg);
+
+			try {
+				await this.ensureUserExists(msg.from.id, msg.from.username);
+
+				if (text) {
+					await this.handleTextMessage(chatId, text);
+				}
+			} catch (error) {
+				this.logger.error('Ошибка при обработке сообщения:', error);
+			}
 		});
 	}
 
+	private async handleTextMessage(chatId: number, text: string) {
+		// Пример обработки текста
+		if (text.toLowerCase().includes('/start')) {
+			await this.bot.sendMessage(chatId, 'Привет! Я Милана, чем могу помочь?');
+		} else {
+			await this.bot.sendMessage(chatId, 'Не понимаю');
+		}
+	}
+
+	private async ensureUserExists(telegramId: number, name: string) {
+		const user = await this.users.findOne({ where: { telegramId } });
+
+		if (!user) {
+			const userCount = await this.users.count();
+
+			await this.users.create({
+				name,
+				role: userCount === 0 ? process.env.DEFAULT_ROLE : null,
+				avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg',
+				telegramId,
+				isTeamMember: userCount === 0
+			});
+		}
+	}
+
 	async sendMessageAtScheduledTime(timeData: { time: Date; chatId: string }) {
-		const postWithImages: any = await this.dataBasePosts.findOne({
+		const postWithImages = await this.dataBasePosts.findOne({
 			include: [
 				{
-					model: Channels as any,
+					model: Channels,
 					where: { chatId: timeData.chatId },
 					required: true
 				},
@@ -55,7 +104,7 @@ export class TGBotService {
 
 		if (!postWithImages) return;
 
-		const media: any = [];
+		const media = [];
 		for (const item of postWithImages.dataValues.images) {
 			try {
 				const result = await this.fileRepository.downloadFile(
@@ -84,14 +133,14 @@ export class TGBotService {
 		}
 
 		const deletePost = async () => {
-			const channelPosts = await ChannelPosts.findAll({
+			const channelPosts = await this.channelPosts.findAll({
 				where: {
 					postId: postWithImages.dataValues.id
 				}
 			});
 
 			if (channelPosts.length > 1) {
-				await ChannelPosts.destroy({
+				await this.channelPosts.destroy({
 					where: {
 						channelId: chatInfo.dataValues.id,
 						postId: postWithImages.dataValues.id
@@ -104,7 +153,7 @@ export class TGBotService {
 						this.s3Repository.deleteImageFromS3(item.image);
 					})
 				);
-				await ChannelPosts.destroy({ where: { postId: postWithImages.id } });
+				await this.channelPosts.destroy({ where: { postId: postWithImages.id } });
 				await this.dataBasePosts.destroy({ where: { id: postWithImages.id } });
 			}
 		};
@@ -149,6 +198,62 @@ export class TGBotService {
 				console.error('Ошибка при отправке сообщения:', error);
 				reject(error);
 			}
+		});
+	}
+
+	public async requestLoginConfirmation(chatId: number): Promise<boolean> {
+		return new Promise((resolve, reject) => {
+			// Отправляем сообщение с кнопками подтверждения
+			this.bot
+				.sendMessage(chatId, 'Подтвердите вход в систему:', {
+					reply_markup: {
+						inline_keyboard: [
+							[
+								{ text: 'Подтвердить', callback_data: 'confirm' },
+								{ text: 'Отказать', callback_data: 'deny' }
+							]
+						]
+					}
+				})
+				.then((sentMessage) => {
+					const messageId = sentMessage.message_id;
+
+					// Обрабатываем выбор пользователя
+					const callbackHandler = async (callbackQuery: TelegramBot.CallbackQuery) => {
+						if (callbackQuery.message?.chat.id === chatId) {
+							const action = callbackQuery.data;
+
+							if (action === 'confirm') {
+								this.bot.answerCallbackQuery(callbackQuery.id, {
+									text: 'Вход подтверждён'
+								});
+								this.bot.deleteMessage(chatId, String(messageId));
+								this.bot.removeListener('callback_query', callbackHandler);
+								resolve(true);
+							} else if (action === 'deny') {
+								this.bot.answerCallbackQuery(callbackQuery.id, {
+									text: 'Вход отклонён'
+								});
+								this.bot.deleteMessage(chatId, String(messageId));
+								this.bot.removeListener('callback_query', callbackHandler);
+								resolve(false);
+							} else {
+								this.bot.answerCallbackQuery(callbackQuery.id, {
+									text: 'Неизвестное действие'
+								});
+							}
+						}
+					};
+
+					this.bot.on('callback_query', callbackHandler);
+
+					// Устанавливаем тайм-аут на случай отсутствия ответа
+					setTimeout(() => {
+						this.bot.removeListener('callback_query', callbackHandler);
+						this.bot.deleteMessage(chatId, String(messageId));
+						reject(new Error('Ответ от пользователя не получен в установленное время'));
+					}, 60000);
+				});
 		});
 	}
 }

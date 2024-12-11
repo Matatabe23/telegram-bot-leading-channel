@@ -15,7 +15,6 @@ import {
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { UsersDto } from './dto/user.dto';
-import { UpdatePasswordDto } from './dto/update-password.dto';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/const/const';
 
@@ -42,9 +41,9 @@ export class UsersController {
 	}
 
 	@Get('login')
-	async login(@Query('name') name: string, @Query('password') password: string) {
+	async login(@Query('name') name: string) {
 		try {
-			const result = await this.userService.login(name, password);
+			const result = await this.userService.login(name);
 			return result;
 		} catch (e) {
 			throw new HttpException(
@@ -126,28 +125,6 @@ export class UsersController {
 	async deleteUser(@Param('id') id: number) {
 		try {
 			return await this.userService.deleteUser(Number(id));
-		} catch (e) {
-			throw new HttpException(
-				{
-					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					message: e.message
-				},
-				HttpStatus.INTERNAL_SERVER_ERROR
-			);
-		}
-	}
-
-	@Put('update-password')
-	@UseGuards(AuthGuard)
-	async updatePassword(@Req() request: any, @Body() updatePasswordDto: UpdatePasswordDto) {
-		const { oldPassword, newPassword } = updatePasswordDto;
-
-		try {
-			return await this.userService.updatePassword(
-				request.authData.id,
-				oldPassword,
-				newPassword
-			);
 		} catch (e) {
 			throw new HttpException(
 				{

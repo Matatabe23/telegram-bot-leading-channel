@@ -33,7 +33,7 @@
 					<template v-slot:activator="{ props }">
 						<v-avatar
 							v-bind="props"
-							:image="appStore.userData.avatarUrl"
+							:image="appStore.userData.avatarUrl || 'https://api.dicebear.com/9.x/bottts/svg'"
 						></v-avatar>
 					</template>
 

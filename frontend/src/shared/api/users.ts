@@ -8,8 +8,8 @@ export const createUser = async (name: string, password: string) => {
 };
 
 // Функция для авторизации пользователя
-export const login = async (name: string, password: string) => {
-    const { data } = await $host.get('user/login', { params: { name, password } });
+export const login = async (name: string) => {
+    const { data } = await $host.get('user/login', { params: { name } });
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     localStorage.setItem('user', JSON.stringify(data.user));
@@ -70,12 +70,6 @@ export const getUsersList = async (page: number, limit: number) => {
 //Удалить пользователя
 export const deleteUser = async (id: number) => {
     const response = await $autHost.delete(`user/delete-post/${id}`);
-    return response.data;
-};
-
-// Обновление пароля
-export const updatePassword = async (oldPassword: string, newPassword: string) => {
-    const response = await $autHost.put('user/update-password', {oldPassword, newPassword});
     return response.data;
 };
 
