@@ -1,12 +1,6 @@
 import { $autHost, $host, userData } from "@/shared";
 import { jwtDecode } from "jwt-decode";
 
-// Создание нового пользователя
-export const createUser = async (name: string, password: string) => {
-    const response = await $autHost.post('user/create-user', { name, password });
-    return response.data;
-};
-
 // Функция для авторизации пользователя
 export const login = async (name: string) => {
     const { data } = await $host.get('user/login', { params: { name } });

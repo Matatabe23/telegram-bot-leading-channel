@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Users } from 'src/module/db/models/users.repository';
 import { UsersDto } from './dto/user.dto';
 import { TokenRepository } from 'src/module/service/token/token.repository';
-import * as bcrypt from 'bcrypt';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.repository';
 
 @Injectable()
@@ -14,41 +13,6 @@ export class UsersService {
 		private readonly tokenRepository: TokenRepository,
 		private readonly tGBotService: TGBotService
 	) {}
-
-	async createUser(name: string, password: string) {
-		if (!name || !password) {
-			throw new UnauthorizedException('Некорректные данные');
-		}
-
-		const lowerName = name.toLowerCase();
-
-		const existingUser = await this.usersRepository.findOne({
-			where: { name: lowerName }
-		});
-		if (existingUser) {
-			throw new UnauthorizedException('Пользователь с таким именем уже существует');
-		}
-
-		const hashedPassword = await bcrypt.hash(password, 10);
-
-		const newUser = await this.usersRepository.create({
-			name: name,
-			password: hashedPassword,
-			role: null,
-			avatarUrl:
-				'https://steamuserimages-a.akamaihd.net/ugc/1708538690062820758/000B5BFAFEA88146C04CC6C04630270AA2AD04D7/?imw=512&imh=512&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true',
-			telegramId: null
-		});
-
-		return {
-			message: 'Пользователь успешно создан',
-			user: {
-				id: newUser.id,
-				name: newUser.name,
-				role: newUser.role
-			}
-		};
-	}
 
 	async login(name: string) {
 		if (!name) throw new UnauthorizedException('Некорректные данные');

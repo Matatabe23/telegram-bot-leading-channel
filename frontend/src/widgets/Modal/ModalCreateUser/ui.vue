@@ -39,7 +39,7 @@
 <script lang="ts" setup>
 	import { onMounted, reactive } from 'vue';
 	import { useAppStore } from '@/app/app.store';
-	import { createUser, Modal } from '@/shared';
+	import { Modal } from '@/shared';
 	import { faker } from '@faker-js/faker';
 	import { useToast } from 'vue-toastification';
 
@@ -64,7 +64,6 @@
 			state.form.name = faker.internet.userName();
 			state.form.password = faker.internet.password();
 
-			await createUser(state.form.name, state.form.password);
             await emit('update-list')
 		} catch (e) {
             toast.error(e.response.data.message);

@@ -9,9 +9,6 @@ export class Users extends Model {
 	name: string;
 
 	@Column({})
-	password: string;
-
-	@Column({})
 	role: string;
 
 	@Column({ allowNull: true })

@@ -8,7 +8,6 @@ import {
 	HttpStatus,
 	Put,
 	Body,
-	Post,
 	Delete,
 	Param
 } from '@nestjs/common';
@@ -21,24 +20,6 @@ import { EPermissions } from 'src/const/const';
 @Controller('user')
 export class UsersController {
 	constructor(private readonly userService: UsersService) {}
-
-	@Post('create-user')
-	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
-	async createUser(@Body() createUserDto: { name: string; password: string }) {
-		try {
-			const { name, password } = createUserDto;
-			const result = await this.userService.createUser(name, password);
-			return result;
-		} catch (e) {
-			throw new HttpException(
-				{
-					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					message: e.message
-				},
-				HttpStatus.INTERNAL_SERVER_ERROR
-			);
-		}
-	}
 
 	@Get('login')
 	async login(@Query('name') name: string) {
