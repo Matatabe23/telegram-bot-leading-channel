@@ -4,7 +4,7 @@ import * as moment from 'moment-timezone';
 import * as schedule from 'node-schedule';
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
-import { TGBotService } from '../tg-bot/tg-bot.repository';
+import { TGBotPostsRepository } from '../tg-bot/repository/tg-bot-posts.repository';
 
 @Injectable()
 export class RegularPublicationBotRepository implements OnModuleInit {
@@ -13,7 +13,7 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 	constructor(
 		@InjectModel(RegularPublicationTime)
 		private readonly regularPublicationTime: typeof RegularPublicationTime,
-		private readonly tGBotService: TGBotService
+		private readonly tGBotPostsRepository: TGBotPostsRepository
 	) {}
 
 	async onModuleInit() {
@@ -42,7 +42,7 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 
 		scheduleTimes.forEach((time) => {
 			const job = schedule.scheduleJob(time.time, () => {
-				this.tGBotService.sendMessageAtScheduledTime(time);
+				this.tGBotPostsRepository.sendMessageAtScheduledTime(time);
 			});
 			if (job) {
 				this.jobs.push(job);

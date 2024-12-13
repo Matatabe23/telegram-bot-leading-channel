@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Users } from 'src/module/db/models/users.repository';
 import { UsersDto } from './dto/user.dto';
 import { TokenRepository } from 'src/module/service/token/token.repository';
-import { TGBotService } from 'src/module/service/tg-bot/tg-bot.repository';
+import { TGBotUsersRepository } from 'src/module/service/tg-bot/repository/tg-bot-users.repository';
 
 @Injectable()
 export class UsersService {
@@ -11,7 +11,7 @@ export class UsersService {
 		@InjectModel(Users)
 		private readonly usersRepository: typeof Users,
 		private readonly tokenRepository: TokenRepository,
-		private readonly tGBotService: TGBotService
+		private readonly tGBotUsersRepository: TGBotUsersRepository
 	) {}
 
 	async login(name: string) {
@@ -25,7 +25,7 @@ export class UsersService {
 		if (!user) throw new NotFoundException('Пользователь не найден');
 		if (!user.isTeamMember) throw new NotFoundException('Вы не участник команды');
 
-		const isVerification = await this.tGBotService.requestLoginConfirmation(
+		const isVerification = await this.tGBotUsersRepository.requestLoginConfirmation(
 			Number(user.telegramId)
 		);
 		if (!isVerification) throw new NotFoundException('Отказано во входе');

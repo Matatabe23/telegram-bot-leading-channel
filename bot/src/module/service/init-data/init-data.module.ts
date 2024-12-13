@@ -2,11 +2,11 @@ import { Module, Global } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { InitDataRepository } from './init-data.repository';
 import { DBModule } from 'src/module/db/db.module';
-import { TGModule } from '../tg-bot/tg-bot.module';
+import { TGBotModule } from '../tg-bot/tg-bot.module';
 
 @Global()
 @Module({
-	imports: [ConfigModule, DBModule, TGModule],
+	imports: [ConfigModule, DBModule, TGBotModule],
 	providers: [InitDataRepository],
 	exports: [InitDataRepository]
 })

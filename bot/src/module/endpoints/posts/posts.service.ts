@@ -6,11 +6,11 @@ import { ImageData } from 'src/module/db/models/image-data.repository';
 import { ChannelPosts } from 'src/module/db/models/channel-posts.repository';
 import { WaterMarkRepository } from 'src/module/service/water-mark/water-mark.repository';
 import { S3Repository } from 'src/module/service/s3/s3.repository';
-import { TGBotService } from 'src/module/service/tg-bot/tg-bot.repository';
 import { IImageBlock } from 'src/types/types';
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Op, Order } from 'sequelize';
 import { FileRepository } from 'src/module/service/files/files.repository';
+import { TGBotPostsRepository } from 'src/module/service/tg-bot/repository/tg-bot-posts.repository';
 
 @Injectable()
 export class PostsService {
@@ -27,7 +27,7 @@ export class PostsService {
 		private readonly regularPublicationTime: typeof RegularPublicationTime,
 		private readonly waterMarkRepository: WaterMarkRepository,
 		private readonly s3Repository: S3Repository,
-		private readonly tGBotService: TGBotService,
+		private readonly tGBotPostsRepository: TGBotPostsRepository,
 		private readonly fileRepository: FileRepository
 	) {}
 
@@ -117,13 +117,16 @@ export class PostsService {
 			);
 
 			for (const chatId of chatIdList) {
-				await this.tGBotService.instantPublicationPosts(imagesFromWaterMark, chatId);
+				await this.tGBotPostsRepository.instantPublicationPosts(
+					imagesFromWaterMark,
+					chatId
+				);
 			}
 			return 'Успешная моментальная публикация';
 		}
 
 		for (const chatId of chatIdList) {
-			await this.tGBotService.instantPublicationPosts(files, chatId);
+			await this.tGBotPostsRepository.instantPublicationPosts(files, chatId);
 		}
 		return 'Успешная моментальная публикация';
 	}
@@ -251,7 +254,7 @@ export class PostsService {
 		}
 
 		for (const element of post.dataValues.channels) {
-			await this.tGBotService.instantPublicationPosts(
+			await this.tGBotPostsRepository.instantPublicationPosts(
 				files,
 				element.chatId,
 				post.dataValues.waterMark
