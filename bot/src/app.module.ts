@@ -20,6 +20,7 @@ import { FilesModule } from './module/endpoints/files/files.module';
 import { RolesModule } from './module/endpoints/roles/roles.module';
 import { InitDataModule } from './module/service/init-data/init-data.module';
 import { HelpersModule } from './module/service/helpers/helpers.module';
+import { PaymentsModule } from './module/service/payments/payments.module';
 
 @Module({
 	imports: [
@@ -42,6 +43,7 @@ import { HelpersModule } from './module/service/helpers/helpers.module';
 		RegularPublicationBotModule,
 		InitDataModule,
 		HelpersModule,
+		PaymentsModule,
 
 		TGBotModule
 	],

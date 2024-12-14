@@ -48,3 +48,20 @@ export const PERMISSIONS_LIST = [
 		value: EPermissions.SET_PUBLICATION_TIME
 	}
 ];
+
+export const priceList = {
+	reply_markup: JSON.stringify({
+		inline_keyboard: [
+			[
+				{ text: '10 coins', callback_data: 1000 },
+				{ text: '30 coins', callback_data: 3000 },
+				{ text: '50 coins', callback_data: 5000 }
+			],
+			[
+				{ text: '100 coins', callback_data: 10000 },
+				{ text: '500 coins', callback_data: 50000 },
+				{ text: '1000 coins', callback_data: 100000 }
+			]
+		]
+	})
+};

@@ -2,7 +2,7 @@
 	<div class="x-ident mt-4">
 		<!-- Таблица -->
 		<div class="overflow-x-auto custom-scroll">
-			<table class="table-auto w-full border-collapse border border-gray-200 min-w-[1000px]">
+			<table class="table-auto w-full border-collapse border border-gray-200 min-w-[1300px]">
 				<thead>
 					<tr class="bg-gray-100">
 						<th class="border border-gray-200 px-4 py-2 text-left w-[4%]">id</th>
@@ -11,6 +11,9 @@
 						<th class="border border-gray-200 px-4 py-2 text-left w-[30%]">Роль</th>
 						<th class="border border-gray-200 px-4 py-2 text-left w-[10%]">
 							Телеграмм
+						</th>
+						<th class="border border-gray-200 px-4 py-2 text-left w-[20%] lg:w-[10%]">
+							Coin
 						</th>
 						<th class="border border-gray-200 px-4 py-2 text-left w-[10%]">
 							Участник команды?
@@ -49,9 +52,19 @@
 						</td>
 						<td class="border border-gray-200 px-4 py-2">{{ user.telegramId }}</td>
 						<td class="border border-gray-200 px-4 py-2">
+							<v-text-field
+								label="coin"
+								variant="outlined"
+								v-model="user.coin"
+								class="w-full"
+                                type="number"
+								@update:model-value="updateCoin(user, $event)"
+							/>
+						</td>
+						<td class="border border-gray-200 px-4 py-2">
 							<VSwitch
 								hide-details
-								@change="updateIsTeamMember(user)"
+								@change="updateDataUsers(user, { isTeamMember: true })"
 								:model-value="user.isTeamMember"
 							>
 							</VSwitch>
@@ -86,6 +99,7 @@
 
 <script lang="ts" setup>
 	import { computed, onMounted, reactive } from 'vue';
+	import { useDebounceFn } from '@vueuse/core';
 	import { userData, deleteUser, getUsersList, updateDataUser, useSettings } from '@/shared';
 	import { IStateUsers } from '@/entities';
 	import { useToast } from 'vue-toastification';
@@ -131,10 +145,13 @@
 		getUsers();
 	};
 
-	const updateDataUsers = async (value: userData) => {
+	const updateDataUsers = async (value: userData, update?: { isTeamMember?: boolean }) => {
 		try {
 			appStore.isLoading = true;
-			await updateDataUser(value);
+			await updateDataUser({
+				...value,
+				isTeamMember: update.isTeamMember ? !value.isTeamMember : value.isTeamMember
+			});
 			toast.success('Успешное обновление пользователя');
 		} catch (e) {
 			toast.error(e.response.data.message);
@@ -145,6 +162,11 @@
 
 	const deleteUsers = async (id: number) => {
 		try {
+			const isConfirmed = window.confirm(
+				'Вы уверены, что хотите удалить этого пользователя?'
+			);
+			if (!isConfirmed) return;
+
 			appStore.isLoading = true;
 			await deleteUser(id);
 			await getUsers();
@@ -156,12 +178,12 @@
 		}
 	};
 
-	const updateIsTeamMember = async (value: userData) => {
+	const updateCoin = useDebounceFn(async (user: userData, coin: string) => {
 		try {
 			appStore.isLoading = true;
 			await updateDataUser({
-				...value,
-				isTeamMember: !value.isTeamMember
+				...user,
+				coin: Number(coin)
 			});
 			await getUsers();
 			toast.success('Успешное обновление пользователя');
@@ -170,7 +192,7 @@
 		} finally {
 			appStore.isLoading = false;
 		}
-	};
+	}, 1000);
 
 	onMounted(() => getUsers());
 </script>

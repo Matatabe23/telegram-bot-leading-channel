@@ -68,13 +68,7 @@ export class UsersService {
 			throw new Error('Администратор не найден');
 		}
 
-		await user.update({
-			name: data.name,
-			role: data.role,
-			avatarUrl: data.avatarUrl,
-			telegramId: data.telegramId,
-			isTeamMember: data.isTeamMember
-		});
+		await user.update(new UsersDto(data));
 
 		return user;
 	}
@@ -88,7 +82,9 @@ export class UsersService {
 		const { rows: users, count: totalItems } = await this.usersRepository.findAndCountAll({
 			offset,
 			limit,
-			attributes: ['id', 'name', 'role', 'avatarUrl', 'telegramId', 'isTeamMember'],
+			attributes: {
+				exclude: ['password']
+			},
 			order: [['id', 'ASC']]
 		});
 

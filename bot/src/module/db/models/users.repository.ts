@@ -19,4 +19,7 @@ export class Users extends Model {
 
 	@Column({ defaultValue: false })
 	isTeamMember: boolean;
+
+	@Column({ defaultValue: 0 })
+	coin: number;
 }

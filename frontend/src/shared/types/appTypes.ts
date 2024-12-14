@@ -5,6 +5,7 @@ export interface userData {
     avatarUrl?: string,
     telegramId?: string,
     isTeamMember?: boolean
+    coin: number
 }
 
 export interface IAppStore {

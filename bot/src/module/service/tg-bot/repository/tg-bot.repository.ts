@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { TGBotUsersRepository } from './tg-bot-users.repository';
+import { YuKassaRepository } from '../../payments/repository/yu-kassa.repository';
 
 @Injectable()
 export class TGBotRepository {
@@ -10,7 +11,8 @@ export class TGBotRepository {
 
 	constructor(
 		private readonly tgBotService: TGBotService,
-		private readonly tGBotUsersRepository: TGBotUsersRepository
+		private readonly tGBotUsersRepository: TGBotUsersRepository,
+		private readonly yuKassaRepository: YuKassaRepository
 	) {
 		this.bot = this.tgBotService.getBot();
 		this.initializeMessageHandlers();
@@ -23,7 +25,6 @@ export class TGBotRepository {
 			console.log(msg);
 
 			this.logger.log(`Получено сообщение из чата ${chatId}: ${text}`);
-			console.log(msg);
 
 			try {
 				await this.tGBotUsersRepository.ensureUserExists(msg.from.id, msg.from.username);
@@ -38,9 +39,10 @@ export class TGBotRepository {
 	}
 
 	private async handleTextMessage(chatId: number, text: string) {
-		// Пример обработки текста
 		if (text.toLowerCase().includes('/start')) {
 			await this.bot.sendMessage(chatId, 'Привет! Я Милана, чем могу помочь?');
+		} else if (text.toLowerCase().includes('/pay')) {
+			this.yuKassaRepository.pay(chatId);
 		} else {
 			await this.bot.sendMessage(chatId, 'Не понимаю');
 		}

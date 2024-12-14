@@ -26,6 +26,10 @@ export class UsersDto {
 	@IsBoolean({ message: MUST_BE_BOOLEAN })
 	isTeamMember?: boolean;
 
+	@IsNotEmpty()
+	@IsNumber({}, { message: MUST_BE_NUMBER })
+	coin: number;
+
 	constructor(user: any) {
 		this.id = user.id;
 		this.name = user.name;
@@ -33,5 +37,6 @@ export class UsersDto {
 		this.avatarUrl = user.avatarUrl;
 		this.telegramId = user.telegramId;
 		this.isTeamMember = user.isTeamMember;
+		this.coin = user.coin;
 	}
 }

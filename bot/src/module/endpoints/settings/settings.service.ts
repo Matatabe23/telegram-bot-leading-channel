@@ -4,6 +4,7 @@ import { RegularPublicationBotRepository } from 'src/module/service/regular-publ
 
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
+import { Sequelize } from 'sequelize';
 
 @Injectable()
 export class SettingsService {
@@ -15,7 +16,7 @@ export class SettingsService {
 		private readonly regularPublicationBotRepository: RegularPublicationBotRepository
 	) {}
 
-	async addingPublicationTime(hour, minute, channelId) {
+	async addingPublicationTime(hour: string, minute: string, channelId: string) {
 		if (hour === '' || isNaN(Number(hour)) || Number(hour) < 0 || Number(hour) > 24) {
 			throw new NotFoundException('Некорректные данные');
 		}
@@ -37,14 +38,15 @@ export class SettingsService {
 		return 'Успешное добавление!';
 	}
 
-	async getListRegularPublicationTimes(channelId) {
+	async getListRegularPublicationTimes(channelId: string) {
 		const list = await this.regularPublicationTime.findAll({
-			where: { channelId: channelId }
+			where: { channelId: channelId },
+			order: [[Sequelize.literal('CAST(hour AS UNSIGNED)'), 'ASC']]
 		});
 		return list;
 	}
 
-	async deleteItemPublicationTimes(id) {
+	async deleteItemPublicationTimes(id: string) {
 		const times = await this.regularPublicationTime.findByPk(id);
 		if (!times) {
 			throw new NotFoundException('Некорректные данные');
@@ -56,7 +58,7 @@ export class SettingsService {
 		return 'Успешное удаление';
 	}
 
-	async addingNewChannels(name, chatId) {
+	async addingNewChannels(name: string, chatId: string) {
 		if (!name || !chatId) throw new NotFoundException('Некорректные данные');
 
 		await this.channels.create({
@@ -79,7 +81,7 @@ export class SettingsService {
 		return list;
 	}
 
-	async deleteChannel(id) {
+	async deleteChannel(id: string) {
 		const times = await this.channels.findByPk(id);
 		if (!times) {
 			throw new NotFoundException('Некорректные данные');
@@ -90,7 +92,7 @@ export class SettingsService {
 		return 'Успешное удаление';
 	}
 
-	async editChannel(id, settings) {
+	async editChannel(id: number, settings: string[]) {
 		const settingsString = settings.join(',');
 
 		await this.channels.update({ settings: settingsString }, { where: { id } });
