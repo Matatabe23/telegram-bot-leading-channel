@@ -10,6 +10,7 @@ import { RegularPublicationTime } from './models/regular-publication-time.reposi
 import { Channels } from './models/channels.repository';
 import { ChannelPosts } from './models/channel-posts.repository';
 import { RolesSettings } from './models/roles-settings.repository';
+import { Payments } from './models/payments.repository';
 
 const dbList = [
 	Users,
@@ -18,7 +19,8 @@ const dbList = [
 	RegularPublicationTime,
 	Channels,
 	ChannelPosts,
-	RolesSettings
+	RolesSettings,
+	Payments
 ];
 
 @Module({

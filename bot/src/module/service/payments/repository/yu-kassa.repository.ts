@@ -4,6 +4,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { priceList } from 'src/const/const';
 import { InjectModel } from '@nestjs/sequelize';
 import { Users } from 'src/module/db/models/users.repository';
+import { HelpersRepository } from '../../helpers/helpers.repository';
 
 @Injectable()
 export class YuKassaRepository {
@@ -11,6 +12,7 @@ export class YuKassaRepository {
 
 	constructor(
 		private readonly tgBotService: TGBotService,
+		private readonly helpersRepository: HelpersRepository,
 		@InjectModel(Users)
 		private readonly users: typeof Users
 	) {
@@ -23,14 +25,14 @@ export class YuKassaRepository {
 		this.bot.removeListener('pre_checkout_query');
 
 		const paragraphs = [
-			'Стоимость рекламы может меняться в зависимости от сезона и колличества подписчиков в каналах',
-			'К примеру реклама в новогоднюю ночь будет дешевле тк в каналах толком никто не сидит',
-			'Но с 3 января по 7 января она будет на оборот дороже тк люди на каникулах и в отпусках'
+			'Стоимость рекламы может меняться в зависимости от сезона и количества подписчиков в каналах',
+			'К примеру реклама в новогоднюю ночь будет дешевле, так как в каналах толком никто не сидит',
+			'Но с 2 января по 7 января она будет, наоборот, дороже, так как люди на каникулах и в отпусках'
 		];
 		const paymentInfoMessage = await this.bot.sendMessage(userId, paragraphs.join('\n\n'));
 		const message1 = await this.bot.sendMessage(userId, `Ты готов к покупке?`, priceList);
 
-		this.bot.on('callback_query', async (msg: TelegramBot) => {
+		this.bot.on('callback_query', async (msg: TelegramBot.CallbackQuery) => {
 			const data = msg.data;
 			this.bot.deleteMessage(msg.from.id, message1.message_id);
 			await this.bot.sendInvoice(
@@ -43,7 +45,7 @@ export class YuKassaRepository {
 				[
 					{
 						label: 'RUB',
-						amount: data
+						amount: +data
 					}
 				],
 				{
@@ -54,7 +56,7 @@ export class YuKassaRepository {
 			);
 		});
 
-		this.bot.on('successful_payment', async (msg: TelegramBot) => {
+		this.bot.on('successful_payment', async (msg: TelegramBot.Message) => {
 			const userId = msg.from.id;
 			const selectedPrice = msg.successful_payment.total_amount / 100;
 
@@ -68,17 +70,27 @@ export class YuKassaRepository {
 				{ coin: userData.coin + selectedPrice },
 				{ where: { id: userData.id } }
 			);
+
+			await this.helpersRepository.savePaymentData({
+				userId: userData.id,
+				paymentId: msg.successful_payment.provider_payment_charge_id,
+				status: 'succeeded',
+				provider: 'YooKassa',
+				amount: selectedPrice,
+				currency: 'RUB',
+				paymentData: msg.successful_payment
+			});
+
 			this.bot.sendMessage(userId, 'Успешное пополнение!');
 			this.bot.deleteMessage(userId, paymentInfoMessage.message_id);
 		});
 
-		this.bot.on('pre_checkout_query', async (msg: TelegramBot) => {
+		this.bot.on('pre_checkout_query', async (msg: TelegramBot.PreCheckoutQuery) => {
 			try {
-				// Отправить подтверждение платежа
 				await this.bot.answerPreCheckoutQuery(msg.id, true);
 			} catch (error) {
 				console.error('Ошибка при подтверждении платежа:', error);
-				await this.bot.answerPreCheckoutQuery(msg.id, false, error);
+				await this.bot.answerPreCheckoutQuery(msg.id, false, error.message);
 			}
 		});
 	}

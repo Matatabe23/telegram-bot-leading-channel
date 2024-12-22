@@ -1,4 +1,5 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { RolesSettings } from './roles-settings.repository';
 
 @Table
 export class Users extends Model {
@@ -8,7 +9,8 @@ export class Users extends Model {
 	@Column({ unique: true })
 	name: string;
 
-	@Column({})
+	@ForeignKey(() => RolesSettings)
+	@Column
 	role: string;
 
 	@Column({ allowNull: true })

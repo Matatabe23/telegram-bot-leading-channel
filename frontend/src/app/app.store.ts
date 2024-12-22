@@ -6,13 +6,14 @@ import { useToast } from 'vue-toastification';
 const toast = useToast();
 
 const parseDataForUser = ({
-    id, name, role, avatarUrl, telegramId
+    id, name, role, avatarUrl, telegramId, coin
 }: userData): userData => ({
     id,
     name,
     role,
     avatarUrl,
-    telegramId
+    telegramId,
+    coin
 });
 
 export const useAppStore = defineStore('app', {

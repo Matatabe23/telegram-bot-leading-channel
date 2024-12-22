@@ -44,10 +44,10 @@
 								:items="listRoles"
 								variant="outlined"
 								v-model="user.role"
-								@update:model-value="updateDataUsers(user)"
 								:loading="appStore.isLoading"
 								clearable
 								clear-icon="mdi-close-circle"
+								@update:model-value="updateDataUsers(user, null)"
 							/>
 						</td>
 						<td class="border border-gray-200 px-4 py-2">{{ user.telegramId }}</td>
@@ -57,7 +57,7 @@
 								variant="outlined"
 								v-model="user.coin"
 								class="w-full"
-                                type="number"
+								type="number"
 								@update:model-value="updateCoin(user, $event)"
 							/>
 						</td>
@@ -150,7 +150,7 @@
 			appStore.isLoading = true;
 			await updateDataUser({
 				...value,
-				isTeamMember: update.isTeamMember ? !value.isTeamMember : value.isTeamMember
+				isTeamMember: update?.isTeamMember ? !value.isTeamMember : value.isTeamMember
 			});
 			toast.success('Успешное обновление пользователя');
 		} catch (e) {
