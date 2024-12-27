@@ -87,9 +87,21 @@ export class UsersController {
 
 	@Get('get-users-list')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
-	async getUsersList(@Query('page') page: number, @Query('limit') limit: number) {
+	async getUsersList(
+		@Query('page') page: number,
+		@Query('limit') limit: number,
+		@Query('search') search: string,
+		@Query('sortBy') sortBy: string,
+		@Query('sortOrder') sortOrder: 'ASC' | 'DESC'
+	) {
 		try {
-			return await this.userService.getUsersList(Number(page), Number(limit));
+			return await this.userService.getUsersList(
+				Number(page),
+				Number(limit),
+				search,
+				sortBy ? sortBy : 'id',
+				sortOrder ? sortOrder : 'ASC'
+			);
 		} catch (e) {
 			throw new HttpException(
 				{

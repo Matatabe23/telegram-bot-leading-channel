@@ -131,7 +131,13 @@ export class PostsService {
 		return 'Успешная моментальная публикация';
 	}
 
-	async receiving(page: number, pageSize: number, watched: string, channel: string) {
+	async receiving(
+		page: number,
+		pageSize: number,
+		watched: string,
+		channel: string,
+		search: string
+	) {
 		if (isNaN(page) || isNaN(pageSize)) {
 			throw new NotFoundException('Неверный формат параметров запроса');
 		}
@@ -140,11 +146,18 @@ export class PostsService {
 
 		let whereCondition: {
 			watched?: boolean;
+			id?: string;
 		} = {};
+
 		if (watched === 'watched') {
 			whereCondition = { ...whereCondition, watched: true };
 		} else if (watched === 'unwatched') {
 			whereCondition = { ...whereCondition, watched: false };
+		}
+
+		// Добавляем фильтр по ID, если передан параметр search
+		if (search) {
+			whereCondition = { ...whereCondition, id: search };
 		}
 
 		const posts = await this.dataBasePosts.findAll({

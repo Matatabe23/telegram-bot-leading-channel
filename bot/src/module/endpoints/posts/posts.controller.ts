@@ -108,10 +108,11 @@ export class PostsController {
 		@Query('page') page: number,
 		@Query('pageSize') pageSize: number,
 		@Query('watched') watched: string,
-		@Query('channel') channel: string
+		@Query('channel') channel: string,
+		@Query('search') search: string
 	) {
 		try {
-			const result = this.postsService.receiving(page, pageSize, watched, channel);
+			const result = this.postsService.receiving(page, pageSize, watched, channel, search);
 
 			return result;
 		} catch (e) {

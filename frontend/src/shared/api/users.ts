@@ -54,9 +54,9 @@ export const updateDataUser = async (data: userData) => {
 };
 
 // Список юзеров
-export const getUsersList = async (page: number, limit: number) => {
+export const getUsersList = async (params: { page: number, limit: number, search?: string, sortBy?: string, sortOrder?: string }) => {
     const response = await $autHost.get('user/get-users-list', {
-        params: { page, limit },
+        params: params,
     });
     return response.data;
 };

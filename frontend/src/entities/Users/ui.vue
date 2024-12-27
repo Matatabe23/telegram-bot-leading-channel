@@ -1,29 +1,46 @@
 <template>
 	<div class="x-ident mt-4">
+		<div class="md:flex items-center gap-4 w-full lg:w-4/6">
+			<v-text-field
+				clearable
+				label="id, имя, телеграмм айди"
+				variant="outlined"
+				v-model="search"
+				@update:model-value="updateSearch($event)"
+				:loading="appStore.isLoading"
+				:disabled="appStore.isLoading"
+			/>
+		</div>
 		<!-- Таблица -->
-		<div class="overflow-x-auto custom-scroll">
+		<div class="overflow-x-auto custom-scroll mt-4">
 			<table class="table-auto w-full border-collapse border border-gray-200 min-w-[1300px]">
 				<thead>
 					<tr class="bg-gray-100">
-						<th class="border border-gray-200 px-4 py-2 text-left w-[4%]">id</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[10%]">Аватарка</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[20%]">Имя</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[30%]">Роль</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[10%]">
-							Телеграмм
+						<th
+							class="border border-gray-200 px-4 py-2 text-left"
+							:class="item.weight"
+							v-for="item in tableForm"
+							:key="item.key"
+						>
+							<button
+								class="flex gap-1 items-center"
+								@click="setSort(item.key)"
+							>
+								{{ item.name }}
+								<Icons
+									icon="ARROW_STROKE"
+									:class="{
+										'text-red-600': sortType && sortKey === item.key,
+										'rotate-180': sortType === 'asc' && sortKey === item.key
+									}"
+								/>
+							</button>
 						</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[20%] lg:w-[10%]">
-							Coin
-						</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[10%]">
-							Участник команды?
-						</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[20%]">Действия</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr
-						v-for="user in state.usersList"
+						v-for="user in usersList"
 						:key="user.id"
 					>
 						<td class="border border-gray-200 px-4 py-2">{{ user.id }}</td>
@@ -87,8 +104,8 @@
 		</div>
 
 		<v-pagination
-			v-model="state.currentPage"
-			:length="state.totalPages"
+			v-model="currentPage"
+			:length="totalPages"
 			:total-visible="appStore.isMd ? 7 : 3"
 			@update:model-value="setPage"
 			:disabled="appStore.isLoading"
@@ -98,26 +115,31 @@
 </template>
 
 <script lang="ts" setup>
-	import { computed, onMounted, reactive } from 'vue';
+	import { computed, onMounted, ref } from 'vue';
 	import { useDebounceFn } from '@vueuse/core';
-	import { userData, deleteUser, getUsersList, updateDataUser, useSettings } from '@/shared';
-	import { IStateUsers } from '@/entities';
+	import {
+		userData,
+		deleteUser,
+		getUsersList,
+		updateDataUser,
+		useSettings,
+		Icons
+	} from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
+	import { tableForm } from './const';
 
 	const settingsStore = useSettings();
 	const toast = useToast();
 	const appStore = useAppStore();
 
-	const state: IStateUsers = reactive({
-		form: {
-			name: ''
-		},
-		currentPage: 1,
-		totalItems: 0,
-		totalPages: 0,
-		usersList: []
-	});
+	const search = ref('');
+	const currentPage = ref(1);
+	const totalItems = ref(0);
+	const totalPages = ref(0);
+	const usersList = ref<userData[]>([]);
+	const sortKey = ref();
+	const sortType = ref('');
 
 	const listRoles = computed(() => {
 		return settingsStore.listRoles.map((item) => ({
@@ -129,10 +151,16 @@
 	const getUsers = async () => {
 		try {
 			appStore.isLoading = true;
-			const infoUsers = await getUsersList(state.currentPage, 3);
-			state.usersList = infoUsers.users;
-			state.totalItems = infoUsers.totalItems;
-			state.totalPages = infoUsers.totalPages;
+			const infoUsers = await getUsersList({
+				page: currentPage.value,
+				limit: 3,
+				search: search.value,
+				sortBy: sortKey.value,
+				sortOrder: sortType.value
+			});
+			usersList.value = infoUsers.users;
+			totalItems.value = infoUsers.totalItems;
+			totalPages.value = infoUsers.totalPages;
 		} catch (e) {
 			//
 		} finally {
@@ -141,9 +169,21 @@
 	};
 
 	const setPage = (page: number) => {
-		state.currentPage = page;
+		currentPage.value = page;
 		getUsers();
 	};
+
+	const updateSearch = useDebounceFn(async (value: string) => {
+		try {
+			appStore.isLoading = true;
+			search.value = value;
+			await getUsers();
+		} catch (e) {
+			toast.error(e.response.data.message);
+		} finally {
+			appStore.isLoading = false;
+		}
+	}, 1000);
 
 	const updateDataUsers = async (value: userData, update?: { isTeamMember?: boolean }) => {
 		try {
@@ -193,6 +233,20 @@
 			appStore.isLoading = false;
 		}
 	}, 1000);
+
+	const setSort = (sort: string) => {
+		if (sort) {
+			if (sortKey.value !== sort) {
+				sortKey.value = sort;
+				sortType.value = 'asc';
+			} else {
+				if (!sortType.value) sortType.value = 'asc';
+				else if (sortType.value === 'asc') sortType.value = 'desc';
+				else sortType.value = null;
+			}
+            getUsers()
+		}
+	};
 
 	onMounted(() => getUsers());
 </script>

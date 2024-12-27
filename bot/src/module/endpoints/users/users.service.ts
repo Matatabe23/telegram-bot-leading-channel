@@ -4,6 +4,7 @@ import { Users } from 'src/module/db/models/users.repository';
 import { UsersDto } from './dto/user.dto';
 import { TokenRepository } from 'src/module/service/token/token.repository';
 import { TGBotUsersRepository } from 'src/module/service/tg-bot/repository/tg-bot-users.repository';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class UsersService {
@@ -73,19 +74,36 @@ export class UsersService {
 		return user;
 	}
 
-	async getUsersList(page: number, limit: number) {
+	async getUsersList(
+		page: number,
+		limit: number,
+		search: string,
+		sortBy: string,
+		sortOrder: 'ASC' | 'DESC'
+	) {
 		page = page > 0 ? page : 1;
 		limit = limit > 0 ? limit : 10;
 
 		const offset = (page - 1) * limit;
 
+		const where = search
+			? {
+					[Op.or]: [
+						{ name: { [Op.like]: `%${search.toLowerCase()}%` } }, // Поиск по name
+						{ telegramId: { [Op.like]: `%${search.toLowerCase()}%` } }, // Поиск по telegramId
+						{ id: { [Op.like]: `%${search}%` } } // Поиск по id (поиск подстроки для числовых значений)
+					]
+				}
+			: {};
+
 		const { rows: users, count: totalItems } = await this.usersRepository.findAndCountAll({
+			where,
 			offset,
 			limit,
 			attributes: {
 				exclude: ['password']
 			},
-			order: [['id', 'ASC']]
+			order: [[sortBy, sortOrder]]
 		});
 
 		return {

@@ -39,12 +39,16 @@ export class TGBotRepository {
 	}
 
 	private async handleTextMessage(chatId: number, text: string) {
-		if (text.toLowerCase().includes('/start')) {
-			await this.bot.sendMessage(chatId, 'Привет! Я Милана, чем могу помочь?');
-		} else if (text.toLowerCase().includes('/pay')) {
-			this.yuKassaRepository.pay(chatId);
-		} else {
-			await this.bot.sendMessage(chatId, 'Не понимаю');
+		try {
+			if (text.toLowerCase().includes('/start')) {
+				await this.bot.sendMessage(chatId, 'Привет! Я Милана, чем могу помочь?');
+			} else if (text.toLowerCase().includes('/pay')) {
+				this.yuKassaRepository.pay(chatId);
+			} else {
+				await this.bot.sendMessage(chatId, 'Не понимаю');
+			}
+		} catch (e) {
+			await this.bot.sendMessage(chatId, 'Ошибка');
 		}
 	}
 }

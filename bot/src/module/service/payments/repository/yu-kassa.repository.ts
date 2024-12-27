@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { priceList } from 'src/const/const';
@@ -20,40 +20,45 @@ export class YuKassaRepository {
 	}
 
 	async pay(userId: number) {
+		if (!process.env.YOOKASSA_API_KEY)
+			throw new HttpException('Ошибка сервиса оплаты', HttpStatus.UNAUTHORIZED);
+
 		this.bot.removeListener('callback_query');
 		this.bot.removeListener('successful_payment');
 		this.bot.removeListener('pre_checkout_query');
 
 		const paragraphs = [
-			'Стоимость рекламы может меняться в зависимости от сезона и количества подписчиков в каналах',
-			'К примеру реклама в новогоднюю ночь будет дешевле, так как в каналах толком никто не сидит',
-			'Но с 2 января по 7 января она будет, наоборот, дороже, так как люди на каникулах и в отпусках'
+			'Стоимость рекламы может меняться в зависимости от сезона и количества подписчиков в каналах'
 		];
 		const paymentInfoMessage = await this.bot.sendMessage(userId, paragraphs.join('\n\n'));
 		const message1 = await this.bot.sendMessage(userId, `Ты готов к покупке?`, priceList);
 
 		this.bot.on('callback_query', async (msg: TelegramBot.CallbackQuery) => {
-			const data = msg.data;
-			this.bot.deleteMessage(msg.from.id, message1.message_id);
-			await this.bot.sendInvoice(
-				userId,
-				'Покупка coin',
-				'Валюта которая используется для покупки рекламы',
-				'invoice',
-				process.env.YOOKASSA_API_KEY,
-				'RUB',
-				[
+			try {
+				const data = msg.data;
+				this.bot.deleteMessage(msg.from.id, message1.message_id);
+				await this.bot.sendInvoice(
+					userId,
+					'Покупка coin',
+					'Валюта которая используется для покупки рекламы',
+					'invoice',
+					process.env.YOOKASSA_API_KEY,
+					'RUB',
+					[
+						{
+							label: 'RUB',
+							amount: +data
+						}
+					],
 					{
-						label: 'RUB',
-						amount: +data
+						provider_data: {
+							UserId: userId
+						}
 					}
-				],
-				{
-					provider_data: {
-						UserId: userId
-					}
-				}
-			);
+				);
+			} catch (e) {
+				console.error('Ошибка при подтверждении платежа:', e);
+			}
 		});
 
 		this.bot.on('successful_payment', async (msg: TelegramBot.Message) => {

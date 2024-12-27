@@ -43,6 +43,7 @@ export interface IStoreStatePosts {
         currentPage: number,
         postsPerPage: number,
         watched: string,
-        channel: string
+        channel: string,
+        search: string
     }
 }

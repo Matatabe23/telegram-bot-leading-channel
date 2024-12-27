@@ -5,7 +5,15 @@
 				<div v-if="totalCount">Всего постов: {{ totalCount }}</div>
 				<div v-if="lastPublishDate">Крайняя дата публикации: {{ lastPublishDate }}</div>
 			</div>
-			<div class="flex flex-col md:flex-row md:w-1/2 gap-2.5">
+			<div class="flex flex-col md:flex-row md:w-[60vw] gap-2.5">
+				<v-text-field
+					label="Фильтр по айди"
+					variant="outlined"
+					@update:model-value="updateSearch"
+					clearable
+					:loading="appStore.isLoading"
+					:disabled="appStore.isLoading"
+				/>
 				<v-select
 					label="Канал"
 					v-model="form.channel"
@@ -70,6 +78,7 @@
 	import { watchedOptions, perPage } from '@/entities';
 	import { useAppStore } from '@/app/app.store';
 	import { useRoute, useRouter } from 'vue-router';
+	import { useDebounceFn } from '@vueuse/core';
 
 	const settingsStore = useSettings();
 	const { listChannels } = storeToRefs(settingsStore);
@@ -81,8 +90,14 @@
 	const router = useRouter();
 
 	const setPage = (page: number) => {
-		editorStore.setStateValueByKey('form', { ...form.value, currentPage: page === 0 ? 1 : page });
-		router.push({ name: 'publishingPage', query: { ...route.query, page: page === 0 ? 1 : page } });
+		editorStore.setStateValueByKey('form', {
+			...form.value,
+			currentPage: page === 0 ? 1 : page
+		});
+		router.push({
+			name: 'publishingPage',
+			query: { ...route.query, page: page === 0 ? 1 : page }
+		});
 		editorStore.getPosts();
 	};
 
@@ -164,6 +179,32 @@
 		}
 	};
 
+	const updateSearch = useDebounceFn(async (value: string) => {
+		try {
+			appStore.isLoading = true;
+			await editorStore.setStateValueByKey('form', { ...form.value, search: value });
+			await editorStore.getPosts();
+
+			if (editorStore.postsList.length === 0) {
+				await setPage(lastPage.value);
+			}
+		} catch (e) {
+			toast.error(e.response.data.message);
+		} finally {
+			appStore.isLoading = false;
+		}
+	}, 1000);
+
+	const formattedChannels = computed(() => {
+		if (!listChannels.value) return;
+		const channelsArray = listChannels.value.map((channel) => ({
+			title: channel.name,
+			value: channel.id.toString()
+		}));
+
+		return [{ title: 'Нечего', value: '' }, ...channelsArray];
+	});
+
 	onMounted(async () => {
 		const watched = localStorage.getItem('watched') || '';
 		const channel = localStorage.getItem('channel') || '';
@@ -180,15 +221,5 @@
 		if (editorStore.postsList.length === 0) {
 			await setPage(lastPage.value);
 		}
-	});
-
-	const formattedChannels = computed(() => {
-		if (!listChannels.value) return;
-		const channelsArray = listChannels.value.map((channel) => ({
-			title: channel.name,
-			value: channel.id.toString()
-		}));
-
-		return [{ title: 'Нечего', value: '' }, ...channelsArray];
 	});
 </script>
