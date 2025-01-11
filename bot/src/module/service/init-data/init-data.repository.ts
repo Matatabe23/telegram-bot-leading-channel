@@ -2,7 +2,7 @@ import { Users } from 'src/module/db/models/users.repository';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RolesSettings } from 'src/module/db/models/roles-settings.repository';
-import { EPermissions } from 'src/const/const';
+import { EPermissions } from 'src/types/types';
 
 @Injectable()
 export class InitDataRepository implements OnModuleInit {

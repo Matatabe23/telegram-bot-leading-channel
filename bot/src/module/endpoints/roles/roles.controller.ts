@@ -13,7 +13,7 @@ import {
 import { RolesService } from './roles.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
-import { EPermissions } from 'src/const/const';
+import { EPermissions } from 'src/types/types';
 
 @Controller('roles')
 export class RolesController {

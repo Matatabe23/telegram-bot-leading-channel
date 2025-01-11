@@ -15,7 +15,7 @@ import { UsersService } from './users.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { UsersDto } from './dto/user.dto';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
-import { EPermissions } from 'src/const/const';
+import { EPermissions } from 'src/types/types';
 
 @Controller('user')
 export class UsersController {

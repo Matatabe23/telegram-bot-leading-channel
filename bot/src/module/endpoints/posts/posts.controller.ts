@@ -19,7 +19,7 @@ import { PostsService } from './posts.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { IImageBlock } from 'src/types/types';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
-import { EPermissions } from 'src/const/const';
+import { EPermissions } from 'src/types/types';
 import { HelpersRepository } from 'src/module/service/helpers/helpers.repository';
 
 @Controller('posts')

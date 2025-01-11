@@ -16,7 +16,7 @@ import { Response } from 'express';
 import { SettingsService } from './settings.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
-import { EPermissions } from 'src/const/const';
+import { EPermissions } from 'src/types/types';
 
 @Controller('settings')
 export class SettingsController {

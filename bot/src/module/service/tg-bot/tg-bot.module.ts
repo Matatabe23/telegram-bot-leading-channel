@@ -8,10 +8,23 @@ import { WaterMarkModule } from '../water-mark/water-mark.module';
 import { TGBotUsersRepository } from './repository/tg-bot-users.repository';
 import { TGBotService } from './tg-bot.service';
 import { TGBotPostsRepository } from './repository/tg-bot-posts.repository';
+import { TGBotAdvertisementRepository } from './repository/tg-bot-advertisement.repository';
 
 @Module({
 	imports: [ConfigModule, DBModule, S3Module, FileModule, WaterMarkModule],
-	providers: [TGBotService, TGBotRepository, TGBotUsersRepository, TGBotPostsRepository],
-	exports: [TGBotService, TGBotRepository, TGBotUsersRepository, TGBotPostsRepository]
+	providers: [
+		TGBotService,
+		TGBotRepository,
+		TGBotUsersRepository,
+		TGBotPostsRepository,
+		TGBotAdvertisementRepository
+	],
+	exports: [
+		TGBotService,
+		TGBotRepository,
+		TGBotUsersRepository,
+		TGBotPostsRepository,
+		TGBotAdvertisementRepository
+	]
 })
 export class TGBotModule {}

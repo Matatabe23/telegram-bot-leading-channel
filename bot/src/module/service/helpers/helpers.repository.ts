@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { EPermissions } from 'src/const/const';
+import { EPermissions } from 'src/types/types';
 import { Payments } from 'src/module/db/models/payments.repository';
 import { RolesSettings } from 'src/module/db/models/roles-settings.repository';
 

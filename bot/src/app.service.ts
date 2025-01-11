@@ -3,7 +3,8 @@ import { RegularPublicationTime } from './module/db/models/regular-publication-t
 import { Channels } from './module/db/models/channels.repository';
 import { InjectModel } from '@nestjs/sequelize';
 import { RolesSettings } from './module/db/models/roles-settings.repository';
-import { EPermissions, PERMISSIONS_LIST } from './const/const';
+import { PERMISSIONS_LIST } from './const/const';
+import { EPermissions } from 'src/types/types';
 
 @Injectable()
 export class AppService {
