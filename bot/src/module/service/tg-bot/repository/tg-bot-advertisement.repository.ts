@@ -57,6 +57,10 @@ export class TGBotAdvertisementRepository {
 		}, this.timeout);
 
 		const onMessage = async (message: TelegramBot.Message) => {
+			if (!message.text && !message.caption) {
+				return;
+			}
+
 			if (message.text?.startsWith('/')) {
 				clearTimeout(this.currentTimeout);
 				return;
@@ -110,7 +114,6 @@ export class TGBotAdvertisementRepository {
 			return;
 		}
 
-		// Получаем все рекламные сообщения пользователя для текущего чата
 		const advertisements = await this.advertisement.findAll({
 			where: { sourceChatId: chatId, userId: user.id }
 		});
@@ -123,19 +126,22 @@ export class TGBotAdvertisementRepository {
 			return;
 		}
 
-		// Формируем клавиатуру с кнопками для каждого поста
-		const inlineKeyboard = advertisements.map((ad) => ({
-			text: `Пост #${ad.id}`,
-			callback_data: `view_post_${ad.id}` // Уникальный callback для каждого поста
-		}));
+		const inlineKeyboard = [];
+		for (let i = 0; i < advertisements.length; i += 4) {
+			const chunk = advertisements.slice(i, i + 4).map((ad) => ({
+				text: `Пост #${ad.id}`,
+				callback_data: `view_post_${ad.id}`
+			}));
+			inlineKeyboard.push(chunk);
+		}
 
-		await this.bot.sendMessage(chatId, 'Выберите пост для пересылки:', {
+		const sentMessage = await this.bot.sendMessage(chatId, 'Выберите пост для просмотра:', {
 			reply_markup: {
-				inline_keyboard: [inlineKeyboard] // Кнопки для каждого поста
+				inline_keyboard: inlineKeyboard
 			}
 		});
 
-		this.bot.on('callback_query', async (query) => {
+		const callbackHandler = async (query: TelegramBot.CallbackQuery) => {
 			if (query.message?.chat.id === chatId) {
 				const postId = query.data?.split('_')[2];
 				if (postId) {
@@ -151,7 +157,12 @@ export class TGBotAdvertisementRepository {
 						);
 					}
 				}
+				await this.bot.deleteMessage(chatId, sentMessage.message_id);
+
+				this.bot.removeListener('callback_query', callbackHandler);
 			}
-		});
+		};
+
+		this.bot.on('callback_query', callbackHandler);
 	}
 }
