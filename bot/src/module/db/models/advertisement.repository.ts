@@ -1,6 +1,6 @@
-import { Column, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript';
+import { Column, ForeignKey, Model, Table, BelongsTo, DataType } from 'sequelize-typescript';
 import { Users } from './users.repository';
-import { EAdvertisementStatus, ETypePostsAdvertisement } from 'src/types/types';
+import { EAdvertisementStatus } from 'src/types/types';
 
 @Table
 export class Advertisement extends Model {
@@ -20,12 +20,10 @@ export class Advertisement extends Model {
 	moderationStatus: string;
 	defaultValue = EAdvertisementStatus.CREATED;
 
-	@Column({ type: 'json' })
-	schedule: {
-		type: ETypePostsAdvertisement;
-		times: string[];
-		channel: number;
-	};
+	@Column({
+		type: DataType.TEXT
+	})
+	schedule: string;
 
 	@ForeignKey(() => Users)
 	@Column

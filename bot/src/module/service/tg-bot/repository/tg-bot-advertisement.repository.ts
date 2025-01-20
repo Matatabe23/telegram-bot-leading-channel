@@ -4,7 +4,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { Users } from 'src/module/db/models/users.repository';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { Advertisement } from 'src/module/db/models/advertisement.repository';
-import { EAdvertisementStatus, ISettingChannels } from 'src/types/types';
+import { EAdvertisementStatus, ETypePostsAdvertisement, ISettingChannels } from 'src/types/types';
 import { advertisementStatus } from 'src/const/const';
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { HelpersRepository } from '../../helpers/helpers.repository';
@@ -31,11 +31,14 @@ export class TGBotAdvertisementRepository {
 		this.bot = this.tgBotService.getBot();
 	}
 
+	private activeListeners = new Map<number, (...args: any[]) => void>();
+	private activeCallbackListeners = new Map<number, (query: TelegramBot.CallbackQuery) => void>();
+
 	public async addAdvertisement(msg: TelegramBot.Message) {
 		const user = await this.users.findOne({ where: { telegramId: msg.from?.id } });
 		const chatId = msg.chat.id;
 
-		if (!user.isTeamMember) {
+		if (!user?.isTeamMember) {
 			const count = await this.advertisement.count({
 				where: {
 					sourceChatId: chatId,
@@ -45,76 +48,65 @@ export class TGBotAdvertisementRepository {
 
 			if (count >= 5) {
 				await this.bot.sendMessage(
-					msg.chat.id,
+					chatId,
 					'Одному пользователю положено иметь только 5 постов'
 				);
 				return;
 			}
 		}
 
-		if (this.currentTimeout) {
-			clearTimeout(this.currentTimeout);
+		if (this.activeListeners.has(chatId)) {
+			const previousListener = this.activeListeners.get(chatId);
+			this.bot.removeListener('message', previousListener!);
+			this.activeListeners.delete(chatId);
 		}
 
-		await this.bot.sendMessage(
-			msg.chat.id,
-			'Пожалуйста, отправьте рекламу в течение 1 минуты.'
-		);
+		await this.bot.sendMessage(chatId, 'Пожалуйста, отправьте рекламу в течение 1 минуты.');
 
-		this.currentTimeout = setTimeout(async () => {
-			await this.bot.sendMessage(msg.chat.id, 'Время истекло. Реклама не была получена.');
+		const timeoutId = setTimeout(async () => {
+			await this.bot.sendMessage(chatId, 'Время истекло. Реклама не была получена.');
+			if (this.activeListeners.has(chatId)) {
+				const listener = this.activeListeners.get(chatId);
+				this.bot.removeListener('message', listener!);
+				this.activeListeners.delete(chatId);
+			}
 		}, this.timeout);
 
 		const onMessage = async (message: TelegramBot.Message) => {
+			if (message.chat.id !== chatId) return;
+
 			if (!message.text && !message.caption) {
 				return;
 			}
 
 			if (message.text?.startsWith('/')) {
-				clearTimeout(this.currentTimeout);
+				clearTimeout(timeoutId);
+				this.bot.removeListener('message', onMessage);
+				this.activeListeners.delete(chatId);
 				return;
 			}
 
+			const sentMessage = await this.bot.copyMessage(chatId, chatId, message.message_id);
+
 			await this.advertisement.create({
-				sourceChatId: msg.chat.id,
-				messageId: message.message_id,
+				sourceChatId: chatId,
+				messageId: sentMessage.message_id,
 				userId: user?.id,
 				moderationStatus: EAdvertisementStatus.CREATED
 			});
 
-			await this.bot.sendMessage(
-				msg.chat.id,
-				`Реклама получена и сохранена. \n\nНЕ УДАЛЯЙТЕ И НЕ ИЗМЕНЯЙТЕ СООБЩЕНИЕ! ИНАЧЕ РЕКЛАМА НЕ СРАБОТАЕТ`,
-				{
-					reply_to_message_id: message.message_id
-				}
-			);
+			await this.bot.sendMessage(chatId, 'Реклама получена и сохранена.', {
+				reply_to_message_id: sentMessage.message_id
+			});
 
-			clearTimeout(this.currentTimeout);
-
+			clearTimeout(timeoutId);
 			this.bot.removeListener('message', onMessage);
+			this.activeListeners.delete(chatId);
 		};
 
+		this.activeListeners.set(chatId, onMessage);
+
 		this.bot.on('message', onMessage);
-	}
-
-	// Функция проверки и изменения статуса рекламы
-	public async checkEditAdvertisement(msg: TelegramBot.Message) {
-		const chatId = msg.chat.id;
-		const messageId = msg.message_id;
-
-		const advertisement = await this.getAdvertisementByChatIdAndMessageId(chatId, messageId);
-
-		if (!advertisement) {
-			await this.bot.sendMessage(chatId, 'Реклама не найдена.');
-			return;
-		}
-
-		await this.updateAdvertisementStatus(advertisement, EAdvertisementStatus.DRAFT);
-
-		await this.bot.sendMessage(chatId, 'Вы изменили рекламу, её статус верификации сброшен', {
-			reply_to_message_id: messageId
-		});
 	}
 
 	// Получение списка рекламных постов пользователя
@@ -143,22 +135,24 @@ export class TGBotAdvertisementRepository {
 			reply_markup: { inline_keyboard: inlineKeyboard }
 		});
 
-		this.bot.removeAllListeners('callback_query');
+		// Удаляем предыдущий обработчик для этого чата, если он существует
+		if (this.activeCallbackListeners.has(chatId)) {
+			const previousListener = this.activeCallbackListeners.get(chatId);
+			this.bot.removeListener('callback_query', previousListener!);
+			this.activeCallbackListeners.delete(chatId);
+		}
 
-		this.bot.on('callback_query', (query) => this.handleCallbackQuery(query, chatId));
-	}
+		// Создаем новый обработчик для этого чата
+		const onCallbackQuery = (query: TelegramBot.CallbackQuery) => {
+			if (query.message?.chat.id !== chatId) return; // Игнорируем события из других чатов
+			this.handleCallbackQuery(query, chatId);
+		};
 
-	// Получение рекламы по chatId и messageId
-	private async getAdvertisementByChatIdAndMessageId(chatId: number, messageId: number) {
-		return this.advertisement.findOne({
-			where: { sourceChatId: chatId, messageId: messageId }
-		});
-	}
+		// Сохраняем обработчик в Map
+		this.activeCallbackListeners.set(chatId, onCallbackQuery);
 
-	// Обновление статуса рекламы
-	private async updateAdvertisementStatus(advertisement: any, status: EAdvertisementStatus) {
-		advertisement.moderationStatus = status;
-		await advertisement.save();
+		// Добавляем обработчик
+		this.bot.on('callback_query', onCallbackQuery);
 	}
 
 	// Получение пользователя по Telegram ID
@@ -354,6 +348,30 @@ export class TGBotAdvertisementRepository {
 		channel: string,
 		time: string
 	) {
-		console.log(chatId, postId, channel, time);
+		const advertisement = await this.advertisement.findOne({
+			where: { id: postId }
+		});
+
+		let schedule: { type: ETypePostsAdvertisement; times: string[]; channel: string }[] = [];
+
+		// Проверяем, если это строка, парсим в массив
+		if (typeof advertisement.schedule === 'string') {
+			schedule = JSON.parse(advertisement.schedule) || [];
+		} else {
+			schedule = advertisement.schedule; // Если это уже массив, просто присваиваем
+		}
+
+		const block: { type: ETypePostsAdvertisement; times: string[]; channel: string } = {
+			type: ETypePostsAdvertisement.SOLO,
+			times: [time],
+			channel: channel
+		};
+
+		schedule.push(block); // Теперь это гарантированно массив
+
+		advertisement.schedule = JSON.stringify(schedule);
+
+		await advertisement.save();
+		await this.bot.sendMessage(chatId, `Пост #${advertisement.id} успешно настроен.`);
 	}
 }

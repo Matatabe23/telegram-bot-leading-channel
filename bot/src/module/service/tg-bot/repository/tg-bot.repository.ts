@@ -38,10 +38,6 @@ export class TGBotRepository {
 				this.logger.error('Ошибка при обработке сообщения:', error);
 			}
 		});
-
-		this.bot.on('edited_message', async (msg) => {
-			await this.tGBotAdvertisementRepository.checkEditAdvertisement(msg);
-		});
 	}
 
 	private async handleTextMessage(msg: TelegramBot) {

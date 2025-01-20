@@ -56,7 +56,14 @@ export class HelpersRepository {
 	async getUnavailableTimes(daysCount: number, channel: string): Promise<string[]> {
 		const advertisements = await this.advertisement.findAll();
 
-		const advertisementTimes = advertisements.flatMap((ad) => ad.schedule?.times) || [];
+		const advertisementTimes = advertisements.flatMap((ad) => {
+			const scheduleArray = Array.isArray(ad.schedule)
+				? ad.schedule
+				: JSON.parse(ad.schedule) || [];
+
+			// Извлекаем все значения times и возвращаем их как плоский массив
+			return scheduleArray.flatMap((item) => item.times);
+		});
 
 		const regularTimes = await this.regularPublicationTime.findAll({
 			attributes: ['hour', 'minute'],
@@ -111,8 +118,6 @@ export class HelpersRepository {
 			const date = new Date(moscowNow);
 			date.setDate(moscowNow.getDate() + day);
 			const formattedDate = date.toISOString().slice(0, 10);
-
-			console.log(date);
 
 			for (let hour = 0; hour < 24; hour++) {
 				date.setUTCHours(hour, 0, 0, 0);
