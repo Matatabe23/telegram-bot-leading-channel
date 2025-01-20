@@ -9,9 +9,10 @@ import { TGBotUsersRepository } from './repository/tg-bot-users.repository';
 import { TGBotService } from './tg-bot.service';
 import { TGBotPostsRepository } from './repository/tg-bot-posts.repository';
 import { TGBotAdvertisementRepository } from './repository/tg-bot-advertisement.repository';
+import { HelpersModule } from '../helpers/helpers.module';
 
 @Module({
-	imports: [ConfigModule, DBModule, S3Module, FileModule, WaterMarkModule],
+	imports: [ConfigModule, DBModule, S3Module, FileModule, WaterMarkModule, HelpersModule],
 	providers: [
 		TGBotService,
 		TGBotRepository,

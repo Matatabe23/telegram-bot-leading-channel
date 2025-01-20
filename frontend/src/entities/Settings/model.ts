@@ -38,6 +38,7 @@ export interface IStateRoles {
 
 export enum IEditChannelType {
     PRIVATED = 'privated',
+    ADVERTISEMENT = 'advertisement'
 }
 export interface IGetListRegularPublicationTimes {
     id: number,

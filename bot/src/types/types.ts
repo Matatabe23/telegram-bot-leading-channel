@@ -34,3 +34,8 @@ export enum EPermissions {
 
 	SET_PUBLICATION_TIME = 'set_publication_time' // Редактировать время публикации
 }
+
+export enum ISettingChannels {
+	PRIVATED = 'privated',
+	ADVERTISEMENT = 'advertisement'
+}

@@ -1,6 +1,5 @@
 import { Column, ForeignKey, Model, Table, BelongsTo } from 'sequelize-typescript';
 import { Users } from './users.repository';
-import { Channels } from './channels.repository';
 import { EAdvertisementStatus, ETypePostsAdvertisement } from 'src/types/types';
 
 @Table
@@ -25,6 +24,7 @@ export class Advertisement extends Model {
 	schedule: {
 		type: ETypePostsAdvertisement;
 		times: string[];
+		channel: number;
 	};
 
 	@ForeignKey(() => Users)
@@ -33,11 +33,4 @@ export class Advertisement extends Model {
 
 	@BelongsTo(() => Users)
 	user: Users;
-
-	@ForeignKey(() => Channels)
-	@Column
-	channelIds: number;
-
-	@BelongsTo(() => Channels)
-	channel: Channels;
 }
