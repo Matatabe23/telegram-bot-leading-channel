@@ -5,7 +5,7 @@ import { Users } from 'src/module/db/models/users.repository';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { Advertisement } from 'src/module/db/models/advertisement.repository';
 import { EAdvertisementStatus, ETypePostsAdvertisement, ISettingChannels } from 'src/types/types';
-import { advertisementStatus } from 'src/const/const';
+import { advertisementStatus, buttonText } from 'src/const/const';
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { HelpersRepository } from '../../helpers/helpers.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
@@ -31,8 +31,7 @@ export class TGBotAdvertisementRepository {
 		this.bot = this.tgBotService.getBot();
 	}
 
-	private activeListeners = new Map<number, (...args: any[]) => void>();
-	private activeCallbackListeners = new Map<number, (query: TelegramBot.CallbackQuery) => void>();
+	private activeChatHandlers: Set<number> = new Set();
 
 	public async addAdvertisement(msg: TelegramBot.Message) {
 		const user = await this.users.findOne({ where: { telegramId: msg.from?.id } });
@@ -55,21 +54,10 @@ export class TGBotAdvertisementRepository {
 			}
 		}
 
-		if (this.activeListeners.has(chatId)) {
-			const previousListener = this.activeListeners.get(chatId);
-			this.bot.removeListener('message', previousListener!);
-			this.activeListeners.delete(chatId);
-		}
-
 		await this.bot.sendMessage(chatId, 'Пожалуйста, отправьте рекламу в течение 1 минуты.');
 
 		const timeoutId = setTimeout(async () => {
 			await this.bot.sendMessage(chatId, 'Время истекло. Реклама не была получена.');
-			if (this.activeListeners.has(chatId)) {
-				const listener = this.activeListeners.get(chatId);
-				this.bot.removeListener('message', listener!);
-				this.activeListeners.delete(chatId);
-			}
 		}, this.timeout);
 
 		const onMessage = async (message: TelegramBot.Message) => {
@@ -79,10 +67,12 @@ export class TGBotAdvertisementRepository {
 				return;
 			}
 
-			if (message.text?.startsWith('/')) {
+			if (
+				message.text?.startsWith(buttonText.addAdvertisements) ||
+				message.text?.startsWith('/')
+			) {
 				clearTimeout(timeoutId);
 				this.bot.removeListener('message', onMessage);
-				this.activeListeners.delete(chatId);
 				return;
 			}
 
@@ -101,16 +91,13 @@ export class TGBotAdvertisementRepository {
 
 			clearTimeout(timeoutId);
 			this.bot.removeListener('message', onMessage);
-			this.activeListeners.delete(chatId);
 		};
-
-		this.activeListeners.set(chatId, onMessage);
 
 		this.bot.on('message', onMessage);
 	}
 
 	// Получение списка рекламных постов пользователя
-	public async getMyListAdvertisement(msg: TelegramBot.Message) {
+	public async viewAdvertisements(msg: TelegramBot.Message) {
 		const chatId = msg.chat.id;
 		const user = await this.getUserByTelegramId(msg.from?.id);
 
@@ -135,24 +122,19 @@ export class TGBotAdvertisementRepository {
 			reply_markup: { inline_keyboard: inlineKeyboard }
 		});
 
-		// Удаляем предыдущий обработчик для этого чата, если он существует
-		if (this.activeCallbackListeners.has(chatId)) {
-			const previousListener = this.activeCallbackListeners.get(chatId);
-			this.bot.removeListener('callback_query', previousListener!);
-			this.activeCallbackListeners.delete(chatId);
+		if (!this.activeChatHandlers.has(chatId)) {
+			const onCallbackQuery = (query: TelegramBot.CallbackQuery) => {
+				this.handleCallbackQuery(query, chatId);
+			};
+
+			this.bot.on('callback_query', onCallbackQuery);
+
+			this.activeChatHandlers.add(chatId);
+
+			setTimeout(() => {
+				this.activeChatHandlers.delete(chatId);
+			}, 600000);
 		}
-
-		// Создаем новый обработчик для этого чата
-		const onCallbackQuery = (query: TelegramBot.CallbackQuery) => {
-			if (query.message?.chat.id !== chatId) return; // Игнорируем события из других чатов
-			this.handleCallbackQuery(query, chatId);
-		};
-
-		// Сохраняем обработчик в Map
-		this.activeCallbackListeners.set(chatId, onCallbackQuery);
-
-		// Добавляем обработчик
-		this.bot.on('callback_query', onCallbackQuery);
 	}
 
 	// Получение пользователя по Telegram ID
@@ -194,8 +176,8 @@ export class TGBotAdvertisementRepository {
 		if (query.message?.chat.id !== chatId) return;
 
 		const data = query.data?.split('_');
-		const action = data?.[0]; // Действие: view, delete или moderate
-		const postId = data?.[2]; // ID поста
+		const action = data?.[0];
+		const postId = data?.[2];
 		const channel = data?.[4];
 		const time = data?.[6];
 
@@ -226,6 +208,9 @@ export class TGBotAdvertisementRepository {
 				break;
 			case 'selectTime':
 				await this.handleSelectTimeSelection(chatId, postId, channel, time);
+				break;
+			case 'clearTime':
+				await this.handleClearTimeAction(chatId, advertisement);
 		}
 
 		this.bot.answerCallbackQuery(query.id);
@@ -239,9 +224,18 @@ export class TGBotAdvertisementRepository {
 			advertisement.messageId
 		);
 
+		const channel = await this.channels.findAll();
+		const publicationTimes = await Promise.all(
+			JSON.parse(advertisement?.schedule)?.map(async (item) => {
+				const matchedChannel = channel.find((chan) => item.channel === chan.chatId);
+				return `(${item.times} - ${matchedChannel?.name || 'Неизвестный канал'})`;
+			}) || []
+		);
+
 		const textButton = [
 			`id: Пост #${advertisement.id}`,
 			`Статус: ${advertisementStatus.find((item) => item.value === advertisement.moderationStatus).title}`,
+			publicationTimes.length > 0 ? publicationTimes.join(', ') : null,
 			'',
 			'Выберите действие:'
 		];
@@ -253,13 +247,21 @@ export class TGBotAdvertisementRepository {
 					text: 'Отправить на модерацию',
 					callback_data: `moderate_post_${advertisement.id}`
 				}
-			].filter(Boolean)
+			].filter(Boolean),
+			[]
 		];
 
 		if (advertisement.moderationStatus === EAdvertisementStatus.APPROVED) {
 			inline_keyboard[0].push({
 				text: 'Выбрать время публикации',
 				callback_data: `channel_post_${advertisement.id}`
+			});
+		}
+
+		if (advertisement.schedule?.length > 0) {
+			inline_keyboard[1].push({
+				text: 'Очистить время публикации',
+				callback_data: `clearTime_post_${advertisement.id}`
 			});
 		}
 
@@ -322,21 +324,18 @@ export class TGBotAdvertisementRepository {
 			howDays,
 			unavailableTimes
 		);
-		console.log(availableTimes);
 
 		if (availableTimes.length === 0) {
 			await this.bot.sendMessage(chatId, 'Нет доступного времени для публикации.');
 			return;
 		}
 
-		// Формирование кнопок для выбора времени
 		const inlineKeyboard = this.helpersRepository.createInlineKeyboard(
 			availableTimes.map((item) => ({ text: item, data: item })),
 			3,
 			`selectTime_post_${advertisement.id}_channel_${channel}_time`
 		);
 
-		// Отправка сообщения с кнопками
 		await this.bot.sendMessage(chatId, 'Выберите время публикации:', {
 			reply_markup: { inline_keyboard: inlineKeyboard }
 		});
@@ -352,26 +351,38 @@ export class TGBotAdvertisementRepository {
 			where: { id: postId }
 		});
 
-		let schedule: { type: ETypePostsAdvertisement; times: string[]; channel: string }[] = [];
+		let schedule: { type: ETypePostsAdvertisement; times: string; channel: string }[] = [];
 
-		// Проверяем, если это строка, парсим в массив
 		if (typeof advertisement.schedule === 'string') {
 			schedule = JSON.parse(advertisement.schedule) || [];
 		} else {
-			schedule = advertisement.schedule; // Если это уже массив, просто присваиваем
+			schedule = advertisement.schedule || [];
 		}
 
-		const block: { type: ETypePostsAdvertisement; times: string[]; channel: string } = {
+		const block: { type: ETypePostsAdvertisement; times: string; channel: string } = {
 			type: ETypePostsAdvertisement.SOLO,
-			times: [time],
+			times: time,
 			channel: channel
 		};
 
-		schedule.push(block); // Теперь это гарантированно массив
+		schedule.push(block);
 
 		advertisement.schedule = JSON.stringify(schedule);
 
 		await advertisement.save();
 		await this.bot.sendMessage(chatId, `Пост #${advertisement.id} успешно настроен.`);
+	}
+
+	private async handleClearTimeAction(chatId: number, advertisement: Advertisement) {
+		const selectAdvertisement = await this.advertisement.findOne({
+			where: { id: advertisement.id }
+		});
+		selectAdvertisement.schedule = null;
+		selectAdvertisement.save();
+		await this.bot.sendMessage(chatId, 'Время успешно очищенно');
+	}
+
+	async publishAdvertisementFromChannel(advertisement: Advertisement) {
+		console.log(advertisement);
 	}
 }

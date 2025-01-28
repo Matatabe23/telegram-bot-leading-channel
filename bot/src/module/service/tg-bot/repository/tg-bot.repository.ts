@@ -4,7 +4,7 @@ import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { TGBotUsersRepository } from './tg-bot-users.repository';
 import { YuKassaRepository } from '../../payments/repository/yu-kassa.repository';
 import { TGBotAdvertisementRepository } from './tg-bot-advertisement.repository';
-import { instructions } from 'src/const/const';
+import { buttonText } from 'src/const/const';
 
 @Injectable()
 export class TGBotRepository {
@@ -22,39 +22,38 @@ export class TGBotRepository {
 	}
 
 	private initializeMessageHandlers() {
-		this.bot.on('message', async (msg: TelegramBot) => {
+		this.bot.on('message', async (msg) => {
 			const chatId = msg.chat.id;
 			const text = msg.text;
+			const session = this.tgBotService.getSession(chatId);
 
 			this.logger.log(`Получено сообщение из чата ${chatId}: ${text}`);
 
 			try {
 				await this.tGBotUsersRepository.ensureUserExists(msg.from.id, msg.from.username);
 
-				if (text) {
-					await this.handleTextMessage(msg);
+				switch (text) {
+					case buttonText.pay:
+						session.step = 'pay';
+						await this.yuKassaRepository.pay(chatId);
+						break;
+
+					case buttonText.addAdvertisements:
+						session.step = 'addAdvertisements';
+						await this.tGBotAdvertisementRepository.addAdvertisement(msg);
+						break;
+
+					case '🗂 Мои объявления':
+						session.step = buttonText.viewAdvertisements;
+						await this.tGBotAdvertisementRepository.viewAdvertisements(msg);
+						break;
 				}
+
+				this.tgBotService.setSession(chatId, session);
 			} catch (error) {
 				this.logger.error('Ошибка при обработке сообщения:', error);
+				await this.bot.sendMessage(chatId, 'Произошла ошибка. Попробуйте ещё раз.');
 			}
 		});
-	}
-
-	private async handleTextMessage(msg: TelegramBot) {
-		const chatId = msg.chat.id;
-		const text = msg.text;
-		try {
-			if (text.toLowerCase().includes('/start'.toLowerCase())) {
-				await this.bot.sendMessage(chatId, instructions.join('\n'));
-			} else if (text.toLowerCase().includes('/pay'.toLowerCase())) {
-				this.yuKassaRepository.pay(chatId);
-			} else if (text.toLowerCase().includes('/addAdvertisement'.toLowerCase())) {
-				this.tGBotAdvertisementRepository.addAdvertisement(msg);
-			} else if (text.toLowerCase().includes('/getMyListAdvertisement'.toLowerCase())) {
-				this.tGBotAdvertisementRepository.getMyListAdvertisement(msg);
-			}
-		} catch (e) {
-			await this.bot.sendMessage(chatId, 'Ошибка');
-		}
 	}
 }

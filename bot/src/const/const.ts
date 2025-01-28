@@ -69,3 +69,9 @@ export const advertisementStatus = [
 	{ value: EAdvertisementStatus.PUBLISHED, title: 'Опубликовано' },
 	{ value: EAdvertisementStatus.DRAFT, title: 'Черновик' }
 ];
+
+export const buttonText = {
+	pay: '🏦 Оплатить',
+	addAdvertisements: '📌 Добавить объявление',
+	viewAdvertisements: '🗂 Мои объявления'
+};

@@ -14,9 +14,6 @@ export class Advertisement extends Model {
 	messageId: number;
 
 	@Column
-	publicationTime: Date;
-
-	@Column
 	moderationStatus: string;
 	defaultValue = EAdvertisementStatus.CREATED;
 

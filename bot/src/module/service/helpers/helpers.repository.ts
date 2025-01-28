@@ -62,7 +62,7 @@ export class HelpersRepository {
 				: JSON.parse(ad.schedule) || [];
 
 			// Извлекаем все значения times и возвращаем их как плоский массив
-			return scheduleArray.flatMap((item) => item.times);
+			return scheduleArray.times;
 		});
 
 		const regularTimes = await this.regularPublicationTime.findAll({
