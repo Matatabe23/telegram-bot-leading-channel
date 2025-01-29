@@ -34,8 +34,9 @@ export class TGBotRepository {
 
 				switch (text) {
 					case buttonText.pay:
-						session.step = 'pay';
-						await this.yuKassaRepository.pay(chatId);
+						this.bot.sendMessage(chatId, 'Данная функция пока не доступна');
+						// session.step = 'pay';
+						// await this.yuKassaRepository.pay(chatId);
 						break;
 
 					case buttonText.addAdvertisements:

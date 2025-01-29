@@ -5,10 +5,10 @@ import { Users } from 'src/module/db/models/users.repository';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { Advertisement } from 'src/module/db/models/advertisement.repository';
 import { EAdvertisementStatus, ETypePostsAdvertisement, ISettingChannels } from 'src/types/types';
-import { advertisementStatus, buttonText } from 'src/const/const';
-import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
+import { advertisementStatus, buttonText, priceAdvertising } from 'src/const/const';
 import { HelpersRepository } from '../../helpers/helpers.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class TGBotAdvertisementRepository {
@@ -24,9 +24,7 @@ export class TGBotAdvertisementRepository {
 		@InjectModel(Advertisement)
 		private readonly advertisement: typeof Advertisement,
 		@InjectModel(Channels)
-		private readonly channels: typeof Channels,
-		@InjectModel(RegularPublicationTime)
-		private readonly regularPublicationTime: typeof RegularPublicationTime
+		private readonly channels: typeof Channels
 	) {
 		this.bot = this.tgBotService.getBot();
 	}
@@ -144,8 +142,13 @@ export class TGBotAdvertisementRepository {
 
 	// Получение активных рекламных постов
 	private async getActiveAdvertisements(chatId: number, userId: number) {
-		const res = await this.advertisement.findAll({ where: { sourceChatId: chatId, userId } });
-		return res.filter((item) => item.moderationStatus !== EAdvertisementStatus.ARCHIVED);
+		return this.advertisement.findAll({
+			where: {
+				sourceChatId: chatId,
+				userId,
+				moderationStatus: { [Op.not]: EAdvertisementStatus.ARCHIVED }
+			}
+		});
 	}
 
 	// Создание клавиатуры с рекламными постами
@@ -350,6 +353,39 @@ export class TGBotAdvertisementRepository {
 		const advertisement = await this.advertisement.findOne({
 			where: { id: postId }
 		});
+
+		const user = await this.users.findOne({ where: { telegramId: chatId } });
+
+		if (user.coin >= priceAdvertising) {
+			const adListUser = await this.advertisement.findAll({
+				where: {
+					sourceChatId: chatId,
+					moderationStatus: { [Op.not]: EAdvertisementStatus.ARCHIVED }
+				}
+			});
+
+			let total = 0;
+
+			adListUser.forEach((ad) => {
+				if (ad.dataValues.schedule) {
+					const scheduleArray = JSON.parse(ad.dataValues.schedule);
+					scheduleArray.forEach((entry) => {
+						if (entry.type !== ETypePostsAdvertisement.RANDOM) {
+							total++;
+						}
+					});
+				}
+			});
+
+			const totalSum = total * priceAdvertising + priceAdvertising;
+			if (totalSum > user.coin) {
+				await this.bot.sendMessage(chatId, `На вашем балансе не достаточно coin.`);
+				return;
+			}
+		} else {
+			await this.bot.sendMessage(chatId, `На вашем балансе не достаточно coin.`);
+			return;
+		}
 
 		let schedule: { type: ETypePostsAdvertisement; times: string; channel: string }[] = [];
 

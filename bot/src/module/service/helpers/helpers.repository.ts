@@ -61,8 +61,7 @@ export class HelpersRepository {
 				? ad.schedule
 				: JSON.parse(ad.schedule) || [];
 
-			// Извлекаем все значения times и возвращаем их как плоский массив
-			return scheduleArray.times;
+			return scheduleArray.map((item) => (item.channel === channel ? item.times : undefined));
 		});
 
 		const regularTimes = await this.regularPublicationTime.findAll({

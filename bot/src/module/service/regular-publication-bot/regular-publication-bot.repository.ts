@@ -103,7 +103,6 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 		this.adJobs.forEach((job) => schedule.cancelJob(job));
 		this.adJobs = [];
 
-		console.log(scheduleTimes);
 		scheduleTimes.forEach((item) => {
 			const job = schedule.scheduleJob(item.time, () => {
 				this.tGBotAdvertisementRepository.publishAdvertisementFromChannel(

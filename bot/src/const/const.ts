@@ -75,3 +75,5 @@ export const buttonText = {
 	addAdvertisements: '📌 Добавить объявление',
 	viewAdvertisements: '🗂 Мои объявления'
 };
+
+export const priceAdvertising = 50;
