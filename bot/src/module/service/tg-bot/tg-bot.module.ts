@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TGBotRepository } from './repository/tg-bot.repository';
 import { DBModule } from 'src/module/db/db.module';
@@ -10,9 +10,18 @@ import { TGBotService } from './tg-bot.service';
 import { TGBotPostsRepository } from './repository/tg-bot-posts.repository';
 import { TGBotAdvertisementRepository } from './repository/tg-bot-advertisement.repository';
 import { HelpersModule } from '../helpers/helpers.module';
+import { RegularPublicationBotModule } from 'src/module/service/regular-publication-bot/regular-publication-bot.module';
 
 @Module({
-	imports: [ConfigModule, DBModule, S3Module, FileModule, WaterMarkModule, HelpersModule],
+	imports: [
+		ConfigModule,
+		DBModule,
+		S3Module,
+		FileModule,
+		WaterMarkModule,
+		HelpersModule,
+		forwardRef(() => RegularPublicationBotModule)
+	],
 	providers: [
 		TGBotService,
 		TGBotRepository,

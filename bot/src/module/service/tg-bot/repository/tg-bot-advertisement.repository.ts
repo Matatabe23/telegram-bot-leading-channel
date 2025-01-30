@@ -9,6 +9,7 @@ import { advertisementStatus, buttonText, priceAdvertising } from 'src/const/con
 import { HelpersRepository } from '../../helpers/helpers.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
 import { Op } from 'sequelize';
+import { RegularPublicationBotRepository } from '../../regular-publication-bot/regular-publication-bot.repository';
 
 @Injectable()
 export class TGBotAdvertisementRepository {
@@ -19,6 +20,7 @@ export class TGBotAdvertisementRepository {
 	constructor(
 		private readonly tgBotService: TGBotService,
 		private readonly helpersRepository: HelpersRepository,
+		private readonly regularPublicationBotRepository: RegularPublicationBotRepository,
 		@InjectModel(Users)
 		private readonly users: typeof Users,
 		@InjectModel(Advertisement)
@@ -279,6 +281,7 @@ export class TGBotAdvertisementRepository {
 		advertisement.moderationStatus = EAdvertisementStatus.ARCHIVED;
 		await advertisement.save();
 		await this.bot.sendMessage(chatId, `Пост #${advertisement.id} был удалён.`);
+		await this.regularPublicationBotRepository.scheduleAdExecution();
 	}
 
 	// Обработка действия "Модерация"
@@ -407,6 +410,7 @@ export class TGBotAdvertisementRepository {
 
 		await advertisement.save();
 		await this.bot.sendMessage(chatId, `Пост #${advertisement.id} успешно настроен.`);
+		await this.regularPublicationBotRepository.scheduleAdExecution();
 	}
 
 	private async handleClearTimeAction(chatId: number, advertisement: Advertisement) {
@@ -416,9 +420,21 @@ export class TGBotAdvertisementRepository {
 		selectAdvertisement.schedule = null;
 		selectAdvertisement.save();
 		await this.bot.sendMessage(chatId, 'Время успешно очищенно');
+		await this.regularPublicationBotRepository.scheduleAdExecution();
 	}
 
-	async publishAdvertisementFromChannel(advertisement: Advertisement) {
-		console.log(advertisement);
+	async publishAdvertisementFromChannel(advertisement: any) {
+		if (advertisement.moderationStatus !== EAdvertisementStatus.APPROVED) return;
+
+		const user = await this.users.findOne({ where: { id: advertisement.userId } });
+
+		user.coin -= priceAdvertising;
+		await user.save();
+
+		await this.bot.copyMessage(
+			advertisement.schedule.channel,
+			advertisement.sourceChatId,
+			advertisement.messageId
+		);
 	}
 }

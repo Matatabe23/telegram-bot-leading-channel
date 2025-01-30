@@ -1,5 +1,5 @@
 import { Advertisement } from './../../db/models/advertisement.repository';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as moment from 'moment-timezone';
 import * as schedule from 'node-schedule';
@@ -7,9 +7,8 @@ import { RegularPublicationTime } from 'src/module/db/models/regular-publication
 import { Channels } from 'src/module/db/models/channels.repository';
 import { TGBotPostsRepository } from '../tg-bot/repository/tg-bot-posts.repository';
 import { Op } from 'sequelize';
-import { EAdvertisementStatus } from 'src/types/types';
+import { EAdvertisementStatus, ETypePostsAdvertisement } from 'src/types/types';
 import { TGBotAdvertisementRepository } from '../tg-bot/repository/tg-bot-advertisement.repository';
-import { Users } from 'src/module/db/models/users.repository';
 
 @Injectable()
 export class RegularPublicationBotRepository implements OnModuleInit {
@@ -21,9 +20,9 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 		private readonly regularPublicationTime: typeof RegularPublicationTime,
 		@InjectModel(Advertisement)
 		private readonly advertisement: typeof Advertisement,
-		@InjectModel(Users)
-		private readonly users: typeof Users,
+		@Inject(forwardRef(() => TGBotPostsRepository))
 		private readonly tGBotPostsRepository: TGBotPostsRepository,
+		@Inject(forwardRef(() => TGBotAdvertisementRepository))
 		private readonly tGBotAdvertisementRepository: TGBotAdvertisementRepository
 	) {}
 
@@ -31,11 +30,17 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 		moment.tz.setDefault('Europe/Moscow');
 		await this.scheduleFunctionExecution();
 		await this.scheduleAdExecution();
+		await this.scheduleWeeklyExecution();
 
 		schedule.scheduleJob('0 0 * * *', async () => {
 			moment.tz.setDefault('Europe/Moscow');
 			await this.scheduleFunctionExecution();
 			await this.scheduleAdExecution();
+		});
+
+		schedule.scheduleJob('0 0 * * 0', async () => {
+			moment.tz.setDefault('Europe/Moscow');
+			await this.scheduleWeeklyExecution();
 		});
 	}
 
@@ -66,7 +71,7 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 
 	//Публикация рекламы
 	async scheduleAdExecution() {
-		const advertisements = await this.getTodayAdvertisements();
+		const advertisements = await this.getAdvertisements('daily');
 
 		const scheduleTimes = advertisements
 			.flatMap((ad) => {
@@ -104,6 +109,7 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 		this.adJobs = [];
 
 		scheduleTimes.forEach((item) => {
+			console.log(item);
 			const job = schedule.scheduleJob(item.time, () => {
 				this.tGBotAdvertisementRepository.publishAdvertisementFromChannel(
 					item.advertisement
@@ -112,6 +118,45 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 			if (job) {
 				this.adJobs.push(job);
 			}
+		});
+	}
+
+	private async scheduleWeeklyExecution() {
+		const getRandomDayAndTime = () => {
+			const randomDayOffset = Math.floor(Math.random() * 7); // Случайный день в пределах недели
+			const randomHour = Math.floor(Math.random() * 24); // Случайный час
+			const randomMinute = Math.floor(Math.random() * 60); // Случайная минута
+
+			return moment()
+				.add(randomDayOffset, 'days')
+				.hour(randomHour)
+				.minute(randomMinute)
+				.second(0)
+				.millisecond(0);
+		};
+
+		const advertisements = await this.getAdvertisements('weekly');
+
+		advertisements.forEach((item) => {
+			JSON.parse(item.schedule).forEach((element) => {
+				const nextExecutionTime = getRandomDayAndTime().toDate();
+
+				const newAdvertisements = {
+					...item.dataValues,
+					schedule: element
+				};
+
+				if (newAdvertisements.schedule.type !== ETypePostsAdvertisement.RANDOM) return;
+
+				const job = schedule.scheduleJob(nextExecutionTime, () => {
+					this.tGBotAdvertisementRepository.publishAdvertisementFromChannel(
+						newAdvertisements
+					);
+				});
+				if (job) {
+					this.adJobs.push(job);
+				}
+			});
 		});
 	}
 
@@ -136,7 +181,7 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 		});
 	}
 
-	private async getTodayAdvertisements() {
+	private async getAdvertisements(periodType: 'daily' | 'weekly') {
 		const today = new Date();
 		today.setHours(today.getHours() + 3);
 		const todayDate = today.toISOString().split('T')[0];
@@ -150,19 +195,25 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 			}
 		});
 
-		return advertisements.filter((ad) => {
-			try {
+		try {
+			return advertisements.filter((ad) => {
 				const schedule = JSON.parse(ad.schedule);
 
-				return schedule.some((entry) => {
-					const date = new Date(`${entry.times} UTC`);
+				if (periodType === 'weekly') {
+					return (
+						Array.isArray(schedule) &&
+						schedule.some((entry) => entry.type === ETypePostsAdvertisement.RANDOM)
+					);
+				} else if (periodType === 'daily') {
+					return schedule.some((entry) => {
+						const date = new Date(`${entry.times} UTC`);
 
-					return date.toISOString().split('T')[0] === todayDate;
-				});
-			} catch (error) {
-				console.error(`Ошибка парсинга schedule: ${error.message}`);
-				return false;
-			}
-		});
+						return date.toISOString().split('T')[0] === todayDate;
+					});
+				}
+			});
+		} catch (e) {
+			console.error(`Ошибка получения объявлений: ${e.message}`);
+		}
 	}
 }
