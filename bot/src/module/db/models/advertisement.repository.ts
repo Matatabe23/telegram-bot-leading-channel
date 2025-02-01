@@ -22,6 +22,11 @@ export class Advertisement extends Model {
 	})
 	schedule: string;
 
+	@Column({
+		type: DataType.TEXT
+	})
+	deleteMessageInfo: string;
+
 	@ForeignKey(() => Users)
 	@Column
 	userId: number;

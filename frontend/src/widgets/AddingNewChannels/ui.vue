@@ -46,8 +46,13 @@
 					label="Приватность чата"
 					@change="updateDefaultChannel(channel, IEditChannelType.PRIVATED)"
 					:model-value="channel.settings.includes(IEditChannelType.PRIVATED)"
-				>
-				</VSwitch>
+				/>
+                <VSwitch
+					hide-details
+					label="Реклама в чате"
+					@change="updateDefaultChannel(channel, IEditChannelType.ADVERTISEMENT)"
+					:model-value="channel.settings.includes(IEditChannelType.ADVERTISEMENT)"
+				/>
 
 				<v-btn
 					color="#5865f2"

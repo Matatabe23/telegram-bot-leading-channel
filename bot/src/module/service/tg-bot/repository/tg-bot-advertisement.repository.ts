@@ -431,10 +431,51 @@ export class TGBotAdvertisementRepository {
 		user.coin -= priceAdvertising;
 		await user.save();
 
-		await this.bot.copyMessage(
+		const message = await this.bot.copyMessage(
 			advertisement.schedule.channel,
 			advertisement.sourceChatId,
 			advertisement.messageId
 		);
+
+		const advertisementDb = await this.advertisement.findOne({
+			where: { id: advertisement.id }
+		});
+
+		if (advertisement.schedule.type === ETypePostsAdvertisement.SOLO) {
+			const oldSchedule = JSON.parse(advertisementDb.dataValues.schedule || '[]');
+			const newSchedule = oldSchedule.filter(
+				(item) =>
+					!(
+						item.times === advertisement.schedule.times &&
+						item.channel === advertisement.schedule.channel
+					)
+			);
+
+			advertisementDb.schedule = JSON.stringify(newSchedule);
+		}
+
+		const newDeleteMessageInfo = [
+			...JSON.parse(advertisementDb.dataValues.deleteMessageInfo || '[]'),
+			{
+				messageId: message.message_id,
+				channel: advertisement.schedule.channel,
+				time: ETypePostsAdvertisement.SOLO
+					? advertisement.schedule.times
+					: new Date()
+							.toLocaleString('sv-SE', { timeZone: 'Europe/Moscow' })
+							.replace('T', ' ')
+			}
+		];
+
+		advertisementDb.deleteMessageInfo = JSON.stringify(newDeleteMessageInfo);
+		advertisementDb.save();
+	}
+
+	async deleteAdvertisementFromChannel(value: { channel: string; messageId: number }) {
+		try {
+			await this.bot.deleteMessage(value.channel, value.messageId);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 }

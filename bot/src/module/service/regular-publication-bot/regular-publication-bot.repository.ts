@@ -9,6 +9,8 @@ import { TGBotPostsRepository } from '../tg-bot/repository/tg-bot-posts.reposito
 import { Op } from 'sequelize';
 import { EAdvertisementStatus, ETypePostsAdvertisement } from 'src/types/types';
 import { TGBotAdvertisementRepository } from '../tg-bot/repository/tg-bot-advertisement.repository';
+import { parseISO, differenceInDays } from 'date-fns';
+import { deleteAdvertisementsMessagePeriod } from 'src/const/const';
 
 @Injectable()
 export class RegularPublicationBotRepository implements OnModuleInit {
@@ -31,13 +33,17 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 		await this.scheduleFunctionExecution();
 		await this.scheduleAdExecution();
 		await this.scheduleWeeklyExecution();
+		await this.processOldAdvertisements();
 
+		// Каждый день в 00:00
 		schedule.scheduleJob('0 0 * * *', async () => {
 			moment.tz.setDefault('Europe/Moscow');
 			await this.scheduleFunctionExecution();
 			await this.scheduleAdExecution();
+			await this.processOldAdvertisements();
 		});
 
+		// Каждое воскресенье в 00:00
 		schedule.scheduleJob('0 0 * * 0', async () => {
 			moment.tz.setDefault('Europe/Moscow');
 			await this.scheduleWeeklyExecution();
@@ -109,7 +115,6 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 		this.adJobs = [];
 
 		scheduleTimes.forEach((item) => {
-			console.log(item);
 			const job = schedule.scheduleJob(item.time, () => {
 				this.tGBotAdvertisementRepository.publishAdvertisementFromChannel(
 					item.advertisement
@@ -158,6 +163,47 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 				}
 			});
 		});
+	}
+
+	async processOldAdvertisements() {
+		const advertisements = await Advertisement.findAll();
+		const now = new Date();
+
+		for (const ad of advertisements) {
+			if (!ad.dataValues.deleteMessageInfo) continue;
+
+			try {
+				const messages = JSON.parse(ad.dataValues.deleteMessageInfo) as {
+					messageId: number;
+					channel: string;
+					time: string;
+				}[];
+
+				const filteredMessages = [];
+
+				for (const message of messages) {
+					const messageTime = parseISO(message.time);
+					if (differenceInDays(now, messageTime) >= deleteAdvertisementsMessagePeriod) {
+						await this.tGBotAdvertisementRepository.deleteAdvertisementFromChannel({
+							channel: message.channel,
+							messageId: message.messageId
+						});
+					} else {
+						filteredMessages.push(message);
+					}
+				}
+
+				if (filteredMessages.length !== messages.length) {
+					ad.deleteMessageInfo = JSON.stringify(filteredMessages);
+					await ad.save();
+				}
+			} catch (error) {
+				console.error(
+					`Ошибка парсинга deleteMessageInfo для объявления ID ${ad.id}:`,
+					error
+				);
+			}
+		}
 	}
 
 	private async getPublishTimesFromDB(): Promise<any> {

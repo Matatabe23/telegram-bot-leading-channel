@@ -77,3 +77,4 @@ export const buttonText = {
 };
 
 export const priceAdvertising = 50;
+export const deleteAdvertisementsMessagePeriod = 14;
