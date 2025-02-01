@@ -5,7 +5,7 @@ import { Users } from 'src/module/db/models/users.repository';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { Advertisement } from 'src/module/db/models/advertisement.repository';
 import { EAdvertisementStatus, ETypePostsAdvertisement, ISettingChannels } from 'src/types/types';
-import { advertisementStatus, buttonText, priceAdvertising } from 'src/const/const';
+import { ADVERTISEMENT_STATUS, buttonText, priceAdvertising } from 'src/const/const';
 import { HelpersRepository } from '../../helpers/helpers.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
 import { Op } from 'sequelize';
@@ -239,7 +239,7 @@ export class TGBotAdvertisementRepository {
 
 		const textButton = [
 			`id: Пост #${advertisement.id}`,
-			`Статус: ${advertisementStatus.find((item) => item.value === advertisement.moderationStatus).title}`,
+			`Статус: ${ADVERTISEMENT_STATUS.find((item) => item.value === advertisement.moderationStatus).title}`,
 			publicationTimes.length > 0 ? publicationTimes.join(', ') : null,
 			'',
 			'Выберите действие:'

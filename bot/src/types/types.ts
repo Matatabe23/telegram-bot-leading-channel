@@ -32,7 +32,9 @@ export enum EPermissions {
 
 	CREATE_CHANNEL = 'create_channel', // Редактировать каналы
 
-	SET_PUBLICATION_TIME = 'set_publication_time' // Редактировать время публикации
+	SET_PUBLICATION_TIME = 'set_publication_time', // Редактировать время публикации,
+
+	EDIT_ADVERTISEMENTS = 'edit_advertisements' // Редактировать рекламы
 }
 
 export enum ISettingChannels {

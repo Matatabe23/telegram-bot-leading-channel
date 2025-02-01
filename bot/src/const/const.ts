@@ -32,6 +32,10 @@ export const PERMISSIONS_LIST = [
 	{
 		title: 'Редактировать время публикации',
 		value: EPermissions.SET_PUBLICATION_TIME
+	},
+	{
+		title: 'Редактировать рекламу',
+		value: EPermissions.EDIT_ADVERTISEMENTS
 	}
 ];
 
@@ -60,7 +64,7 @@ export const instructions = [
 	'/getMyListAdvertisement - Получить список моей рекламы'
 ];
 
-export const advertisementStatus = [
+export const ADVERTISEMENT_STATUS = [
 	{ value: EAdvertisementStatus.CREATED, title: 'Пост создан' },
 	{ value: EAdvertisementStatus.PENDING_VERIFICATION, title: 'Ожидает верификации' },
 	{ value: EAdvertisementStatus.REJECTED, title: 'Отказ' },

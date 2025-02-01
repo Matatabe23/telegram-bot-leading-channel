@@ -7,8 +7,8 @@ export class Advertisement extends Model {
 	@Column({ primaryKey: true, autoIncrement: true })
 	id: number;
 
-	@Column
-	sourceChatId: number;
+	@Column({ type: 'bigint' })
+	sourceChatId: string;
 
 	@Column
 	messageId: number;

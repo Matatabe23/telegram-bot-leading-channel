@@ -87,6 +87,11 @@
 			path: '/roles',
 			visible: checkPermissions(appStore.permissions?.EDIT_ROLES)
 		},
+        {
+			title: 'Реклама',
+			path: '/advertisement',
+			visible: checkPermissions(appStore.permissions?.EDIT_ADVERTISEMENTS)
+		},
 		{
 			title: 'Настройки',
 			path: '/settings',

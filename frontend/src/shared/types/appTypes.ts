@@ -18,5 +18,9 @@ export interface IAppStore {
     PERMISSIONS_LIST: {
         title: string,
         value:string
-    }[]
+    }[],
+    ADVERTISEMENT_STATUS: {
+        title: string,
+        value:string
+    }[],
 }
