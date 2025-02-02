@@ -1,7 +1,7 @@
 <template>
 	<div class="md:flex justify-center items-start w-full">
-		<AddingNewChannels v-if="checkPermissions(appStore.permissions?.CREATE_CHANNEL)" />
-		<AddingPublicationTimeSettings v-if="checkPermissions(appStore.permissions?.SET_PUBLICATION_TIME)" />
+		<AddingNewChannels v-if="checkPermissions(appStore.data?.EPermissions?.CREATE_CHANNEL)" />
+		<AddingPublicationTimeSettings v-if="checkPermissions(appStore.data?.EPermissions?.SET_PUBLICATION_TIME)" />
 	</div>
 </template>
 

@@ -80,22 +80,22 @@
 		{
 			title: 'Аккаунты',
 			path: '/users',
-			visible: checkPermissions(appStore.permissions?.EDIT_USERS)
+			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_USERS)
 		},
 		{
 			title: 'Роли',
 			path: '/roles',
-			visible: checkPermissions(appStore.permissions?.EDIT_ROLES)
+			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_ROLES)
 		},
         {
 			title: 'Реклама',
 			path: '/advertisement',
-			visible: checkPermissions(appStore.permissions?.EDIT_ADVERTISEMENTS)
+			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_ADVERTISEMENTS)
 		},
 		{
 			title: 'Настройки',
 			path: '/settings',
-			visible: checkPermissions(appStore.permissions?.CREATE_CHANNEL) || checkPermissions(appStore.permissions?.SET_PUBLICATION_TIME)
+			visible: checkPermissions(appStore.data?.EPermissions?.CREATE_CHANNEL) || checkPermissions(appStore.data?.EPermissions?.SET_PUBLICATION_TIME)
 		}
 	];
 

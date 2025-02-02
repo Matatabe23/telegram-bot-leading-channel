@@ -12,7 +12,7 @@
 				class="rotate-90"
 		/></v-btn>
 		<v-btn
-			v-if="checkPermissions(appStore.permissions?.DELETE_POSTS)"
+			v-if="checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
 			variant="flat"
 			@click="$emit('delPost')"
 			color="#5865f2"
@@ -21,7 +21,7 @@
 		/></v-btn>
 		<div class="min-w-[30%] text-white">
 			<v-select
-				v-if="checkPermissions(appStore.permissions?.EDIT_POSTS)"
+				v-if="checkPermissions(appStore.data?.EPermissions?.EDIT_POSTS)"
 				label="Каналы публикации"
 				:items="channelsListSelect"
 				multiple
@@ -33,7 +33,7 @@
 			></v-select>
 		</div>
 		<v-btn
-			v-if="checkPermissions(appStore.permissions?.DELETE_POSTS)"
+			v-if="checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
 			variant="flat"
 			@click="$emit('deleteSelectedImg')"
 			color="#5865f2"

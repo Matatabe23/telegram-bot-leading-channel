@@ -20,7 +20,7 @@
 						<td class="border border-gray-200 px-4 py-2">
 							<v-select
 								label="Статус"
-								:items="appStore.ADVERTISEMENT_STATUS"
+								:items="appStore.data.ADVERTISEMENT_STATUS"
 								variant="outlined"
 								v-model="ad.moderationStatus"
 								@update:model-value="handleStatusUpdate(ad)"
@@ -55,7 +55,7 @@
 
 	const listAdvertisement = ref<IAdvertisement[]>([]);
 	const page = ref(1);
-	const perpage = ref(3);
+	const perpage = ref(7);
 	const totalPages = ref(1);
 
 	const getAdvertisement = async () => {

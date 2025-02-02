@@ -4,7 +4,7 @@ import { Channels } from './module/db/models/channels.repository';
 import { InjectModel } from '@nestjs/sequelize';
 import { RolesSettings } from './module/db/models/roles-settings.repository';
 import { ADVERTISEMENT_STATUS, PERMISSIONS_LIST } from './const/const';
-import { EAdvertisementStatus, EPermissions, ISettingChannels } from 'src/types/types';
+import { EAdvertisementStatus, EPermissions, ESettingChannels } from 'src/types/types';
 
 @Injectable()
 export class AppService {
@@ -28,11 +28,13 @@ export class AppService {
 		return {
 			listChannel,
 			listRoles,
-			EPermissions,
-			PERMISSIONS_LIST,
-			ADVERTISEMENT_STATUS,
-			ISettingChannels,
-			EAdvertisementStatus
+			data: {
+				EPermissions,
+				PERMISSIONS_LIST,
+				EAdvertisementStatus,
+				ADVERTISEMENT_STATUS,
+				ESettingChannels
+			}
 		};
 	}
 

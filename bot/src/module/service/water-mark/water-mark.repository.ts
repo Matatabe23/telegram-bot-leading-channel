@@ -26,12 +26,9 @@ export class WaterMarkRepository {
 			const image = await Jimp.read(inputBuffer);
 
 			let watermark = await Jimp.read('src/assets/image/waterMark.png');
-			watermark = watermark.resize(
-				watermark.bitmap.width / 1.5,
-				watermark.bitmap.height / 1.5
-			);
+			watermark = watermark.resize(watermark.bitmap.width / 2, watermark.bitmap.height / 2);
 
-			const x = (image.bitmap.width - watermark.bitmap.width) / 2;
+			const x = image.bitmap.width - watermark.bitmap.width - 10;
 			const y = image.bitmap.height - watermark.bitmap.height - 10;
 
 			image.composite(watermark, x, y, {

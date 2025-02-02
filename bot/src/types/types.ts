@@ -37,7 +37,7 @@ export enum EPermissions {
 	EDIT_ADVERTISEMENTS = 'edit_advertisements' // Редактировать рекламы
 }
 
-export enum ISettingChannels {
+export enum ESettingChannels {
 	PRIVATED = 'privated',
 	ADVERTISEMENT = 'advertisement'
 }

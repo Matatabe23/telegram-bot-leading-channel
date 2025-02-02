@@ -4,7 +4,7 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { Users } from 'src/module/db/models/users.repository';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { Advertisement } from 'src/module/db/models/advertisement.repository';
-import { EAdvertisementStatus, ETypePostsAdvertisement, ISettingChannels } from 'src/types/types';
+import { EAdvertisementStatus, ETypePostsAdvertisement, ESettingChannels } from 'src/types/types';
 import { ADVERTISEMENT_STATUS, buttonText, priceAdvertising } from 'src/const/const';
 import { HelpersRepository } from '../../helpers/helpers.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
@@ -294,7 +294,7 @@ export class TGBotAdvertisementRepository {
 	private async handleChannelSelection(chatId: number, advertisement: Advertisement) {
 		const channels = await this.channels.findAll();
 		const result = channels.filter((channel) =>
-			channel.settings?.split(',').includes(ISettingChannels.ADVERTISEMENT)
+			channel.settings?.split(',').includes(ESettingChannels.ADVERTISEMENT)
 		);
 
 		if (result.length === 0) {

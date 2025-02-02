@@ -26,11 +26,15 @@ export class TGBotRepository {
 			const chatId = msg.chat.id;
 			const text = msg.text;
 			const session = this.tgBotService.getSession(chatId);
+			console.log(msg);
 
 			this.logger.log(`Получено сообщение из чата ${chatId}: ${text}`);
 
 			try {
-				await this.tGBotUsersRepository.ensureUserExists(msg.from.id, msg.from.username);
+				await this.tGBotUsersRepository.ensureUserExists(
+					msg.from.id,
+					msg.from.username || msg.from.first_name
+				);
 
 				switch (text) {
 					case buttonText.pay:

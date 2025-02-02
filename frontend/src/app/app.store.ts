@@ -23,9 +23,7 @@ export const useAppStore = defineStore('app', {
         width: 0,
         height: 0,
         isLoading: false,
-        permissions: null,
-        PERMISSIONS_LIST: [],
-        ADVERTISEMENT_STATUS: []
+        data: {}  // Здесь будем хранить все данные
     }),
 
     getters: {
@@ -71,9 +69,7 @@ export const useAppStore = defineStore('app', {
                     permissions: role.permissions ? role.permissions.split(',') : []
                 }));
                 settingsStore.listChannels = mainInfo.listChannel;
-                this.permissions = mainInfo.EPermissions;
-                this.PERMISSIONS_LIST = mainInfo.PERMISSIONS_LIST;
-                this.ADVERTISEMENT_STATUS = mainInfo.ADVERTISEMENT_STATUS
+                this.data = mainInfo.data;
 
                 const useChannel = localStorage.getItem('useChannelList');
                 const useListChannels = useChannel ? JSON.parse(useChannel).split(',') : [];

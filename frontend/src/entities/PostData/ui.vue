@@ -26,7 +26,7 @@
 					class="absolute top-2 right-2 bg-white px-2 rounded-lg"
 					color="red"
 					hide-details
-					v-if="imagesToLoad < 1 && checkPermissions(appStore.permissions?.DELETE_POSTS)"
+					v-if="imagesToLoad < 1 && checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
 					:model-value="checkListImage.some((checkId) => checkId.id === photo.id)"
 					@update:model-value="setValueSheckBox(photo)"
 				/>
