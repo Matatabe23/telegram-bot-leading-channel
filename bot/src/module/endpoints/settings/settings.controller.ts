@@ -17,13 +17,23 @@ import { SettingsService } from './settings.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/types/types';
+import { AddPublicationTime } from './decorators/add-publication-time.decorator';
+import { ApiTags } from '@nestjs/swagger';
+import { GetListRegularPublicationTimes } from './decorators/get-list-regular-publication-times.decorator';
+import { DeletePublicationTime } from './decorators/delete-publication-time.decorator';
+import { AddNewChannel } from './decorators/add-new-channel.decorator';
+import { GetListChannel } from './decorators/get-list-channel.decorator';
+import { DeleteChannel } from './decorators/delete-channel.decorator';
+import { EditChannel } from './decorators/edit-channel.decorator';
 
 @Controller('settings')
+@ApiTags('Настройки')
 export class SettingsController {
 	constructor(private readonly settingsService: SettingsService) {}
 
 	@Post('adding-publication-time')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
+	@AddPublicationTime()
 	async addingPublicationTime(@Body() body, @Res() res: Response) {
 		try {
 			const { hour, minute, channelId } = body;
@@ -46,6 +56,7 @@ export class SettingsController {
 
 	@Get('get-list-regular-publication-times')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
+	@GetListRegularPublicationTimes()
 	async getListRegularPublicationTimes(
 		@Query('channelId') channelId: string,
 		@Res() res: Response
@@ -66,6 +77,7 @@ export class SettingsController {
 
 	@Delete('delete-item-publication-times/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
+	@DeletePublicationTime()
 	async deleteItemPublicationTimes(@Param('id') id: string, @Res() res: Response) {
 		try {
 			const result = await this.settingsService.deleteItemPublicationTimes(id);
@@ -83,6 +95,7 @@ export class SettingsController {
 
 	@Post('adding-new-channels')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
+	@AddNewChannel()
 	async addingNewChannels(@Body() body, @Res() res: Response) {
 		try {
 			const { name, chatId } = body;
@@ -101,6 +114,7 @@ export class SettingsController {
 
 	@Get('get-list-channel')
 	@UseGuards(AuthGuard)
+	@GetListChannel()
 	async getListChannel(@Res() res: Response) {
 		try {
 			const list = await this.settingsService.getListChannel();
@@ -118,6 +132,7 @@ export class SettingsController {
 
 	@Delete('delete-channel/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
+	@DeleteChannel()
 	async deleteChannel(@Param('id') id: string, @Res() res: Response) {
 		try {
 			const result = await this.settingsService.deleteChannel(id);
@@ -135,6 +150,7 @@ export class SettingsController {
 
 	@Put('edit-channel')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
+	@EditChannel()
 	async editChannel(@Body() body, @Res() res: Response) {
 		try {
 			const { id, settings } = body;
