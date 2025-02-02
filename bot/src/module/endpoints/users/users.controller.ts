@@ -16,12 +16,21 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { UsersDto } from './dto/user.dto';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/types/types';
+import { ApiTags } from '@nestjs/swagger';
+import { LoginUser } from './decorators/login-user.decorator';
+import { CheckUserData } from './decorators/check-data-web.decorator';
+import { UpdateAccessToken } from './decorators/update-access-token.decorator';
+import { UpdateUserData } from './decorators/update-data-user.decorator';
+import { GetUsersList } from './decorators/get-users-list.decorator';
+import { DeleteUser } from './decorators/delete-post.decorator';
 
 @Controller('user')
+@ApiTags('Пользователи')
 export class UsersController {
 	constructor(private readonly userService: UsersService) {}
 
 	@Get('login')
+	@LoginUser()
 	async login(@Query('name') name: string) {
 		try {
 			const result = await this.userService.login(name);
@@ -39,6 +48,7 @@ export class UsersController {
 
 	@Get('check-data')
 	@UseGuards(AuthGuard)
+	@CheckUserData()
 	async checkDataWeb(@Req() request: any) {
 		try {
 			const result = await this.userService.checkDataWeb(request.authData.id);
@@ -55,6 +65,7 @@ export class UsersController {
 	}
 
 	@Get('update-access-token')
+	@UpdateAccessToken()
 	async updateAccessToken(@Query('refreshToken') refreshToken: string) {
 		try {
 			return await this.userService.updateAccessToken(refreshToken);
@@ -71,6 +82,7 @@ export class UsersController {
 
 	@Put('update-data-user')
 	@UseGuards(AuthGuard)
+	@UpdateUserData()
 	async updateDataUsers(@Body() data: UsersDto) {
 		try {
 			return await this.userService.updateDataUsers(data);
@@ -87,6 +99,7 @@ export class UsersController {
 
 	@Get('get-users-list')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
+	@GetUsersList()
 	async getUsersList(
 		@Query('page') page: number,
 		@Query('limit') limit: number,
@@ -115,6 +128,7 @@ export class UsersController {
 
 	@Delete('delete-post/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
+	@DeleteUser()
 	async deleteUser(@Param('id') id: number) {
 		try {
 			return await this.userService.deleteUser(Number(id));

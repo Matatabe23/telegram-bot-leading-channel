@@ -6,6 +6,10 @@ export class FilesService {
 	constructor(private readonly s3Repository: S3Repository) {}
 
 	async uploadFilesToS3(files: Express.Multer.File[], nameFiles: string) {
-		return `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${await this.s3Repository.uploadImageToS3(files[0], nameFiles)}`;
+		return {
+			pagination: null,
+			data: `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${await this.s3Repository.uploadImageToS3(files[0], nameFiles)}`,
+			message: 'Успешное сохранение изображения в базу данных'
+		};
 	}
 }

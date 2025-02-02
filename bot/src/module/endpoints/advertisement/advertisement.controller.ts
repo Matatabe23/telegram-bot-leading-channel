@@ -13,13 +13,17 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/types/types';
 import { AdvertisementDto } from './dto/advertisement.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { UpdateAdvertisements } from './decorators/update-advertisements.decorators';
 
 @Controller('advertisements')
+@ApiTags('Реклама')
 export class AdvertisementController {
 	constructor(private readonly advertisementsService: AdvertisementService) {}
 
 	@Get('get-advertisements')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_ADVERTISEMENTS))
+	@UpdateAdvertisements()
 	async createNewRole(
 		@Query('page') page: number,
 		@Query('perpage') perpage: number,
@@ -46,6 +50,7 @@ export class AdvertisementController {
 
 	@Put('update-advertisement')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_ROLES))
+	@UpdateAdvertisements()
 	async updateAdvertisement(@Body('advertisement') advertisement: AdvertisementDto) {
 		try {
 			return this.advertisementsService.updateAdvertisement(advertisement);
