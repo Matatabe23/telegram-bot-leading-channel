@@ -1,5 +1,5 @@
 <template>
-	<div class="x-ident mt-4">
+	<div class="users x-ident mt-4">
 		<div class="md:flex items-center gap-4 w-full lg:w-4/6">
 			<v-text-field
 				clearable
@@ -13,11 +13,11 @@
 		</div>
 		<!-- Таблица -->
 		<div class="overflow-x-auto custom-scroll mt-4">
-			<table class="table-auto w-full border-collapse border border-gray-200 min-w-[1300px]">
+			<table class="table-auto w-full border-collapse users__table-form min-w-[1300px]">
 				<thead>
 					<tr class="bg-gray-100">
 						<th
-							class="border border-gray-200 px-4 py-2 text-left"
+							class="users__table-form users__padding-table text-left"
 							:class="item.weight"
 							v-for="item in tableForm"
 							:key="item.key"
@@ -43,8 +43,8 @@
 						v-for="user in usersList"
 						:key="user.id"
 					>
-						<td class="border border-gray-200 px-4 py-2">{{ user.id }}</td>
-						<td class="border border-gray-200 px-4 py-2">
+						<td class="users__table-form users__padding-table">{{ user.id }}</td>
+						<td class="users__table-form users__padding-table">
 							<div class="w-16 h-16 mx-auto">
 								<img
 									:src="user.avatarUrl"
@@ -54,8 +54,8 @@
 							</div>
 						</td>
 
-						<td class="border border-gray-200 px-4 py-2">{{ user.name }}</td>
-						<td class="border border-gray-200 px-4 py-2">
+						<td class="users__table-form users__padding-table">{{ user.name }}</td>
+						<td class="users__table-form users__padding-table">
 							<v-select
 								label="Права"
 								:items="listRoles"
@@ -67,8 +67,8 @@
 								@update:model-value="updateDataUsers(user, null)"
 							/>
 						</td>
-						<td class="border border-gray-200 px-4 py-2">{{ user.telegramId }}</td>
-						<td class="border border-gray-200 px-4 py-2">
+						<td class="users__table-form users__padding-table">{{ user.telegramId }}</td>
+						<td class="users__table-form users__padding-table">
 							<v-text-field
 								label="coin"
 								variant="outlined"
@@ -78,7 +78,7 @@
 								@update:model-value="updateCoin(user, $event)"
 							/>
 						</td>
-						<td class="border border-gray-200 px-4 py-2">
+						<td class="users__table-form users__padding-table">
 							<VSwitch
 								hide-details
 								@change="updateDataUsers(user, { isTeamMember: true })"
@@ -86,7 +86,7 @@
 							>
 							</VSwitch>
 						</td>
-						<td class="border border-gray-200 px-4 py-2">
+						<td class="users__table-form users__padding-table">
 							<v-btn
 								variant="flat"
 								class="mb-4"
@@ -250,3 +250,15 @@
 
 	onMounted(() => getUsers());
 </script>
+
+<style lang="scss">
+.users{
+    &__table-form{
+        @apply border border-gray-200
+    }
+
+    &__padding-table{
+        @apply px-4 py-2
+    }
+}
+</style>
