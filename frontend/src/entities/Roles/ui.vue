@@ -1,5 +1,5 @@
 <template>
-	<div class="x-ident mt-4">
+	<div class="roles x-ident mt-4">
 		<!-- Поле для добавления новой строки -->
 		<div class="mb-4 flex items-center gap-2">
 			<!-- Инпут из Vuetify -->
@@ -23,13 +23,13 @@
 
 		<!-- Таблица -->
 		<div class="overflow-x-auto custom-scroll">
-			<table class="table-auto w-full border-collapse border border-gray-200 min-w-[700px]">
+			<table class="table-auto w-full border-collapse roles__table-form min-w-[700px]">
 				<thead>
 					<tr class="bg-gray-100">
-						<th class="border border-gray-200 px-4 py-2 text-left w-[4%]">id</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[20%]">Имя роли</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[50%]">Права</th>
-						<th class="border border-gray-200 px-4 py-2 text-left">Действия</th>
+						<th class="roles__table-form roles__padding-table text-left w-[4%]">id</th>
+						<th class="roles__table-form roles__padding-table text-left w-[20%]">Имя роли</th>
+						<th class="roles__table-form roles__padding-table text-left w-[50%]">Права</th>
+						<th class="roles__table-form roles__padding-table text-left">Действия</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -37,9 +37,9 @@
 						v-for="(role, index) in state.listRoles"
 						:key="index"
 					>
-						<td class="border border-gray-200 px-4 py-2">{{ role.id }}</td>
-						<td class="border border-gray-200 px-4 py-2">{{ role.name }}</td>
-						<td class="border border-gray-200 px-4 py-2">
+						<td class="roles__table-form roles__padding-table">{{ role.id }}</td>
+						<td class="roles__table-form roles__padding-table">{{ role.name }}</td>
+						<td class="roles__table-form roles__padding-table">
 							<v-select
 								label="Права"
 								:items="appStore.data.PERMISSIONS_LIST"
@@ -50,7 +50,7 @@
 								:loading="appStore.isLoading"
 							/>
 						</td>
-						<td class="border border-gray-200 px-4 py-2">
+						<td class="border border-gray-200 roles__padding-table">
 							<button
 								@click="deleRole(role.id)"
 								class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
@@ -123,3 +123,15 @@
 		{ deep: true, immediate: true }
 	);
 </script>
+
+<style lang="scss">
+.roles{
+    &__table-form{
+        @apply border border-gray-200
+    }
+
+    &__padding-table{
+        @apply px-4 py-2
+    }
+}
+</style>

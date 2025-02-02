@@ -1,13 +1,13 @@
 <template>
-	<div class="x-ident mt-4">
+	<div class="advertisement x-ident mt-4">
 		<!-- Таблица -->
 		<div class="overflow-x-auto custom-scroll">
-			<table class="table-auto w-full border-collapse border border-gray-200 min-w-[700px]">
+			<table class="table-auto w-full border-collapse advertisement__table-form min-w-[700px]">
 				<thead>
 					<tr class="bg-gray-100">
-						<th class="border border-gray-200 px-4 py-2 text-left w-[4%]">id</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[20%]">Владелец</th>
-						<th class="border border-gray-200 px-4 py-2 text-left w-[20%]">Статус</th>
+						<th class="advertisement__table-form advertisement__padding-table text-left w-[4%]">id</th>
+						<th class="advertisement__table-form advertisement__padding-table text-left w-[20%]">Владелец</th>
+						<th class="advertisement__table-form advertisement__padding-table text-left w-[20%]">Статус</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -15,9 +15,9 @@
 						v-for="(ad, index) in listAdvertisement"
 						:key="index"
 					>
-						<td class="border border-gray-200 px-4 py-2">{{ ad.id }}</td>
-						<td class="border border-gray-200 px-4 py-2">{{ ad.user.name }}</td>
-						<td class="border border-gray-200 px-4 py-2">
+						<td class="advertisement__table-form advertisement__padding-table">{{ ad.id }}</td>
+						<td class="advertisement__table-form advertisement__padding-table">{{ ad.user.name }}</td>
+						<td class="advertisement__table-form advertisement__padding-table">
 							<v-select
 								label="Статус"
 								:items="appStore.data.ADVERTISEMENT_STATUS"
@@ -82,3 +82,15 @@
 
 	onMounted(() => getAdvertisement());
 </script>
+
+<style lang="scss">
+.advertisement{
+    &__table-form{
+        @apply border border-gray-200
+    }
+
+    &__padding-table{
+        @apply px-4 py-2
+    }
+}
+</style>

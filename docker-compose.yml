@@ -19,13 +19,13 @@ services:
             - frontend
         networks:
             - dev
-        restart: always
+        restart: unless-stopped
         env_file:
             - .env
 
     db:
         image: mysql
-        restart: always
+        restart: unless-stopped
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -44,7 +44,7 @@ services:
         image: phpmyadmin
         depends_on:
             - db
-        restart: always
+        restart: unless-stopped
         ports:
             - 3500:80
         environment:
@@ -58,6 +58,7 @@ services:
             - db
         build:
             context: ./bot
+        restart: unless-stopped
         networks:
             - dev
 
@@ -66,6 +67,7 @@ services:
             context: ./frontend
         depends_on:
             - bot
+        restart: unless-stopped
         networks:
             - dev
 
