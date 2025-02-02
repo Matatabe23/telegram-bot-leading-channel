@@ -62,7 +62,6 @@
 		const result = await getListAdvertisements({ page: page.value, perpage: perpage.value });
 		listAdvertisement.value = result.data;
 		totalPages.value = Math.ceil(result.pagination.count / perpage.value);
-		console.log(result);
 	};
 
 	const setPage = (value: number) => {
