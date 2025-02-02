@@ -11,17 +11,25 @@ import {
 import { FilesService } from './files.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { UploadFilesDto } from './dto/UploadFiles.dto';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller('files')
+@ApiTags('Файлы')
 export class FilesController {
 	constructor(private readonly filesService: FilesService) {}
 
 	@Post('upload-files-to-s3')
 	@UseGuards(AuthGuard)
 	@UseInterceptors(FilesInterceptor('files[]'))
+	@ApiResponse({
+		status: 200,
+		description: 'Список рекламных объявлений',
+		type: UploadFilesDto
+	})
 	async uploadFilesToS3(
 		@UploadedFiles() files: Express.Multer.File[],
-		@Body() body: { fileName: string }
+		@Body() body: UploadFilesDto
 	) {
 		try {
 			return this.filesService.uploadFilesToS3(files, body.fileName);

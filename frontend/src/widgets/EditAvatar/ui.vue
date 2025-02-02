@@ -64,13 +64,13 @@
 		if (file) {
 			isUploading.value = true;
 			try {
-				const imageUrl = await uploadFilesToS3(file, props.fileName);
+				const image = await uploadFilesToS3(file, props.fileName);
 
 				const img = new Image();
-				img.src = imageUrl;
+				img.src = image.data;
 
 				img.onload = () => {
-					model.value = imageUrl;
+					model.value = image.data;
 					isUploading.value = false;
 				};
 			} catch (error) {
