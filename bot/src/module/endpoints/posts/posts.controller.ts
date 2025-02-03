@@ -21,8 +21,18 @@ import { IImageBlock } from 'src/types/types';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/types/types';
 import { HelpersRepository } from 'src/module/service/helpers/helpers.repository';
+import { ApiTags } from '@nestjs/swagger';
+import { ApiPublication } from './decorators/api-publication.decorator';
+import { ApiInstantPublicationPosts } from './decorators/api-instant-publication-posts.decorator';
+import { ApiReceiving } from './decorators/api-receiving.decorator';
+import { ApiDeletePost } from './decorators/api-delete-post.decorator';
+import { ApiPublishInstantly } from './decorators/api-publish-instantly.decorator';
+import { ApiReceivingPost } from './decorators/api-receiving-post.decorator';
+import { ApiChangePage } from './decorators/api-change-page.decorator';
+import { ApiUpdatePost } from './decorators/api-update-post.decorator';
 
 @Controller('posts')
+@ApiTags('Посты')
 export class PostsController {
 	constructor(
 		private readonly postsService: PostsService,
@@ -32,6 +42,7 @@ export class PostsController {
 	@Post('publication')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
 	@UseInterceptors(FilesInterceptor('files[]'))
+	@ApiPublication()
 	async publication(
 		@UploadedFiles() files: Express.Multer.File[],
 		@Body() body: { waterMark: string; chatIdList: string }
@@ -54,14 +65,12 @@ export class PostsController {
 		}
 	}
 
-	@Put('edit-post-link-channels')
+	@Put('update-posts')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_POSTS))
-	async editPostLinkChannels(@Body() body: { postId: number; channelIds: number[] }) {
+	@ApiUpdatePost()
+	async updatePosts(@Body() body: { id: number; channelIds: number[]; idList: IImageBlock[] }) {
 		try {
-			const { postId, channelIds } = body;
-			const result = await this.postsService.editPostLinkСhannels(postId, channelIds);
-
-			return result;
+			return await this.postsService.updatePosts(body);
 		} catch (e) {
 			throw new HttpException(
 				{
@@ -76,6 +85,7 @@ export class PostsController {
 	@Post('instant-publication-posts')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
 	@UseInterceptors(FilesInterceptor('files[]'))
+	@ApiInstantPublicationPosts()
 	async instantPublicationPosts(
 		@UploadedFiles() files: Express.Multer.File[],
 		@Body() body: { waterMark: string; chatIdList: string }
@@ -104,6 +114,7 @@ export class PostsController {
 
 	@Get('receiving')
 	@UseGuards(AuthGuard)
+	@ApiReceiving()
 	async receiving(
 		@Query('page') page: number,
 		@Query('pageSize') pageSize: number,
@@ -128,6 +139,7 @@ export class PostsController {
 
 	@Delete('delete-post/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.DELETE_POSTS))
+	@ApiDeletePost()
 	async deletePost(@Param('id') id: number) {
 		try {
 			const result = await this.postsService.deletePost(id);
@@ -145,6 +157,7 @@ export class PostsController {
 
 	@Post('publish-instantly/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
+	@ApiPublishInstantly()
 	async publishInstantly(@Param('id') id: number) {
 		try {
 			const result = await this.postsService.publishInstantly(id);
@@ -162,6 +175,7 @@ export class PostsController {
 
 	@Get('receiving-post/:id')
 	@UseGuards(AuthGuard)
+	@ApiReceivingPost()
 	async receivingPost(@Req() request: any, @Param('id') id: number) {
 		try {
 			const isPermissions = await this.helpersRepository.checkPermissions(
@@ -183,6 +197,7 @@ export class PostsController {
 
 	@Get('change-page/:id')
 	@UseGuards(AuthGuard)
+	@ApiChangePage()
 	async changePage(
 		@Param('id') id: number,
 		@Query('where') where?: string,
@@ -191,24 +206,6 @@ export class PostsController {
 	) {
 		try {
 			const result = await this.postsService.changePage(id, where, watched, channel);
-			return result;
-		} catch (e) {
-			throw new HttpException(
-				{
-					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					message: e.message
-				},
-				HttpStatus.INTERNAL_SERVER_ERROR
-			);
-		}
-	}
-
-	@Get('delete-selected-imgs')
-	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.DELETE_POSTS))
-	async deleteSelectedImgs(@Query() query: { idList: IImageBlock[] }) {
-		try {
-			const { idList } = query;
-			const result = await this.postsService.deleteSelectedImgs(idList);
 			return result;
 		} catch (e) {
 			throw new HttpException(

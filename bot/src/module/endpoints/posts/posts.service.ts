@@ -62,47 +62,65 @@ export class PostsService {
 				dataBasePostId: postId
 			});
 
-			this.editPostLinkСhannels(postId, chatId);
+			this.updatePosts({ id: postId, channelIds: chatId });
 		}
 
-		return 'Успешное сохранение в базу данных!';
+		return {
+			pagination: null,
+			data: post,
+			message: 'Успешное сохранение в базу данных!'
+		};
 	}
 
-	async editPostLinkСhannels(postId: number, channelIds?: number[]) {
-		if (!postId || !Array.isArray(channelIds)) {
+	async updatePosts(post: { id: number; channelIds?: number[]; images?: IImageBlock[] }) {
+		if (!post.id) {
 			throw new NotFoundException('Неверный формат параметров запроса');
 		}
 
-		const existingRecords = await this.channelPosts.findAll({
-			where: { postId }
-		});
-
+		const existingRecords = await this.channelPosts.findAll({ where: { postId: post.id } });
 		const existingChannelIds = existingRecords.map((record: any) => record.channelId);
 
-		const idsToDelete = existingChannelIds.filter((id) => !channelIds.includes(id));
-		const idsToAdd = channelIds.filter((id) => !existingChannelIds.includes(id));
+		if (post.channelIds) {
+			const idsToDelete = existingChannelIds.filter((id) => !post.channelIds.includes(id));
+			const idsToAdd = post.channelIds.filter((id) => !existingChannelIds.includes(id));
 
-		if (idsToDelete.length > 0) {
-			idsToDelete.forEach(async (element) => {
+			if (idsToDelete.length > 0) {
 				await this.channelPosts.destroy({
-					where: {
-						channelId: element,
-						postId: postId
-					}
+					where: { channelId: idsToDelete, postId: post.id }
 				});
-			});
+			}
+			if (idsToAdd.length > 0) {
+				await this.channelPosts.bulkCreate(
+					idsToAdd.map((channelId) => ({ channelId, postId: post.id }))
+				);
+			}
 		}
 
-		if (idsToAdd.length > 0) {
-			idsToAdd.forEach(async (element) => {
-				await this.channelPosts.create({
-					channelId: element,
-					postId: postId
-				});
-			});
+		if (post.images?.length > 0) {
+			for (const element of post.images) {
+				const imageRecord = await this.imageData.findByPk(element.id);
+				if (imageRecord) {
+					await this.s3Repository.deleteImageFromS3(imageRecord.dataValues.image);
+					await this.imageData.destroy({ where: { id: imageRecord.dataValues.id } });
+				}
+			}
 		}
 
-		return 'Успешное изменение!';
+		const updatedPost = await this.dataBasePosts.findByPk(post.id, {
+			include: [{ model: Channels }, { model: ImageData }]
+		});
+
+		const imageList = updatedPost.dataValues.images.map((item) => ({
+			id: item.dataValues.id,
+			img: `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`,
+			dataBasePostId: item.dataValues.dataBasePostId
+		}));
+
+		return {
+			pagination: null,
+			data: { imageList, post: updatedPost },
+			message: 'Успешное обновление поста!'
+		};
 	}
 
 	async instantPublicationPosts(files: any, waterMark: boolean, chatIdList: string[]) {
@@ -359,17 +377,5 @@ export class PostsService {
 			imageList,
 			channelsPost: post.dataValues.channels
 		};
-	}
-
-	async deleteSelectedImgs(idList: IImageBlock[]) {
-		for (const element of idList) {
-			const post = await this.imageData.findByPk(element.id);
-			if (post) {
-				await this.s3Repository.deleteImageFromS3(post.dataValues.image);
-				await this.imageData.destroy({ where: { id: post.dataValues.id } });
-			}
-		}
-
-		return 'Фото удалены';
 	}
 }

@@ -49,12 +49,7 @@ export const changePage = async (id: number, where: string, watched: string, cha
     return data;
 }
 
-export const deleteSelectedImgs = async (idList: IImageBlock) => {
-    const { data } = await $autHost.get(`posts/delete-selected-imgs`, { params: { idList } });
-    return data;
-}
-
-export const editPostLinkСhannels = async (postId: number, channelIds?: number[]) => {
-    const { data } = await $autHost.put(`posts/edit-post-link-channels`, { postId, channelIds });
+export const updatePosts = async (value: { id: number; channelIds?: number[]; images?: IImageBlock[] }) => {
+    const { data } = await $autHost.put(`posts/update-posts`, value);
     return data;
 }

@@ -185,7 +185,7 @@
 			if (result) {
 				state.images = [];
 				state.imagePost = [];
-				toast.success(result);
+				toast.success(result.message);
 			}
 			editorStore.getPosts();
 		} catch (e: any) {

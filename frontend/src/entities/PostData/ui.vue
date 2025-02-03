@@ -26,7 +26,10 @@
 					class="absolute top-2 right-2 bg-white px-2 rounded-lg"
 					color="red"
 					hide-details
-					v-if="imagesToLoad < 1 && checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
+					v-if="
+						imagesToLoad < 1 &&
+						checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)
+					"
 					:model-value="checkListImage.some((checkId) => checkId.id === photo.id)"
 					@update:model-value="setValueSheckBox(photo)"
 				/>
@@ -37,19 +40,13 @@
 
 <script lang="ts" setup>
 	import { onMounted, ref } from 'vue';
-	import {
-		receivingPost,
-		deletePost,
-		changePage,
-		deleteSelectedImgs,
-		editPostLinkСhannels,
-		checkPermissions
-	} from '@/shared';
+	import { receivingPost, deletePost, changePage, checkPermissions, updatePosts } from '@/shared';
 	import { useRoute, useRouter } from 'vue-router';
 	import { useToast } from 'vue-toastification';
 	import { PaginationPostData } from '@/widgets';
 	import { useAppStore } from '@/app/app.store';
 	import { EDirection } from './const';
+	import { debounce } from 'lodash';
 
 	const route = useRoute();
 	const router = useRouter();
@@ -61,6 +58,11 @@
 	const imagesToLoad = ref(0);
 	const useChannelList = ref([]);
 
+	const saveData = (values: any) => {
+		images.value = values.imageList;
+		useChannelList.value = values.channelsPost?.map((item) => item.id);
+	};
+
 	const openPostPanel = async () => {
 		try {
 			appStore.isLoading = true;
@@ -68,8 +70,7 @@
 			images.value = [];
 
 			const response = await receivingPost(Number(route.params.id));
-			images.value = response.imageList;
-			useChannelList.value = response.channelsPost?.map((item) => item.id);
+			await saveData(response);
 		} catch (e) {
 			router.push('/publishing-panel');
 			localStorage.setItem('watched', '');
@@ -93,7 +94,7 @@
 			const response = await changePage(Number(route.params.id), who, watched, channel);
 			images.value = response.imageList;
 			useChannelList.value = response.channelsPost?.map((item) => item.id);
-            checkListImage.value = []
+			checkListImage.value = [];
 			router.push(response.postId.toString());
 		} catch (e) {
 			router.push('/publishing-page');
@@ -151,8 +152,11 @@
 		try {
 			if (checkListImage.value.length >= 1) {
 				appStore.isLoading = true;
-				await deleteSelectedImgs(checkListImage.value as any);
-				openPostPanel();
+				const response = await updatePosts({
+					id: Number(route.params.id),
+					images: checkListImage.value
+				});
+				saveData(response.data);
 			}
 		} catch (e) {
 			toast.error(e.response.data.message);
@@ -162,13 +166,20 @@
 		}
 	};
 
-	const updateChannelList = async () => {
+	const updateChannelList = debounce(async () => {
 		try {
-			await editPostLinkСhannels(Number(route.params.id), useChannelList.value);
+			appStore.isLoading = true;
+			const response = await updatePosts({
+				id: Number(route.params.id),
+				channelIds: useChannelList.value
+			});
+			toast.success(response?.message);
 		} catch (e) {
-			toast.error(e.response.data.message);
+			toast.error(e.response?.data?.message || 'Ошибка обновления');
+		} finally {
+			appStore.isLoading = false;
 		}
-	};
+	}, 300);
 
 	onMounted(() => {
 		openPostPanel();
