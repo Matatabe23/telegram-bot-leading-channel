@@ -34,7 +34,6 @@
 							class="hidden"
 						/>
 						<label
-							for="file-upload"
 							class="publishing-panel__custom-file-upload"
 						>
 							<i class="fas fa-upload"></i> Загрузить файлы
