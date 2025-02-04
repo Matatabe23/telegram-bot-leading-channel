@@ -22,8 +22,7 @@ import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/types/types';
 import { HelpersRepository } from 'src/module/service/helpers/helpers.repository';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiPublication } from './decorators/api-publication.decorator';
-import { ApiInstantPublicationPosts } from './decorators/api-instant-publication-posts.decorator';
+import { ApiUnifiedPublication } from './decorators/api-unified-publication.decorator';
 import { ApiReceiving } from './decorators/api-receiving.decorator';
 import { ApiDeletePost } from './decorators/api-delete-post.decorator';
 import { ApiPublishInstantly } from './decorators/api-publish-instantly.decorator';
@@ -39,19 +38,25 @@ export class PostsController {
 		private readonly helpersRepository: HelpersRepository
 	) {}
 
-	@Post('publication')
+	@Post('unified-publication')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
 	@UseInterceptors(FilesInterceptor('files[]'))
-	@ApiPublication()
-	async publication(
+	@ApiUnifiedPublication()
+	async unifiedPublication(
 		@UploadedFiles() files: Express.Multer.File[],
-		@Body() body: { waterMark: string; chatIdList: string }
+		@Body() body: { waterMark: string; chatIdList: string; isInstant: string }
 	) {
 		try {
 			const waterMark = JSON.parse(body.waterMark);
 			const chatIdList = body.chatIdList !== '' ? body.chatIdList.split(',') : [];
+			const isInstant = body.isInstant === 'true' ? true : false;
 
-			const result = await this.postsService.publication(files, waterMark, chatIdList);
+			const result = await this.postsService.unifiedPublication(
+				files,
+				waterMark,
+				chatIdList,
+				isInstant
+			);
 
 			return result;
 		} catch (e) {
@@ -82,48 +87,18 @@ export class PostsController {
 		}
 	}
 
-	@Post('instant-publication-posts')
-	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
-	@UseInterceptors(FilesInterceptor('files[]'))
-	@ApiInstantPublicationPosts()
-	async instantPublicationPosts(
-		@UploadedFiles() files: Express.Multer.File[],
-		@Body() body: { waterMark: string; chatIdList: string }
-	) {
-		try {
-			const waterMark = JSON.parse(body.waterMark);
-			const chatIdList = body.chatIdList !== '' ? body.chatIdList.split(',') : [];
-
-			const result = await this.postsService.instantPublicationPosts(
-				files,
-				waterMark,
-				chatIdList
-			);
-
-			return result;
-		} catch (e) {
-			throw new HttpException(
-				{
-					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					message: e.message
-				},
-				HttpStatus.INTERNAL_SERVER_ERROR
-			);
-		}
-	}
-
 	@Get('receiving')
 	@UseGuards(AuthGuard)
 	@ApiReceiving()
 	async receiving(
 		@Query('page') page: number,
-		@Query('pageSize') pageSize: number,
+		@Query('perpage') perpage: number,
 		@Query('watched') watched: string,
 		@Query('channel') channel: string,
 		@Query('search') search: string
 	) {
 		try {
-			const result = this.postsService.receiving(page, pageSize, watched, channel, search);
+			const result = this.postsService.receiving(page, perpage, watched, channel, search);
 
 			return result;
 		} catch (e) {

@@ -26,8 +26,8 @@ export const usePosts = defineStore('posts', {
         async getPosts() {
             try {
                 const posts = await receiving(this.form.currentPage, this.form.postsPerPage, this.form.watched, this.form.channel, this.form.search);
-                this.postsList = posts.posts;
-                this.totalCount = posts.totalCount;
+                this.postsList = posts.data;
+                this.totalCount = posts.pagination.count;
                 this.publishTime = posts.publishTime;
             } catch (e: any) {
                 //

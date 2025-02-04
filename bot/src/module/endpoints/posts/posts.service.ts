@@ -31,45 +31,82 @@ export class PostsService {
 		private readonly fileRepository: FileRepository
 	) {}
 
-	async publication(files: Express.Multer.File[], waterMark: boolean, chatIdList: string[]) {
-		if (chatIdList.length === 0 || chatIdList[0] === '')
+	async unifiedPublication(
+		files: Express.Multer.File[],
+		waterMark: boolean,
+		chatIdList: string[],
+		isInstant: boolean
+	) {
+		if (chatIdList.length === 0 || chatIdList[0] === '') {
 			throw new NotFoundException('Нету каналов для публикации');
-
-		const post = await this.dataBasePosts.create({
-			waterMark
-		});
-		const postId = post.dataValues.id;
-
-		const chatIds = await Promise.all(
-			chatIdList.map(async (chatId) => {
-				return await this.channels.findOne({
-					where: {
-						chatId: chatId
-					}
-				});
-			})
-		);
-		const chatId = chatIds.map((item) => item?.dataValues.id);
-
-		for (const file of files) {
-			const url = await this.s3Repository.uploadImageToS3(
-				file,
-				`${process.env.S3_FOLDER_SAVED}/${postId}/${Date.now()}.png`
-			);
-
-			await this.imageData.create({
-				image: url,
-				dataBasePostId: postId
-			});
-
-			this.updatePosts({ id: postId, channelIds: chatId });
 		}
 
-		return {
-			pagination: null,
-			data: post,
-			message: 'Успешное сохранение в базу данных!'
-		};
+		if (isInstant) {
+			let processedFiles = files;
+
+			if (waterMark) {
+				processedFiles = await Promise.all(
+					files.map(async (file) => ({
+						...file,
+						...(await this.waterMarkRepository.addWatermark(file))
+					})) as Promise<Express.Multer.File>[]
+				);
+			}
+
+			for (const chatId of chatIdList) {
+				await this.tGBotPostsRepository.instantPublicationPosts(processedFiles, chatId);
+			}
+
+			return {
+				pagination: null,
+				data: null,
+				message: 'Успешная моментальная публикация'
+			};
+		} else {
+			const post = await this.dataBasePosts.create({ waterMark });
+			const postId = post.dataValues.id;
+
+			const channels = await Promise.all(
+				chatIdList.map((chatId) => this.channels.findOne({ where: { chatId } }))
+			);
+
+			const channelIds = channels.map((item) => item?.dataValues.id);
+
+			for (const file of files) {
+				const url = await this.s3Repository.uploadImageToS3(
+					file,
+					`${process.env.S3_FOLDER_SAVED}/${postId}/${Date.now()}.png`
+				);
+
+				await this.imageData.create({
+					image: url,
+					dataBasePostId: postId
+				});
+
+				this.updatePosts({
+					id: postId,
+					channelIds
+				});
+			}
+
+			const updatePost = await this.dataBasePosts.findOne({
+				where: { id: postId },
+				include: [
+					{
+						model: ImageData
+					},
+					{
+						model: Channels
+					}
+				]
+			});
+
+			return {
+				pagination: null,
+				data: updatePost,
+				message: 'Успешное сохранение в базу данных!'
+			};
+		}
 	}
 
 	async updatePosts(post: { id: number; channelIds?: number[]; images?: IImageBlock[] }) {
@@ -123,44 +160,18 @@ export class PostsService {
 		};
 	}
 
-	async instantPublicationPosts(files: any, waterMark: boolean, chatIdList: string[]) {
-		if (chatIdList.length === 0 && chatIdList[0] === '')
-			throw new NotFoundException('Нету каналов для публикации');
-
-		if (waterMark === true) {
-			const imagesFromWaterMark = await Promise.all(
-				files.map(async (item) => {
-					return this.waterMarkRepository.addWatermark(item);
-				})
-			);
-
-			for (const chatId of chatIdList) {
-				await this.tGBotPostsRepository.instantPublicationPosts(
-					imagesFromWaterMark,
-					chatId
-				);
-			}
-			return 'Успешная моментальная публикация';
-		}
-
-		for (const chatId of chatIdList) {
-			await this.tGBotPostsRepository.instantPublicationPosts(files, chatId);
-		}
-		return 'Успешная моментальная публикация';
-	}
-
 	async receiving(
 		page: number,
-		pageSize: number,
+		perpage: number,
 		watched: string,
 		channel: string,
 		search: string
 	) {
-		if (isNaN(page) || isNaN(pageSize)) {
+		if (isNaN(page) || isNaN(perpage)) {
 			throw new NotFoundException('Неверный формат параметров запроса');
 		}
 
-		const offset = (page - 1) * pageSize;
+		const offset = (page - 1) * perpage;
 
 		let whereCondition: {
 			watched?: boolean;
@@ -173,7 +184,6 @@ export class PostsService {
 			whereCondition = { ...whereCondition, watched: false };
 		}
 
-		// Добавляем фильтр по ID, если передан параметр search
 		if (search) {
 			whereCondition = { ...whereCondition, id: search };
 		}
@@ -190,13 +200,13 @@ export class PostsService {
 					where: channel ? { id: channel } : undefined
 				}
 			],
-			limit: Number(pageSize),
+			limit: Number(perpage),
 			offset: offset,
 			where: whereCondition
 		});
 
 		const updatedPosts = posts.map((post) => {
-			post.dataValues.imageData = post.dataValues.images.map((img) => {
+			post.dataValues.images = post.dataValues.images.map((img) => {
 				img.image = `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${img.dataValues.image}`;
 				return img;
 			});
@@ -216,7 +226,16 @@ export class PostsService {
 			distinct: true
 		});
 
-		return { posts: updatedPosts, totalCount, publishTime: list };
+		return {
+			pagination: {
+				count: totalCount,
+				currentPage: Number(page),
+				perpage: Number(perpage)
+			},
+			data: updatedPosts,
+			publishTime: list,
+			message: 'Успешное получение постов'
+		};
 	}
 
 	async deletePost(id: number) {
@@ -241,7 +260,11 @@ export class PostsService {
 
 		await post.destroy();
 
-		return 'Пост успешно удален';
+		return {
+			pagination: null,
+			data: null,
+			message: 'Пост успешно удален'
+		};
 	}
 
 	async publishInstantly(id: number) {
@@ -293,7 +316,11 @@ export class PostsService {
 		}
 		await deletePost();
 
-		return 'Пост успешно опубликован';
+		return {
+			pagination: null,
+			data: null,
+			message: 'Пост успешно опубликован'
+		};
 	}
 
 	async receivingPost(id: number, updateWatch?: boolean) {
@@ -315,7 +342,12 @@ export class PostsService {
 			await post.update({ watched: true });
 		}
 
-		return { imageList, channelsPost: post.dataValues.channels };
+		return {
+			pagination: null,
+			imageList,
+			channelsPost: post.dataValues.channels,
+			message: 'Успешное получение поста'
+		};
 	}
 
 	async changePage(id: number, where: string, watched: string, channel: string) {

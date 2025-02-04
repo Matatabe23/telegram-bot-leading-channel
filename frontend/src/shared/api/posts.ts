@@ -2,30 +2,20 @@ import { $autHost } from "@/shared";
 import { IImageBlock } from '@/shared'
 
 // Функция публикации поста
-export const publication = async (files: FileList, waterMark: boolean, chatIdList: string[]) => {
+export const unifiedPublication = async (files: FileList, waterMark: boolean, chatIdList: string[], isInstant: boolean) => {
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
         formData.append('files[]', files[i]);
     }
     formData.append('waterMark', waterMark.toString());
     formData.append('chatIdList', chatIdList.join(','));
-    const { data } = await $autHost.post('posts/publication', formData);
+    formData.append('isInstant', isInstant.toString());
+    const { data } = await $autHost.post('posts/unified-publication', formData);
     return data;
 }
 
-export const instantPublicationPosts = async (files: FileList, waterMark: boolean, chatIdList: string[]) => {
-    const formData = new FormData();
-    for (let i = 0; i < files.length; i++) {
-        formData.append('files[]', files[i]);
-    }
-    formData.append('waterMark', waterMark.toString());
-    formData.append('chatIdList', chatIdList.join(','));
-    const { data } = await $autHost.post('posts/instant-publication-posts', formData);
-    return data;
-}
-
-export const receiving = async (page: number, pageSize: number, watched?: string, channel?: string, search?: string) => {
-    const { data } = await $autHost.get('posts/receiving', { params: { page, pageSize, watched, channel, search } });
+export const receiving = async (page: number, perpage: number, watched?: string, channel?: string, search?: string) => {
+    const { data } = await $autHost.get('posts/receiving', { params: { page, perpage, watched, channel, search } });
     return data;
 }
 

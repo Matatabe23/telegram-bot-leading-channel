@@ -5,7 +5,22 @@ export function ApiDeletePost(): MethodDecorator {
 		ApiOperation({ summary: 'Удаление поста' })(target, propertyKey, descriptor);
 		ApiResponse({
 			status: 200,
-			description: 'Пост успешно удалён'
+			description: 'Пост успешно удалён',
+			schema: {
+				example: {
+					pagination: null,
+					data: null,
+					message: 'Пост успешно удален'
+				}
+			}
+		})(target, propertyKey, descriptor);
+		ApiResponse({
+			status: 400,
+			description: 'Некорректный запрос'
+		})(target, propertyKey, descriptor);
+		ApiResponse({
+			status: 404,
+			description: 'Пост не найден'
 		})(target, propertyKey, descriptor);
 		ApiResponse({
 			status: 500,

@@ -117,7 +117,7 @@
 			}
 			appStore.isLoading = true;
 			const result = await deletePost(id);
-			toast.success(result);
+			toast.success(result.message);
 			editorStore.getPosts();
 		} catch (e) {
 			toast.error(e.response.data.message);

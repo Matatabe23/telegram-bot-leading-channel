@@ -24,7 +24,7 @@ export interface IPosts {
     createdAt: string,
     updatedAt: string,
     id: number,
-    imageData: IImageData[]
+    images: IImageData[]
 }
 
 export interface IPublishTime {

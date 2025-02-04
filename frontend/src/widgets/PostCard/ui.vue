@@ -3,7 +3,7 @@
 		<div class="grid md:flex items-center gap-4 p-5">
 			<img
 				class="md:w-24 md:h-24 rounded-lg object-cover mb-2 md:md-0"
-				v-for="img in props.post.imageData"
+				v-for="img in props.post.images"
 				:key="img.id"
 				:src="img.image"
 			/>

@@ -33,9 +33,7 @@
 							@change="handleFileUpload"
 							class="hidden"
 						/>
-						<label
-							class="publishing-panel__custom-file-upload"
-						>
+						<label class="publishing-panel__custom-file-upload">
 							<i class="fas fa-upload"></i> Загрузить файлы
 						</label>
 					</v-btn>
@@ -104,7 +102,7 @@
 
 <script lang="ts" setup>
 	import { onMounted, reactive, ref, watch, computed } from 'vue';
-	import { publication, instantPublicationPosts } from '@/shared';
+	import { unifiedPublication } from '@/shared';
 	import { IPublish } from '@/entities';
 	import { useToast } from 'vue-toastification';
 	import { usePosts } from '@/shared';
@@ -166,20 +164,12 @@
 				toast.error('Не более 10 медиафайлов!');
 				return;
 			}
-			let result;
-			if (state.settingsArray.includes('instantPublication')) {
-				result = await instantPublicationPosts(
-					state.imagePost,
-					state.settingsArray.includes('waterMark'),
-					state.form.useChannelList
-				);
-			} else {
-				result = await publication(
-					state.imagePost,
-					state.settingsArray.includes('waterMark'),
-					state.form.useChannelList
-				);
-			}
+			const result = await unifiedPublication(
+				state.imagePost,
+				state.settingsArray.includes('waterMark'),
+				state.form.useChannelList,
+				state.settingsArray.includes('instantPublication')
+			);
 
 			if (result) {
 				state.images = [];
@@ -243,10 +233,11 @@
 
 			for (let i = 0; i < folderContent.length; i++) {
 				const file = folderContent[i] as FileList;
-				await publication(
+				await unifiedPublication(
 					file,
 					state.settingsArray.includes('waterMark'),
-					state.form.useChannelList
+					state.form.useChannelList,
+                    false
 				);
 				state.processLoader.loaded += 1;
 			}

@@ -8,8 +8,18 @@ export function ApiPublishInstantly(): MethodDecorator {
 			descriptor
 		);
 		ApiResponse({
-			status: 200,
-			description: 'Пост мгновенно опубликован'
+			status: 201,
+			description: 'Пост успешно опубликован',
+			schema: {
+				type: 'object',
+				properties: {
+					pagination: { type: 'null', example: null },
+					data: {
+						oneOf: [{ type: 'null', example: null }]
+					},
+					message: { type: 'string', example: 'Успешная моментальная публикация!' }
+				}
+			}
 		})(target, propertyKey, descriptor);
 		ApiResponse({
 			status: 500,
