@@ -31,7 +31,7 @@ export class TGBotAdvertisementRepository {
 		this.bot = this.tgBotService.getBot();
 	}
 
-	private activeChatHandlers: Set<number> = new Set();
+	private processedQueries: Set<string> = new Set();
 
 	public async addAdvertisement(msg: TelegramBot.Message) {
 		const user = await this.users.findOne({ where: { telegramId: msg.from?.id } });
@@ -122,17 +122,17 @@ export class TGBotAdvertisementRepository {
 			reply_markup: { inline_keyboard: inlineKeyboard }
 		});
 
-		if (!this.activeChatHandlers.has(chatId)) {
+		if (!this.processedQueries.has(chatId)) {
 			const onCallbackQuery = (query: TelegramBot.CallbackQuery) => {
 				this.handleCallbackQuery(query, chatId);
 			};
 
 			this.bot.on('callback_query', onCallbackQuery);
 
-			this.activeChatHandlers.add(chatId);
+			this.processedQueries.add(chatId);
 
 			setTimeout(() => {
-				this.activeChatHandlers.delete(chatId);
+				this.processedQueries.delete(chatId);
 			}, 600000);
 		}
 	}
@@ -176,8 +176,15 @@ export class TGBotAdvertisementRepository {
 		return inlineKeyboard;
 	}
 
-	// Обработка callback_query
 	private async handleCallbackQuery(query: TelegramBot.CallbackQuery, chatId: number) {
+		const queryId = query.id;
+
+		if (this.processedQueries.has(queryId)) {
+			return;
+		}
+
+		this.processedQueries.add(queryId);
+
 		if (query.message?.chat.id !== chatId) return;
 
 		const data = query.data?.split('_');
@@ -219,6 +226,10 @@ export class TGBotAdvertisementRepository {
 		}
 
 		this.bot.answerCallbackQuery(query.id);
+
+		setTimeout(() => {
+			this.processedQueries.delete(queryId);
+		}, 100000);
 	}
 
 	// Обработка действия "Просмотр"
