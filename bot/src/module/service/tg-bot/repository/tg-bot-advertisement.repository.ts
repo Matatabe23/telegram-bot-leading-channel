@@ -393,11 +393,11 @@ export class TGBotAdvertisementRepository {
 
 			const totalSum = total * priceAdvertising + priceAdvertising;
 			if (totalSum > user.coin) {
-				await this.bot.sendMessage(chatId, `На вашем балансе не достаточно coin.`);
+				await this.bot.sendMessage(chatId, `На вашем балансе недостаточно coin.`);
 				return;
 			}
 		} else {
-			await this.bot.sendMessage(chatId, `На вашем балансе не достаточно coin.`);
+			await this.bot.sendMessage(chatId, `На вашем балансе недостаточно coin.`);
 			return;
 		}
 

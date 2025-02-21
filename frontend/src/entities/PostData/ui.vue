@@ -60,7 +60,7 @@
 
 	const saveData = (values: any) => {
 		images.value = values.imageList;
-		useChannelList.value = values.channelsPost?.map((item) => item.id);
+		useChannelList.value = values.post.channels?.map((item) => item.id);
 	};
 
 	const openPostPanel = async () => {
@@ -70,13 +70,13 @@
 			images.value = [];
 
 			const response = await receivingPost(Number(route.params.id));
-			await saveData(response);
+			await saveData(response.data);
 		} catch (e) {
 			router.push('/publishing-panel');
 			localStorage.setItem('watched', '');
 			toast.error(e.response.data.message);
 		} finally {
-			imagesToLoad.value = images.value.length;
+			imagesToLoad.value = images.value?.length;
 			if (imagesToLoad.value === 0) {
 				appStore.isLoading = false;
 			}
@@ -123,7 +123,7 @@
 			appStore.isLoading = true;
 			const result = await deletePost(Number(route.params.id));
 			nextPage();
-			toast.success(result);
+			toast.success(result?.message);
 		} catch (e) {
 			toast.error(e.response.data.message);
 		} finally {
@@ -179,7 +179,7 @@
 		} finally {
 			appStore.isLoading = false;
 		}
-	}, 300);
+	}, 600);
 
 	onMounted(() => {
 		openPostPanel();

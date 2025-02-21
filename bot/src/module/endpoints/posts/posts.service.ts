@@ -344,9 +344,8 @@ export class PostsService {
 
 		return {
 			pagination: null,
-			imageList,
-			channelsPost: post.dataValues.channels,
-			message: 'Успешное получение поста'
+			data: { imageList, post: post },
+			message: 'Успешное обновление поста!'
 		};
 	}
 

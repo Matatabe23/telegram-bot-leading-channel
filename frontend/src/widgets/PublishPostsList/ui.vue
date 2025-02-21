@@ -133,7 +133,7 @@
 			}
 			appStore.isLoading = true;
 			const result = await publishInstantly(id);
-			toast.success(result);
+			toast.success(result.message);
 			editorStore.getPosts();
 		} catch (e: any) {
 			toast.error(e.response.data.message);
