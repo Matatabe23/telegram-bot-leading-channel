@@ -28,12 +28,17 @@
 					class="h-6 w-6"
 				/>
 			</v-app-bar-nav-icon>
+			Пользователей онлайн: {{ onlineUsers }}
+
 			<div class="ml-auto mr-4 cursor-pointer">
 				<v-menu location="bottom">
 					<template v-slot:activator="{ props }">
 						<v-avatar
 							v-bind="props"
-							:image="appStore.userData.avatarUrl || 'https://api.dicebear.com/9.x/bottts/svg'"
+							:image="
+								appStore.userData.avatarUrl ||
+								'https://api.dicebear.com/9.x/bottts/svg'
+							"
 						></v-avatar>
 					</template>
 
@@ -57,15 +62,17 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, computed } from 'vue';
+	import { ref, computed, onMounted } from 'vue';
 	import { useRouter } from 'vue-router';
-	import { checkPermissions, Icons } from '@/shared';
+	import { checkPermissions, Icons, useSocket } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
 
 	const router = useRouter();
 	const appStore = useAppStore();
+	const socket = useSocket();
 
 	const drawer = ref(false);
+	const onlineUsers = ref(1);
 
 	const goTo = (path: string) => {
 		router.push(path);
@@ -75,7 +82,7 @@
 		{
 			title: 'Главная страница',
 			path: '/publishing-page',
-			visible: true 
+			visible: true
 		},
 		{
 			title: 'Аккаунты',
@@ -87,7 +94,7 @@
 			path: '/roles',
 			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_ROLES)
 		},
-        {
+		{
 			title: 'Реклама',
 			path: '/advertisement',
 			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_ADVERTISEMENTS)
@@ -95,13 +102,14 @@
 		{
 			title: 'Настройки',
 			path: '/settings',
-			visible: checkPermissions(appStore.data?.EPermissions?.CREATE_CHANNEL) || checkPermissions(appStore.data?.EPermissions?.SET_PUBLICATION_TIME)
+			visible:
+				checkPermissions(appStore.data?.EPermissions?.CREATE_CHANNEL) ||
+				checkPermissions(appStore.data?.EPermissions?.SET_PUBLICATION_TIME)
 		}
 	];
 
 	const isHomePage = computed(() => router.currentRoute.value.path === '/');
-    const visiblePages = computed(() => PAGES.filter(page => page.visible));
-
+	const visiblePages = computed(() => PAGES.filter((page) => page.visible));
 
 	const exit = async () => {
 		localStorage.removeItem('user');
@@ -121,4 +129,12 @@
 			function: exit
 		}
 	];
+
+	onMounted(async () => {
+		socket.on('onlineUsers', (count) => {
+			onlineUsers.value = count;
+		});
+
+		socket.emit('requestOnlineUsersUpdate');
+	});
 </script>

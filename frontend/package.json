@@ -30,6 +30,7 @@
 		"lodash": "^4.17.21",
 		"lodash.debounce": "^4.0.8",
 		"pinia": "^2.1.7",
+		"socket.io-client": "^4.8.1",
 		"swiper": "^11.1.12",
 		"tauri": "^0.15.0",
 		"vee-validate": "^4.13.2",

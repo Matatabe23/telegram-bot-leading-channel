@@ -1,5 +1,5 @@
 <template>
-	<section class="w-full pb-32 md:pb-0">
+	<section class="post-data w-full pb-32 md:pb-0">
 		<PaginationPostData
 			:checkListImageLenght="checkListImage.length"
 			v-model:useChannelList="useChannelList"
@@ -16,23 +16,26 @@
 				:key="index"
 				class="relative"
 			>
-				<img
-					:src="photo.img"
-					alt="Photo"
-					class="h-[58vh] object-contain rounded-lg"
-					@load="checkImageLoaded"
-				/>
-				<v-checkbox
-					class="absolute top-2 right-2 bg-white px-2 rounded-lg"
-					color="red"
-					hide-details
-					v-if="
-						imagesToLoad < 1 &&
-						checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)
-					"
-					:model-value="checkListImage.some((checkId) => checkId.id === photo.id)"
-					@update:model-value="setValueSheckBox(photo)"
-				/>
+				<v-skeleton-loader class="post-data__image-skelet" v-show="imagesToLoad > 1" type="image"></v-skeleton-loader>
+				<div v-show="imagesToLoad <= 0">
+					<img
+						:src="photo.img"
+						alt="Photo"
+						class="h-[58vh] object-contain rounded-lg"
+						@load="checkImageLoaded"
+					/>
+					<v-checkbox
+						class="absolute top-2 right-2 bg-white px-2 rounded-lg"
+						color="red"
+						hide-details
+						v-if="
+							imagesToLoad < 1 &&
+							checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)
+						"
+						:model-value="checkListImage.some((checkId) => checkId.id === photo.id)"
+						@update:model-value="setValueSheckBox(photo)"
+					/>
+				</div>
 			</div>
 		</div>
 	</section>
@@ -75,7 +78,7 @@
 			router.push('/publishing-panel');
 			localStorage.setItem('watched', '');
 			toast.error(e.response.data.message);
-		} finally {
+		} finally {``
 			imagesToLoad.value = images.value?.length;
 			if (imagesToLoad.value === 0) {
 				appStore.isLoading = false;
@@ -185,3 +188,13 @@
 		openPostPanel();
 	});
 </script>
+
+<style lang="scss">
+.post-data{
+    &__image-skelet{
+        .v-skeleton-loader__image{
+            @apply h-[58vh] w-[26vw]
+        }
+    }
+}
+</style>

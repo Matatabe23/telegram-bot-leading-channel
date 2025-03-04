@@ -22,6 +22,8 @@ import { InitDataModule } from './module/service/init-data/init-data.module';
 import { HelpersModule } from './module/service/helpers/helpers.module';
 import { PaymentsModule } from './module/service/payments/payments.module';
 import { AdvertisementModule } from './module/endpoints/advertisement/advertisement.module';
+import { WebSocketModule } from './module/websocket/websocket.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
 	imports: [
@@ -29,7 +31,10 @@ import { AdvertisementModule } from './module/endpoints/advertisement/advertisem
 			load: [configuration],
 			isGlobal: true
 		}),
+		EventEmitterModule.forRoot(),
 		DBModule,
+
+		WebSocketModule,
 
 		PostsModule,
 		UsersModule,

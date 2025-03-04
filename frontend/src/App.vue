@@ -40,7 +40,7 @@
 			},
 			10 * 60 * 1000
 		);
-        
+
 		if (route.path === '/' && appStore.auth === true) {
 			await router.push('/publishing-page');
 		} else if (route.path !== '/' && appStore.auth === false) {
