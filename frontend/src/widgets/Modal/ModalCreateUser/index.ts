@@ -1,1 +1,0 @@
-export { default as ModalCreateUser } from './ui.vue';

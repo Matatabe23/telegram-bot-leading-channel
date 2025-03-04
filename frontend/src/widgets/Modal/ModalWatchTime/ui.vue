@@ -1,6 +1,6 @@
 <template>
 	<Modal
-		title="Создание пользователя"
+		title="Время публикации"
 		@close="emit('close')"
 	>
 		<div>
