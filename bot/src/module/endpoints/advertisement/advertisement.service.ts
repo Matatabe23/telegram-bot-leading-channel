@@ -20,26 +20,22 @@ export class AdvertisementService {
 		sortBy: string,
 		sortOrder: 'ASC' | 'DESC'
 	) {
+		let totalItems = 0;
 		try {
-			const offset = (page - 1) * perPage;
-
-			const { rows: users, count: totalItems } = await this.advertisement.findAndCountAll({
-				offset,
-				limit: perPage,
+			const { count, rows: users } = await this.advertisement.findAndCountAll({
+				offset: perPage === -1 ? 0 : (page - 1) * perPage,
+				limit: perPage === -1 ? undefined : perPage,
 				order: [[sortBy, sortOrder]],
-				include: [
-					{
-						model: Users,
-						as: 'user'
-					}
-				]
+				include: [{ model: Users, as: 'user' }]
 			});
+
+			totalItems = count;
 
 			return {
 				pagination: {
 					count: totalItems,
-					currentPage: page,
-					perPage
+					currentPage: perPage === -1 ? 1 : page,
+					perPage: perPage === -1 ? totalItems : perPage
 				},
 				data: users,
 				message: 'Успешное получение постов'

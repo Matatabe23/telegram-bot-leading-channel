@@ -81,36 +81,40 @@ export class UsersService {
 		sortBy: string,
 		sortOrder: 'ASC' | 'DESC'
 	) {
+		// Вычисление смещения и лимита
 		page = page > 0 ? page : 1;
 		limit = limit > 0 ? limit : 10;
+		const offset = limit === -1 ? 0 : (page - 1) * limit;
 
-		const offset = (page - 1) * limit;
-
+		// Формирование условий поиска
 		const where = search
 			? {
 					[Op.or]: [
-						{ name: { [Op.like]: `%${search.toLowerCase()}%` } }, // Поиск по name
-						{ telegramId: { [Op.like]: `%${search.toLowerCase()}%` } }, // Поиск по telegramId
-						{ id: { [Op.like]: `%${search}%` } } // Поиск по id (поиск подстроки для числовых значений)
+						{ name: { [Op.like]: `%${search.toLowerCase()}%` } },
+						{ telegramId: { [Op.like]: `%${search.toLowerCase()}%` } },
+						{ id: { [Op.like]: `%${search}%` } }
 					]
 				}
 			: {};
 
-		const { rows: users, count: totalItems } = await this.usersRepository.findAndCountAll({
+		// Выполнение запроса
+		const result = await this.usersRepository.findAndCountAll({
 			where,
-			offset,
-			limit,
-			attributes: {
-				exclude: ['password']
-			},
+			offset: limit === -1 ? undefined : offset,
+			limit: limit === -1 ? undefined : limit,
+			attributes: { exclude: ['password'] },
 			order: [[sortBy, sortOrder]]
 		});
 
+		// Деструктуризация результата
+		const { count: totalItems, rows: users } = result;
+
+		// Возвращение данных
 		return {
 			users,
 			totalItems,
-			totalPages: Math.ceil(totalItems / limit),
-			currentPage: page
+			totalPages: limit === -1 ? 1 : Math.ceil(totalItems / limit),
+			currentPage: limit === -1 ? 1 : page
 		};
 	}
 
