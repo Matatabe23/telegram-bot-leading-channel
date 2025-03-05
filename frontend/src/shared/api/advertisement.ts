@@ -3,7 +3,7 @@ import { $autHost } from "@/shared";
 
 export const getListAdvertisements = async (params: {
     page: number,
-    perpage: number,
+    perPage: number,
     sortBy?: string,
     sortOrder?: 'ASC' | 'DESC'
 }) => {

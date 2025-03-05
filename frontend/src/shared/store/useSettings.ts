@@ -21,9 +21,11 @@ export const useSettings = defineStore('useSettings', {
         async getListRoles() {
             const listRoles = await getListRoles()
             this.listRoles = listRoles.map((role) => ({
-				...role,
-				permissions: role.permissions ? role.permissions.split(',') : []
-			}));
+                ...role,
+                permissions: role.permissions ? role.permissions.split(',') : []
+            }));
+
+            return listRoles
         }
 
 

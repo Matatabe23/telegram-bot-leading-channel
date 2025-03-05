@@ -1,92 +1,88 @@
 <template>
-	<div class="advertisement x-ident mt-4">
+	<v-container>
 		<!-- Таблица -->
-		<div class="overflow-x-auto custom-scroll">
-			<table class="table-auto w-full border-collapse advertisement__table-form min-w-[700px]">
-				<thead>
-					<tr class="bg-gray-100">
-						<th class="advertisement__table-form advertisement__padding-table text-left w-[4%]">id</th>
-						<th class="advertisement__table-form advertisement__padding-table text-left w-[20%]">Владелец</th>
-						<th class="advertisement__table-form advertisement__padding-table text-left w-[20%]">Статус</th>
-                        <th class="advertisement__table-form advertisement__padding-table text-left w-[20%]">Действия</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="(ad, index) in listAdvertisement"
-						:key="index"
-					>
-						<td class="advertisement__table-form advertisement__padding-table">{{ ad.id }}</td>
-						<td class="advertisement__table-form advertisement__padding-table">{{ ad.user.name }}</td>
-						<td class="advertisement__table-form advertisement__padding-table">
-							<v-select
-								label="Статус"
-								:items="appStore.data.ADVERTISEMENT_STATUS"
-								variant="outlined"
-								v-model="ad.moderationStatus"
-								@update:model-value="handleStatusUpdate(ad)"
-								:loading="appStore.isLoading"
-							/>
-						</td>
-                        <td class="advertisement__table-form advertisement__padding-table">
-							<button
-                                @click="setAdvertisement(ad)"
-								class="bg-blue-500 text-white px-2 py-1 rounded"
-							>
-								Время публикации
-							</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<v-data-table-server
+			:loading="appStore.isLoading"
+			:headers="headers"
+			:items="listAdvertisement"
+			item-key="id"
+			class="elevation-1"
+			v-model:items-per-page="perPage"
+			v-model:page="currentPage"
+			:items-length="totalItems"
+			@update:sortBy="setSort"
+			@update:page="getAdvertisement()"
+			@update:items-per-page="getAdvertisement()"
+		>
+			<template v-slot:item.moderationStatus="{ item }">
+				<v-select
+					v-model="item.moderationStatus"
+					:items="appStore.data.ADVERTISEMENT_STATUS"
+					label="Статус"
+					class="my-2"
+					:loading="appStore.isLoading"
+					@change="handleStatusUpdate(item)"
+				/>
+			</template>
+			<template v-slot:item.actions="{ item }">
+				<v-btn
+					@click="setAdvertisement(item)"
+					color="primary"
+					size="small"
+				>
+					Время публикации
+				</v-btn>
+			</template>
+		</v-data-table-server>
+	</v-container>
 
-		<v-pagination
-			v-model="page"
-			:length="totalPages"
-			:total-visible="appStore.isMd ? 7 : 3"
-			@update:model-value="setPage"
-			:disabled="appStore.isLoading"
-			class="text-xs"
-		/>
-	</div>
-
-    <ModalWatchTime v-if="isWatchTime" @close="isWatchTime = false"/>
+	<!-- Модальное окно для времени публикации -->
+	<ModalWatchTime
+		v-if="isWatchTime"
+		@close="isWatchTime = false"
+	/>
 </template>
 
 <script lang="ts" setup>
-	import { onMounted, ref } from 'vue';
+	import { ref, onMounted } from 'vue';
 	import { getListAdvertisements, updateAdvertisement } from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
 	import { IAdvertisement } from './model';
-    import { ModalWatchTime } from '@/widgets';
+	import { ModalWatchTime } from '@/widgets';
 
 	const toast = useToast();
 	const appStore = useAppStore();
 
 	const listAdvertisement = ref<IAdvertisement[]>([]);
-	const page = ref(1);
-    const isWatchTime = ref(false);
-	const perpage = ref(7);
-	const totalPages = ref(1);
-    const selectAdvertisement = ref<IAdvertisement>()
+	const currentPage = ref(1);
+	const perPage = ref(10);
+	const totalItems = ref(0);
+	const isWatchTime = ref(false);
+	const selectAdvertisement = ref<IAdvertisement>();
+	const sortBy = ref([]);
+
+	const headers = [
+		{ title: 'id', key: 'id' },
+		{ title: 'Владелец', key: 'user.name' },
+		{ title: 'Статус', key: 'moderationStatus' },
+		{ title: 'Действия', key: 'actions', sortable: false }
+	];
 
 	const getAdvertisement = async () => {
-		const result = await getListAdvertisements({ page: page.value, perpage: perpage.value });
+		const result = await getListAdvertisements({
+			page: currentPage.value,
+			perPage: perPage.value,
+			sortBy: sortBy.value?.[0]?.key,
+			sortOrder: sortBy.value?.[0]?.order || 'asc'
+		});
 		listAdvertisement.value = result.data;
-		totalPages.value = Math.ceil(result.pagination.count / perpage.value);
+		totalItems.value = result.pagination.count;
 	};
 
-	const setPage = (value: number) => {
-		page.value = value;
-		getAdvertisement();
-	};
-
-    const setAdvertisement = (value: IAdvertisement) => {
-        selectAdvertisement.value = value
-        isWatchTime.value = true
-        console.log(value)
+	const setAdvertisement = (advertisement: IAdvertisement) => {
+		selectAdvertisement.value = advertisement;
+		isWatchTime.value = true;
 	};
 
 	const handleStatusUpdate = async (advertisement: IAdvertisement) => {
@@ -99,17 +95,12 @@
 		}
 	};
 
-	onMounted(() => getAdvertisement());
+	const setSort = (sort) => {
+		sortBy.value = sort;
+		getAdvertisement();
+	};
+
+	onMounted(() => {
+		getAdvertisement();
+	});
 </script>
-
-<style lang="scss">
-.advertisement{
-    &__table-form{
-        @apply border border-gray-200
-    }
-
-    &__padding-table{
-        @apply px-4 py-2
-    }
-}
-</style>

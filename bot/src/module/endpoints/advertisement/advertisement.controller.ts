@@ -26,14 +26,14 @@ export class AdvertisementController {
 	@UpdateAdvertisements()
 	async createNewRole(
 		@Query('page') page: number,
-		@Query('perpage') perpage: number,
+		@Query('perPage') perPage: number,
 		@Query('sortBy') sortBy: string,
 		@Query('sortOrder') sortOrder: 'ASC' | 'DESC'
 	) {
 		try {
 			return this.advertisementsService.getAdvertisements(
 				Number(page) || 1,
-				Number(perpage) || 10,
+				Number(perPage) || 10,
 				sortBy ? sortBy : 'id',
 				sortOrder ? sortOrder : 'ASC'
 			);

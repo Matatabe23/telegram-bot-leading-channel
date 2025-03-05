@@ -1,133 +1,94 @@
 <template>
-	<div class="users x-ident mt-4">
+	<div class="x-ident mt-4">
 		<div class="md:flex items-center gap-4 w-full lg:w-4/6">
 			<v-text-field
 				clearable
 				label="id, имя, телеграмм айди"
 				variant="outlined"
 				v-model="search"
-				@update:model-value="updateSearch($event)"
+				@update:model-value="updateSearch"
 				:loading="appStore.isLoading"
 				:disabled="appStore.isLoading"
 			/>
 		</div>
-		<!-- Таблица -->
-		<div class="overflow-x-auto custom-scroll mt-4">
-			<table class="table-auto w-full border-collapse users__table-form min-w-[1300px]">
-				<thead>
-					<tr class="bg-gray-100">
-						<th
-							class="users__table-form users__padding-table text-left"
-							:class="item.weight"
-							v-for="item in tableForm"
-							:key="item.key"
-						>
-							<button
-								class="flex gap-1 items-center"
-								@click="setSort(item.key)"
-							>
-								{{ item.name }}
-								<Icons
-									icon="ARROW_STROKE"
-									:class="{
-										'text-red-600': sortType && sortKey === item.key,
-										'rotate-180': sortType === 'asc' && sortKey === item.key
-									}"
-								/>
-							</button>
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="user in usersList"
-						:key="user.id"
-					>
-						<td class="users__table-form users__padding-table">{{ user.id }}</td>
-						<td class="users__table-form users__padding-table">
-							<div class="w-16 h-16 mx-auto">
-								<img
-									:src="user.avatarUrl"
-									alt="User Avatar"
-									class="rounded-full w-full h-full object-cover mx-auto"
-								/>
-							</div>
-						</td>
 
-						<td class="users__table-form users__padding-table">{{ user.name }}</td>
-						<td class="users__table-form users__padding-table">
-							<v-select
-								label="Права"
-								:items="listRoles"
-								variant="outlined"
-								v-model="user.role"
-								:loading="appStore.isLoading"
-								clearable
-								clear-icon="mdi-close-circle"
-								@update:model-value="updateDataUsers(user, null)"
-							/>
-						</td>
-						<td class="users__table-form users__padding-table">{{ user.telegramId }}</td>
-						<td class="users__table-form users__padding-table">
-							<v-text-field
-								label="coin"
-								variant="outlined"
-								v-model="user.coin"
-								class="w-full"
-								type="number"
-								@update:model-value="updateCoin(user, $event)"
-							/>
-						</td>
-						<td class="users__table-form users__padding-table">
-							<VSwitch
-								hide-details
-								@change="updateDataUsers(user, { isTeamMember: true })"
-								:model-value="user.isTeamMember"
-							>
-							</VSwitch>
-						</td>
-						<td class="users__table-form users__padding-table">
-							<v-btn
-								variant="flat"
-								class="mb-4"
-								color="red"
-								:loading="appStore.isLoading"
-								:disabled="appStore.isLoading"
-								@click="deleteUsers(user.id)"
-							>
-								Удалить
-							</v-btn>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<v-data-table-server
+			:loading="appStore.isLoading"
+			:headers="headers"
+			:items="usersList"
+			item-value="id"
+			class="mt-4 elevation-1"
+			v-model:items-per-page="perPage"
+			v-model:page="currentPage"
+			:items-length="totalItems"
+			@update:sortBy="setSort"
+			@update:page="getUsers"
+			@update:items-per-page="getUsers"
+		>
+			<template v-slot:item.avatarUrl="{ item }">
+				<v-avatar size="48">
+					<img
+						:src="item.avatarUrl"
+						alt="User Avatar"
+						class="object-cover"
+					/>
+				</v-avatar>
+			</template>
 
-		<v-pagination
-			v-model="currentPage"
-			:length="totalPages"
-			:total-visible="appStore.isMd ? 7 : 3"
-			@update:model-value="setPage"
-			:disabled="appStore.isLoading"
-			class="text-xs"
-		/>
+			<template #item.role="{ item }">
+				<v-select
+					label="Права"
+					:items="listRoles"
+					variant="outlined"
+					v-model="item.role"
+					:loading="appStore.isLoading"
+					clearable
+					clear-icon="mdi-close-circle"
+					class="min-w-[200px]"
+					@update:model-value="updateDataUsers(item, null)"
+				/>
+			</template>
+
+			<template #item.coin="{ item }">
+				<v-text-field
+					label="coin"
+					variant="outlined"
+					v-model="item.coin"
+					class="w-full my-3 min-w-[100px]"
+					type="number"
+					@update:model-value="updateCoin(item, $event)"
+				/>
+			</template>
+
+			<template #item.isTeamMember="{ item }">
+				<v-switch
+					hide-details
+					@change="updateDataUsers(item, { isTeamMember: true })"
+					:model-value="item.isTeamMember"
+				/>
+			</template>
+
+			<template #item.actions="{ item }">
+				<v-btn
+					:loading="appStore.isLoading"
+					:disabled="appStore.isLoading"
+					@click="deleteUsers(item.id)"
+					color="red"
+					icon
+				>
+					<v-icon>mdi-delete</v-icon>
+				</v-btn>
+			</template>
+		</v-data-table-server>
 	</div>
 </template>
 
 <script lang="ts" setup>
 	import { computed, onMounted, ref } from 'vue';
 	import { useDebounceFn } from '@vueuse/core';
-	import {
-		userData,
-		deleteUser,
-		getUsersList,
-		updateDataUser,
-		useSettings,
-		Icons
-	} from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
-	import { tableForm } from './const';
+	import { getUsersList, updateDataUser, deleteUser, useSettings } from '@/shared';
 
 	const settingsStore = useSettings();
 	const toast = useToast();
@@ -136,63 +97,58 @@
 	const search = ref('');
 	const currentPage = ref(1);
 	const totalItems = ref(0);
-	const totalPages = ref(0);
-	const usersList = ref<userData[]>([]);
-	const sortKey = ref();
-	const sortType = ref('');
+	const usersList = ref([]);
+	const sortBy = ref([]);
+	const perPage = ref(10);
 
-	const listRoles = computed(() => {
-		return settingsStore.listRoles.map((item) => ({
-			title: item.name,
-			value: item.name
-		}));
-	});
+	const headers = [
+		{ title: 'ID', key: 'id', sortable: true },
+		{ title: 'Аватар', key: 'avatarUrl', sortable: false },
+		{ title: 'Имя', key: 'name', sortable: true },
+		{ title: 'Права', key: 'role', sortable: false },
+		{ title: 'Telegram ID', key: 'telegramId', sortable: true },
+		{ title: 'Coin', key: 'coin', sortable: true },
+		{ title: 'Команда', key: 'isTeamMember', sortable: false },
+		{ title: 'Действия', key: 'actions', sortable: false }
+	];
+
+	const listRoles = computed(() =>
+		settingsStore.listRoles.map((item) => ({ title: item.name, value: item.name }))
+	);
 
 	const getUsers = async () => {
 		try {
 			appStore.isLoading = true;
-			const infoUsers = await getUsersList({
+			const { users, totalItems: total } = await getUsersList({
 				page: currentPage.value,
-				limit: 3,
+				limit: perPage.value,
 				search: search.value,
-				sortBy: sortKey.value,
-				sortOrder: sortType.value
+				sortBy: sortBy.value?.[0]?.key,
+				sortOrder: sortBy.value?.[0]?.order || 'asc'
 			});
-			usersList.value = infoUsers.users;
-			totalItems.value = infoUsers.totalItems;
-			totalPages.value = infoUsers.totalPages;
-		} catch (e) {
-			//
+			usersList.value = users;
+			totalItems.value = total;
 		} finally {
 			appStore.isLoading = false;
 		}
 	};
 
-	const setPage = (page: number) => {
-		currentPage.value = page;
+	const setSort = (sort) => {
+		sortBy.value = sort;
 		getUsers();
 	};
 
-	const updateSearch = useDebounceFn(async (value: string) => {
-		try {
-			appStore.isLoading = true;
-			search.value = value;
-			await getUsers();
-		} catch (e) {
-			toast.error(e.response.data.message);
-		} finally {
-			appStore.isLoading = false;
-		}
-	}, 1000);
+	const updateSearch = useDebounceFn(getUsers, 1000);
 
-	const updateDataUsers = async (value: userData, update?: { isTeamMember?: boolean }) => {
+	const updateDataUsers = async (user, update) => {
 		try {
 			appStore.isLoading = true;
 			await updateDataUser({
-				...value,
-				isTeamMember: update?.isTeamMember ? !value.isTeamMember : value.isTeamMember
+				...user,
+				isTeamMember: update?.isTeamMember ? !user.isTeamMember : user.isTeamMember
 			});
 			toast.success('Успешное обновление пользователя');
+			getUsers();
 		} catch (e) {
 			toast.error(e.response.data.message);
 		} finally {
@@ -201,15 +157,11 @@
 	};
 
 	const deleteUsers = async (id: number) => {
+		if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) return;
 		try {
-			const isConfirmed = window.confirm(
-				'Вы уверены, что хотите удалить этого пользователя?'
-			);
-			if (!isConfirmed) return;
-
 			appStore.isLoading = true;
 			await deleteUser(id);
-			await getUsers();
+			getUsers();
 			toast.success('Успешное удаление пользователя');
 		} catch (e) {
 			toast.error(e.response.data.message);
@@ -218,14 +170,11 @@
 		}
 	};
 
-	const updateCoin = useDebounceFn(async (user: userData, coin: string) => {
+	const updateCoin = useDebounceFn(async (user, coin) => {
 		try {
 			appStore.isLoading = true;
-			await updateDataUser({
-				...user,
-				coin: Number(coin)
-			});
-			await getUsers();
+			await updateDataUser({ ...user, coin: Number(coin) });
+			getUsers();
 			toast.success('Успешное обновление пользователя');
 		} catch (e) {
 			toast.error(e.response.data.message);
@@ -234,31 +183,5 @@
 		}
 	}, 1000);
 
-	const setSort = (sort: string) => {
-		if (sort) {
-			if (sortKey.value !== sort) {
-				sortKey.value = sort;
-				sortType.value = 'asc';
-			} else {
-				if (!sortType.value) sortType.value = 'asc';
-				else if (sortType.value === 'asc') sortType.value = 'desc';
-				else sortType.value = null;
-			}
-            getUsers()
-		}
-	};
-
-	onMounted(() => getUsers());
+	onMounted(getUsers);
 </script>
-
-<style lang="scss">
-.users{
-    &__table-form{
-        @apply border border-gray-200
-    }
-
-    &__padding-table{
-        @apply px-4 py-2
-    }
-}
-</style>

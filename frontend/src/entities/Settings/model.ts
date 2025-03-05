@@ -29,13 +29,6 @@ export interface IStateChannels {
     }
 }
 
-export interface IStateRoles {
-    form: {
-        name: string,
-    },
-    listRoles: IGetListRoles[]
-}
-
 export enum IEditChannelType {
     PRIVATED = 'privated',
     ADVERTISEMENT = 'advertisement'

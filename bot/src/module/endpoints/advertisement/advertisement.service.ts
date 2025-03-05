@@ -16,16 +16,16 @@ export class AdvertisementService {
 	// Получения списка рекламы
 	async getAdvertisements(
 		page: number = 1,
-		perpage: number = 10,
+		perPage: number = 10,
 		sortBy: string,
 		sortOrder: 'ASC' | 'DESC'
 	) {
 		try {
-			const offset = (page - 1) * perpage;
+			const offset = (page - 1) * perPage;
 
 			const { rows: users, count: totalItems } = await this.advertisement.findAndCountAll({
 				offset,
-				limit: perpage,
+				limit: perPage,
 				order: [[sortBy, sortOrder]],
 				include: [
 					{
@@ -39,7 +39,7 @@ export class AdvertisementService {
 				pagination: {
 					count: totalItems,
 					currentPage: page,
-					perpage
+					perPage
 				},
 				data: users,
 				message: 'Успешное получение постов'

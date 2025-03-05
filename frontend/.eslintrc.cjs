@@ -19,5 +19,6 @@ module.exports = {
 	rules: {
 		'vue/multi-word-component-names': 'off',
         'no-console': 'warn',
+        'vue/valid-v-slot': ['error', { allowModifiers: true }],
 	}
 }

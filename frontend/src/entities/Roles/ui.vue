@@ -1,16 +1,14 @@
 <template>
-	<div class="roles x-ident mt-4">
-		<!-- Поле для добавления новой строки -->
+	<div class="x-ident mt-4">
 		<div class="mb-4 flex items-center gap-2">
-			<!-- Инпут из Vuetify -->
 			<v-text-field
 				clearable
 				label="Имя роли"
 				variant="outlined"
-				v-model="state.form.name"
+				v-model="name"
 				class="w-full"
 			/>
-			<!-- Кнопка -->
+
 			<v-btn
 				@click="addRoles"
 				color="primary"
@@ -21,80 +19,74 @@
 			</v-btn>
 		</div>
 
-		<!-- Таблица -->
-		<div class="overflow-x-auto custom-scroll">
-			<table class="table-auto w-full border-collapse roles__table-form min-w-[700px]">
-				<thead>
-					<tr class="bg-gray-100">
-						<th class="roles__table-form roles__padding-table text-left w-[4%]">id</th>
-						<th class="roles__table-form roles__padding-table text-left w-[20%]">Имя роли</th>
-						<th class="roles__table-form roles__padding-table text-left w-[50%]">Права</th>
-						<th class="roles__table-form roles__padding-table text-left">Действия</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="(role, index) in state.listRoles"
-						:key="index"
-					>
-						<td class="roles__table-form roles__padding-table">{{ role.id }}</td>
-						<td class="roles__table-form roles__padding-table">{{ role.name }}</td>
-						<td class="roles__table-form roles__padding-table">
-							<v-select
-								label="Права"
-								:items="appStore.data.PERMISSIONS_LIST"
-								multiple
-								variant="outlined"
-								v-model="role.permissions"
-								@update:model-value="handlePermissionsUpdate(role.id, $event)"
-								:loading="appStore.isLoading"
-							/>
-						</td>
-						<td class="border border-gray-200 roles__padding-table">
-							<button
-								@click="deleRole(role.id)"
-								class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
-							>
-								Удалить
-							</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+		<v-data-table
+			:headers="headers"
+			:items="listRoles"
+			:loading="appStore.isLoading"
+			item-value="id"
+			class="elevation-1 mb-4"
+			:items-per-page="-1"
+			@update:sortBy="setSort"
+			hide-default-footer
+		>
+			<template v-slot:item.permissions="{ item }">
+				<v-select
+					:items="appStore.data.PERMISSIONS_LIST"
+					v-model="item.permissions"
+					multiple
+					variant="outlined"
+					@update:model-value="handlePermissionsUpdate(item.id, $event)"
+					:loading="appStore.isLoading"
+					class="my-2 min-w-[200px]"
+				/>
+			</template>
+			<template v-slot:item.actions="{ item }">
+				<v-btn
+					@click="deleRole(item.id)"
+					color="red"
+					icon
+				>
+					<v-icon>mdi-delete</v-icon>
+				</v-btn>
+			</template>
+		</v-data-table>
 	</div>
 </template>
 
 <script lang="ts" setup>
-	import { reactive, watch } from 'vue';
+	import { ref, watch } from 'vue';
 	import { createNewRole, deleteRole, updatePermissions, useSettings } from '@/shared';
-	import { IStateRoles } from '@/entities';
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
+	import { VDataTable, VTextField, VBtn, VSelect, VIcon } from 'vuetify/components';
 
 	const settingsStore = useSettings();
 	const toast = useToast();
 	const appStore = useAppStore();
 
-	const state: IStateRoles = reactive({
-		form: {
-			name: ''
-		},
-		listRoles: []
-	});
+	const name = ref('');
+	const listRoles = ref([]);
+
+	const sortBy = ref([]);
+
+	const headers = [
+		{ title: 'ID', key: 'id', value: 'id' },
+		{ title: 'Имя роли', key: 'name' },
+		{ title: 'Права', key: 'permissions' },
+		{ title: 'Действия', key: 'actions', sortable: false }
+	];
 
 	const addRoles = async () => {
 		try {
-			if (state.form.name === '') {
+			if (name.value === '') {
 				toast.error('Заполните поле');
 				return;
 			}
 
-			const result = await createNewRole(state.form.name);
-
-			state.form.name = '';
-			toast.success(result);
+			const result = await createNewRole(name.value);
 			await settingsStore.getListRoles();
+			name.value = '';
+			toast.success(result);
 		} catch (e: any) {
 			toast.error(e.response.data.message);
 		}
@@ -115,23 +107,15 @@
 		}
 	};
 
+	const setSort = (sort) => {
+		sortBy.value = sort;
+	};
+
 	watch(
 		() => settingsStore.listRoles,
 		(value) => {
-			state.listRoles = value;
+			listRoles.value = value;
 		},
 		{ deep: true, immediate: true }
 	);
 </script>
-
-<style lang="scss">
-.roles{
-    &__table-form{
-        @apply border border-gray-200
-    }
-
-    &__padding-table{
-        @apply px-4 py-2
-    }
-}
-</style>
