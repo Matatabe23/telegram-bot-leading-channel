@@ -8,6 +8,7 @@
 						<th class="advertisement__table-form advertisement__padding-table text-left w-[4%]">id</th>
 						<th class="advertisement__table-form advertisement__padding-table text-left w-[20%]">Владелец</th>
 						<th class="advertisement__table-form advertisement__padding-table text-left w-[20%]">Статус</th>
+                        <th class="advertisement__table-form advertisement__padding-table text-left w-[20%]">Действия</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -27,6 +28,14 @@
 								:loading="appStore.isLoading"
 							/>
 						</td>
+                        <td class="advertisement__table-form advertisement__padding-table">
+							<button
+                                @click="setAdvertisement(ad)"
+								class="bg-blue-500 text-white px-2 py-1 rounded"
+							>
+								Время публикации
+							</button>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -41,6 +50,8 @@
 			class="text-xs"
 		/>
 	</div>
+
+    <ModalWatchTime v-if="isWatchTime" @close="isWatchTime = false"/>
 </template>
 
 <script lang="ts" setup>
@@ -49,14 +60,17 @@
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
 	import { IAdvertisement } from './model';
+    import { ModalWatchTime } from '@/widgets';
 
 	const toast = useToast();
 	const appStore = useAppStore();
 
 	const listAdvertisement = ref<IAdvertisement[]>([]);
 	const page = ref(1);
+    const isWatchTime = ref(false);
 	const perpage = ref(7);
 	const totalPages = ref(1);
+    const selectAdvertisement = ref<IAdvertisement>()
 
 	const getAdvertisement = async () => {
 		const result = await getListAdvertisements({ page: page.value, perpage: perpage.value });
@@ -67,6 +81,12 @@
 	const setPage = (value: number) => {
 		page.value = value;
 		getAdvertisement();
+	};
+
+    const setAdvertisement = (value: IAdvertisement) => {
+        selectAdvertisement.value = value
+        isWatchTime.value = true
+        console.log(value)
 	};
 
 	const handleStatusUpdate = async (advertisement: IAdvertisement) => {
