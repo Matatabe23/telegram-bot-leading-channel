@@ -2,6 +2,8 @@ import { Column, Model, Table, HasMany, BelongsToMany } from 'sequelize-typescri
 import { ImageData } from './image-data.repository';
 import { Channels } from './channels.repository';
 import { ChannelPosts } from './channel-posts.repository';
+import { Tags } from './tags.repository';
+import { PostTags } from './post-tags.repository';
 
 @Table
 export class DataBasePosts extends Model {
@@ -19,4 +21,7 @@ export class DataBasePosts extends Model {
 
 	@BelongsToMany(() => Channels, () => ChannelPosts)
 	channels: Channels[];
+
+	@BelongsToMany(() => Tags, () => PostTags)
+	tags: Tags[];
 }

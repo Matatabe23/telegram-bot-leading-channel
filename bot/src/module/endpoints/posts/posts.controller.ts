@@ -44,18 +44,20 @@ export class PostsController {
 	@ApiUnifiedPublication()
 	async unifiedPublication(
 		@UploadedFiles() files: Express.Multer.File[],
-		@Body() body: { waterMark: string; chatIdList: string; isInstant: string }
+		@Body() body: { waterMark: string; chatIdList: string; isInstant: string; tags?: string }
 	) {
 		try {
 			const waterMark = JSON.parse(body.waterMark);
 			const chatIdList = body.chatIdList !== '' ? body.chatIdList.split(',') : [];
 			const isInstant = body.isInstant === 'true' ? true : false;
+			const tags = body.tags.replace(/\s*,\s*/g, ',').split(',');
 
 			const result = await this.postsService.unifiedPublication(
 				files,
 				waterMark,
 				chatIdList,
-				isInstant
+				isInstant,
+				tags
 			);
 
 			return result;

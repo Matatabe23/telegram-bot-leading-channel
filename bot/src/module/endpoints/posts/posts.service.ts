@@ -11,6 +11,9 @@ import { RegularPublicationTime } from 'src/module/db/models/regular-publication
 import { Op, Order } from 'sequelize';
 import { FileRepository } from 'src/module/service/files/files.repository';
 import { TGBotPostsRepository } from 'src/module/service/tg-bot/repository/tg-bot-posts.repository';
+import { Tags } from 'src/module/db/models/tags.repository';
+import { PostTags } from 'src/module/db/models/post-tags.repository';
+import { HelpersRepository } from 'src/module/service/helpers/helpers.repository';
 
 @Injectable()
 export class PostsService {
@@ -25,17 +28,23 @@ export class PostsService {
 		private readonly channelPosts: typeof ChannelPosts,
 		@InjectModel(RegularPublicationTime)
 		private readonly regularPublicationTime: typeof RegularPublicationTime,
+		@InjectModel(Tags)
+		private readonly tags: typeof Tags,
+		@InjectModel(PostTags)
+		private readonly postTags: typeof PostTags,
 		private readonly waterMarkRepository: WaterMarkRepository,
 		private readonly s3Repository: S3Repository,
 		private readonly tGBotPostsRepository: TGBotPostsRepository,
-		private readonly fileRepository: FileRepository
+		private readonly fileRepository: FileRepository,
+		private readonly helpersRepository: HelpersRepository
 	) {}
 
 	async unifiedPublication(
 		files: Express.Multer.File[],
 		waterMark: boolean,
 		chatIdList: string[],
-		isInstant: boolean
+		isInstant: boolean,
+		tags?: string[]
 	) {
 		if (chatIdList.length === 0 || chatIdList[0] === '') {
 			throw new NotFoundException('Нету каналов для публикации');
@@ -100,6 +109,8 @@ export class PostsService {
 					}
 				]
 			});
+
+			this.helpersRepository.createTags(tags, postId);
 
 			return {
 				pagination: null,
@@ -205,13 +216,25 @@ export class PostsService {
 			where: whereCondition
 		});
 
-		const updatedPosts = posts.map((post) => {
-			post.dataValues.images = post.dataValues.images.map((img) => {
-				img.image = `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${img.dataValues.image}`;
-				return img;
-			});
-			return post;
-		});
+		const updatedPosts = await Promise.all(
+			posts.map(async (post) => {
+				// Используем toJSON(), чтобы избавиться от лишних метаданных
+				const postJson = post.toJSON();
+
+				// Преобразуем изображения
+				postJson.images = postJson.images.map((img) => {
+					img.image = `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${img.image}`;
+					return img;
+				});
+
+				// Добавляем промт
+				postJson.promt = await this.helpersRepository.getTagsByPostId(post.id);
+
+				console.log(postJson);
+
+				return postJson;
+			})
+		);
 
 		const list = await this.regularPublicationTime.findAll();
 		const totalCount = await this.dataBasePosts.count({

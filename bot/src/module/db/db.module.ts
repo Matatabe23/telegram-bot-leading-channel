@@ -12,6 +12,8 @@ import { ChannelPosts } from './models/channel-posts.repository';
 import { RolesSettings } from './models/roles-settings.repository';
 import { Payments } from './models/payments.repository';
 import { Advertisement } from './models/advertisement.repository';
+import { Tags } from './models/tags.repository';
+import { PostTags } from './models/post-tags.repository';
 
 const dbList = [
 	Users,
@@ -22,7 +24,9 @@ const dbList = [
 	ChannelPosts,
 	RolesSettings,
 	Payments,
-	Advertisement
+	Advertisement,
+	Tags,
+	PostTags
 ];
 
 @Module({

@@ -6,6 +6,9 @@ import { RolesSettings } from 'src/module/db/models/roles-settings.repository';
 import { Advertisement } from 'src/module/db/models/advertisement.repository';
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
+import { Tags } from 'src/module/db/models/tags.repository';
+import { PostTags } from 'src/module/db/models/post-tags.repository';
+import { DataBasePosts } from 'src/module/db/models/data-base-posts.repository';
 
 @Injectable()
 export class HelpersRepository {
@@ -17,7 +20,13 @@ export class HelpersRepository {
 		@InjectModel(Advertisement)
 		private readonly advertisement: typeof Advertisement,
 		@InjectModel(RegularPublicationTime)
-		private readonly regularPublicationTime: typeof RegularPublicationTime
+		private readonly regularPublicationTime: typeof RegularPublicationTime,
+		@InjectModel(Tags)
+		private readonly tags: typeof Tags,
+		@InjectModel(PostTags)
+		private readonly postTags: typeof PostTags,
+		@InjectModel(DataBasePosts)
+		private readonly dataBasePosts: typeof DataBasePosts
 	) {}
 
 	async checkPermissions(role: string, permission: EPermissions) {
@@ -158,5 +167,44 @@ export class HelpersRepository {
 		});
 
 		return inlineKeyboard;
+	}
+
+	async createTags(tags: string[], postId?: number) {
+		if (tags && tags.length > 0) {
+			const tagInstances = await Promise.all(
+				tags.map(async (tagName) => {
+					let tag = await this.tags.findOne({ where: { name: tagName } });
+					if (!tag) {
+						tag = await this.tags.create({ name: tagName });
+					}
+					return tag;
+				})
+			);
+
+			// Вставляем связи в таблицу PostTags
+			if (postId) {
+				await Promise.all(
+					tagInstances.map(async (tag) => {
+						await this.postTags.create({
+							postId: postId,
+							tagId: tag.id
+						});
+					})
+				);
+			}
+		}
+	}
+
+	async getTagsByPostId(postId: number): Promise<string> {
+		const post = await this.dataBasePosts.findByPk(postId, {
+			include: {
+				model: this.tags,
+				through: { attributes: [] } // Убираем промежуточные данные
+			}
+		});
+
+		if (!post) return '';
+
+		return post.tags.map((tag) => tag.name).join(', ');
 	}
 }
