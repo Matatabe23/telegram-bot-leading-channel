@@ -6,7 +6,7 @@
 			:headers="headers"
 			:items="listAdvertisement"
 			item-key="id"
-			class="elevation-1"
+			class="elevation-1 my-2"
 			v-model:items-per-page="perPage"
 			v-model:page="currentPage"
 			:items-length="totalItems"

@@ -1,6 +1,6 @@
 <template>
 	<div class="x-ident mt-4">
-		<div class="mb-4 flex items-center gap-2">
+		<div class="flex items-center gap-2">
 			<v-text-field
 				clearable
 				label="Имя роли"
@@ -24,7 +24,7 @@
 			:items="listRoles"
 			:loading="appStore.isLoading"
 			item-value="id"
-			class="elevation-1 mb-4"
+			class="elevation-1 my-4"
 			:items-per-page="-1"
 			@update:sortBy="setSort"
 			hide-default-footer

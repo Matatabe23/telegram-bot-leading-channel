@@ -17,7 +17,7 @@
 			:headers="headers"
 			:items="usersList"
 			item-value="id"
-			class="mt-4 elevation-1"
+			class="my-4 elevation-1"
 			v-model:items-per-page="perPage"
 			v-model:page="currentPage"
 			:items-length="totalItems"
