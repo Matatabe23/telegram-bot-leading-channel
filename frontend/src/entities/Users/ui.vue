@@ -3,12 +3,11 @@
 		<div class="md:flex items-center gap-4 w-full lg:w-4/6">
 			<v-text-field
 				clearable
-				label="id, имя, телеграмм айди"
+				label="id, имя, телеграмм"
 				variant="outlined"
 				v-model="search"
 				@update:model-value="updateSearch"
 				:loading="appStore.isLoading"
-				:disabled="appStore.isLoading"
 			/>
 		</div>
 

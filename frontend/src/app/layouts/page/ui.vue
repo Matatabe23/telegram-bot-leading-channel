@@ -99,6 +99,11 @@
 			path: '/advertisement',
 			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_ADVERTISEMENTS)
 		},
+        {
+			title: 'Теги',
+			path: '/tags',
+            visible: true
+		},
 		{
 			title: 'Настройки',
 			path: '/settings',

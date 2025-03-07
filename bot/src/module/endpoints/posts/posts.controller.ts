@@ -28,6 +28,7 @@ import { ApiDeletePost } from './decorators/api-delete-post.decorator';
 import { ApiPublishInstantly } from './decorators/api-publish-instantly.decorator';
 import { ApiChangePage } from './decorators/api-change-page.decorator';
 import { ApiUpdatePost } from './decorators/api-update-post.decorator';
+import { GetTags } from './decorators/get-tags.decorator';
 
 @Controller('posts')
 @ApiTags('Посты')
@@ -173,6 +174,35 @@ export class PostsController {
 				isPermissions
 			);
 			return result;
+		} catch (e) {
+			throw new HttpException(
+				{
+					status: HttpStatus.INTERNAL_SERVER_ERROR,
+					message: e.message
+				},
+				HttpStatus.INTERNAL_SERVER_ERROR
+			);
+		}
+	}
+
+	@Get('get-tags')
+	@UseGuards(AuthGuard)
+	@GetTags()
+	async getTags(
+		@Query('page') page: number,
+		@Query('perPage') perPage: number,
+		@Query('search') search: string,
+		@Query('sortBy') sortBy: string,
+		@Query('sortOrder') sortOrder: 'ASC' | 'DESC'
+	) {
+		try {
+			return await this.postsService.getTags(
+				Number(page),
+				Number(perPage),
+				search,
+				sortBy ? sortBy : 'id',
+				sortOrder ? sortOrder : 'ASC'
+			);
 		} catch (e) {
 			throw new HttpException(
 				{

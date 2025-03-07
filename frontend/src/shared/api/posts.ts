@@ -38,3 +38,10 @@ export const updatePosts = async (value: { id: number; channelIds?: number[]; im
     const { data } = await $autHost.put(`posts/update-posts`, value);
     return data;
 }
+
+export const receivingTags = async (params: { page: number, perPage: number, search?: string, sortBy?: string, sortOrder?: string }) => {
+    const response = await $autHost.get('posts/get-tags', {
+        params: params,
+    });
+    return response.data;
+};

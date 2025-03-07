@@ -8,7 +8,7 @@ import { WaterMarkRepository } from 'src/module/service/water-mark/water-mark.re
 import { S3Repository } from 'src/module/service/s3/s3.repository';
 import { IImageBlock } from 'src/types/types';
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
-import { Op, Order } from 'sequelize';
+import { Op, Order, Sequelize } from 'sequelize';
 import { FileRepository } from 'src/module/service/files/files.repository';
 import { TGBotPostsRepository } from 'src/module/service/tg-bot/repository/tg-bot-posts.repository';
 import { Tags } from 'src/module/db/models/tags.repository';
@@ -420,6 +420,69 @@ export class PostsService {
 			channels: post.dataValues.channels,
 			promt,
 			message: 'Успешное получение поста!'
+		};
+	}
+
+	async getTags(
+		page: number,
+		perPage: number,
+		search: string,
+		sortBy: string,
+		sortOrder: 'ASC' | 'DESC'
+	) {
+		// Вычисление смещения и лимита
+		page = page > 0 ? page : 1;
+		perPage = perPage > 0 ? perPage : 10;
+		const offset = perPage === -1 ? 0 : (page - 1) * perPage;
+
+		// Формирование условий поиска
+		const where = search
+			? {
+					[Op.or]: [{ name: { [Op.like]: `%${search.toLowerCase()}%` } }]
+				}
+			: {};
+
+		const params: any = {
+			where,
+			offset: perPage === -1 ? undefined : offset,
+			limit: perPage === -1 ? undefined : perPage,
+			order: [[sortBy, sortOrder]],
+			include: [
+				{
+					model: DataBasePosts,
+					through: { attributes: [] }, // Исключаем поля связи
+					attributes: [] // Не загружаем сами посты
+				}
+			],
+			attributes: {
+				include: [
+					[
+						Sequelize.literal(`(
+                                SELECT COUNT(*)
+                                FROM \`PostTags\`
+                                WHERE \`PostTags\`.\`tagId\` = \`Tags\`.\`id\`
+                            )`),
+						'postCount'
+					]
+				]
+			}
+		};
+
+		// Выполнение запроса
+		const { rows: tags } = await this.tags.findAndCountAll({ ...params });
+		const { count: totalItems } = await this.tags.findAndCountAll({
+			...params,
+			distinct: true,
+			subQuery: false
+		});
+
+		return {
+			tags,
+			pagination: {
+				totalItems,
+				totalPages: perPage === -1 ? 1 : Math.ceil(totalItems / perPage),
+				currentPage: perPage === -1 ? 1 : page
+			}
 		};
 	}
 }
