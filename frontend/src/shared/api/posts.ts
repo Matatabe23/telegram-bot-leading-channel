@@ -29,13 +29,8 @@ export const publishInstantly = async (id: number) => {
     return data;
 }
 
-export const receivingPost = async (id: number) => {
-    const { data } = await $autHost.get(`posts/receiving-post/${id}`);
-    return data;
-}
-
-export const changePage = async (id: number, where: string, watched: string, channel?: string) => {
-    const { data } = await $autHost.get(`posts/change-page/${id}`, { params: { where, watched, channel } });
+export const receivingPostOrChangePage = async (id: number, where?: string, watched?: string, channel?: string) => {
+    const { data } = await $autHost.get(`posts/receiving-post-or-change-page/${id}`, { params: { where, watched, channel } });
     return data;
 }
 

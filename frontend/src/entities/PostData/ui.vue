@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
 	import { onMounted, ref } from 'vue';
-	import { receivingPost, deletePost, changePage, checkPermissions, updatePosts } from '@/shared';
+	import { deletePost, checkPermissions, updatePosts, receivingPostOrChangePage } from '@/shared';
 	import { useRoute, useRouter } from 'vue-router';
 	import { useToast } from 'vue-toastification';
 	import { PaginationPostData } from '@/widgets';
@@ -63,7 +63,7 @@
 
 	const saveData = (values: any) => {
 		images.value = values.imageList;
-		useChannelList.value = values.post.channels?.map((item) => item.id);
+		useChannelList.value = values.channels?.map((item) => item.id);
 	};
 
 	const openPostPanel = async () => {
@@ -72,13 +72,13 @@
 			useChannelList.value = [];
 			images.value = [];
 
-			const response = await receivingPost(Number(route.params.id));
-			await saveData(response.data);
+			const response = await receivingPostOrChangePage(Number(route.params.id));
+			await saveData(response);
 		} catch (e) {
 			router.push('/publishing-panel');
 			localStorage.setItem('watched', '');
 			toast.error(e.response.data.message);
-		} finally {``
+		} finally {
 			imagesToLoad.value = images.value?.length;
 			if (imagesToLoad.value === 0) {
 				appStore.isLoading = false;
@@ -94,9 +94,9 @@
 			const watched = localStorage.getItem('watched') || '';
 			const channel = localStorage.getItem('channel') || '';
 
-			const response = await changePage(Number(route.params.id), who, watched, channel);
+			const response = await receivingPostOrChangePage(Number(route.params.id), who, watched, channel);
 			images.value = response.imageList;
-			useChannelList.value = response.channelsPost?.map((item) => item.id);
+			useChannelList.value = response.channels?.map((item) => item.id);
 			checkListImage.value = [];
 			router.push(response.postId.toString());
 		} catch (e) {

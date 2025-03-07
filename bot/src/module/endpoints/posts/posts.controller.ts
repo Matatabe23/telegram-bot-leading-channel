@@ -26,7 +26,6 @@ import { ApiUnifiedPublication } from './decorators/api-unified-publication.deco
 import { ApiReceiving } from './decorators/api-receiving.decorator';
 import { ApiDeletePost } from './decorators/api-delete-post.decorator';
 import { ApiPublishInstantly } from './decorators/api-publish-instantly.decorator';
-import { ApiReceivingPost } from './decorators/api-receiving-post.decorator';
 import { ApiChangePage } from './decorators/api-change-page.decorator';
 import { ApiUpdatePost } from './decorators/api-update-post.decorator';
 
@@ -150,39 +149,29 @@ export class PostsController {
 		}
 	}
 
-	@Get('receiving-post/:id')
-	@UseGuards(AuthGuard)
-	@ApiReceivingPost()
-	async receivingPost(@Req() request: any, @Param('id') id: number) {
-		try {
-			const isPermissions = await this.helpersRepository.checkPermissions(
-				request.authData.role,
-				EPermissions.MARK_POST_VIEWED
-			);
-			const result = await this.postsService.receivingPost(id, isPermissions);
-			return result;
-		} catch (e) {
-			throw new HttpException(
-				{
-					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					message: e.message
-				},
-				HttpStatus.INTERNAL_SERVER_ERROR
-			);
-		}
-	}
-
-	@Get('change-page/:id')
+	@Get('receiving-post-or-change-page/:id')
 	@UseGuards(AuthGuard)
 	@ApiChangePage()
 	async changePage(
+		@Req() request: any,
 		@Param('id') id: number,
 		@Query('where') where?: string,
 		@Query('watched') watched?: string,
 		@Query('channel') channel?: string
 	) {
 		try {
-			const result = await this.postsService.changePage(id, where, watched, channel);
+			const isPermissions = await this.helpersRepository.checkPermissions(
+				request.authData.role,
+				EPermissions.MARK_POST_VIEWED
+			);
+
+			const result = await this.postsService.receivingPostOrChangePage(
+				id,
+				where,
+				watched,
+				channel,
+				isPermissions
+			);
 			return result;
 		} catch (e) {
 			throw new HttpException(

@@ -230,8 +230,6 @@ export class PostsService {
 				// Добавляем промт
 				postJson.promt = await this.helpersRepository.getTagsByPostId(post.id);
 
-				console.log(postJson);
-
 				return postJson;
 			})
 		);
@@ -346,49 +344,31 @@ export class PostsService {
 		};
 	}
 
-	async receivingPost(id: number, updateWatch?: boolean) {
-		const post = await this.dataBasePosts.findByPk(id, {
-			include: [{ model: Channels }, { model: ImageData }]
-		});
+	async receivingPostOrChangePage(
+		id: number,
+		where: string | undefined = undefined,
+		watched: string | undefined = undefined,
+		channel: string | undefined = undefined,
+		updateWatch: boolean = false
+	) {
+		let whereCondition: { watched?: boolean } = {};
 
-		if (!post) throw new NotFoundException('Пост не найден');
-
-		const imageList = post.dataValues.images.map((item) => {
-			return {
-				id: item.dataValues.id,
-				img: `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${item.dataValues.image}`,
-				dataBasePostId: item.dataValues.dataBasePostId
-			};
-		});
-
-		if (updateWatch) {
-			await post.update({ watched: true });
-		}
-
-		return {
-			pagination: null,
-			data: { imageList, post: post },
-			message: 'Успешное обновление поста!'
-		};
-	}
-
-	async changePage(id: number, where: string, watched: string, channel: string) {
-		let whereCondition: {
-			watched?: boolean;
-		} = {};
+		// Определение фильтра для watched, если передан параметр watched
 		if (watched === 'watched') {
 			whereCondition = { ...whereCondition, watched: true };
 		} else if (watched === 'unwatched') {
 			whereCondition = { ...whereCondition, watched: false };
 		}
 
+		// Условия для пагинации
 		const condition =
 			where === 'next'
 				? { id: { [Op.gt]: id } }
 				: where === 'back'
 					? { id: { [Op.lt]: id } }
-					: {};
+					: {}; // если не передана информация о следующей или предыдущей странице
 
+		// Порядок сортировки для пагинации
 		const order: Order =
 			where === 'next'
 				? [['id', 'ASC']]
@@ -396,6 +376,7 @@ export class PostsService {
 					? [['id', 'DESC']]
 					: [['id', 'ASC']];
 
+		// Получаем пост с нужными включениями и условиями
 		const post = await this.dataBasePosts.findOne({
 			include: [
 				{
@@ -416,6 +397,7 @@ export class PostsService {
 			throw new NotFoundException('Пост не найден');
 		}
 
+		// Формирование списка изображений
 		const imageList = post.images.map((item) => {
 			return {
 				id: item.dataValues.id,
@@ -424,12 +406,20 @@ export class PostsService {
 			};
 		});
 
-		await post.update({ watched: true });
+		// Если нужно обновить статус просмотренного поста
+		if (updateWatch) {
+			await post.update({ watched: true });
+		}
+
+		// Получаем теги для поста, если нужно
+		const promt = await this.helpersRepository.getTagsByPostId(post.id);
 
 		return {
 			postId: post.dataValues.id,
 			imageList,
-			channelsPost: post.dataValues.channels
+			channels: post.dataValues.channels,
+			promt,
+			message: 'Успешное получение поста!'
 		};
 	}
 }
