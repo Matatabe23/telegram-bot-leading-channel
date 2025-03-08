@@ -50,6 +50,18 @@
 			</v-card>
 		</v-dialog>
 
+		<v-dialog
+			v-model="isPromtModalOpen"
+			max-width="500"
+		>
+			<v-card>
+				<v-card-text>{{ selectPromt || 'Отсутствуют :(' }}</v-card-text>
+				<v-card-actions>
+					<v-btn @click="isPromtModalOpen = false">Закрыть</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+
 		<div
 			v-for="post in postsList"
 			:key="post.id"
@@ -58,6 +70,7 @@
 				:post="post"
 				@delete-post="delPost"
 				@publish-instantly-post="publishInstantlyPost"
+				@select-promt="setPromt"
 			/>
 		</div>
 
@@ -110,6 +123,41 @@
 
 	const isFilterModalOpen = ref(false);
 	const search = ref('');
+
+	const isPromtModalOpen = ref(false);
+	const selectPromt = ref('');
+
+	const lastPage = computed(() => {
+		return Math.ceil(totalCount.value / form.value.postsPerPage);
+	});
+
+	const formattedChannels = computed(() => {
+		if (!listChannels.value) return;
+		const channelsArray = listChannels.value.map((channel) => ({
+			title: channel.name,
+			value: channel.id.toString()
+		}));
+
+		return [{ title: 'Нечего', value: '' }, ...channelsArray];
+	});
+
+	const lastPublishDate = computed(() => {
+		if (!publishTime.value.length) return '';
+
+		const postsPerDay = publishTime.value.length;
+		const totalDays = Math.ceil(totalCount.value / postsPerDay);
+
+		const startDate = new Date();
+		const lastPostDate = new Date(startDate);
+		lastPostDate.setDate(startDate.getDate() + totalDays);
+
+		return lastPostDate.toLocaleDateString();
+	});
+
+	const setPromt = (value: string) => {
+		isPromtModalOpen.value = true;
+		selectPromt.value = value;
+	};
 
 	const setPage = (page: number) => {
 		editorStore.setStateValueByKey('form', {
@@ -164,23 +212,6 @@
 		}
 	};
 
-	const lastPage = computed(() => {
-		return Math.ceil(totalCount.value / form.value.postsPerPage);
-	});
-
-	const lastPublishDate = computed(() => {
-		if (!publishTime.value.length) return '';
-
-		const postsPerDay = publishTime.value.length;
-		const totalDays = Math.ceil(totalCount.value / postsPerDay);
-
-		const startDate = new Date();
-		const lastPostDate = new Date(startDate);
-		lastPostDate.setDate(startDate.getDate() + totalDays);
-
-		return lastPostDate.toLocaleDateString();
-	});
-
 	const updateWatched = async (value: string) => {
 		localStorage.setItem('watched', value);
 		await editorStore.setStateValueByKey('form', { ...form.value, watched: value });
@@ -217,16 +248,6 @@
 		}
 	}, 1000);
 
-	const formattedChannels = computed(() => {
-		if (!listChannels.value) return;
-		const channelsArray = listChannels.value.map((channel) => ({
-			title: channel.name,
-			value: channel.id.toString()
-		}));
-
-		return [{ title: 'Нечего', value: '' }, ...channelsArray];
-	});
-
 	onMounted(async () => {
 		const watched = localStorage.getItem('watched') || '';
 		const channel = localStorage.getItem('channel') || '';
@@ -251,8 +272,8 @@
 		&__none-message-select {
 			.v-input__details {
 				min-height: 0;
-                height: 0;
-                max-height: 0;
+				height: 0;
+				max-height: 0;
 				padding: 0;
 			}
 			.v-messages {
