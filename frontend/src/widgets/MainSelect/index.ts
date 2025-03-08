@@ -1,1 +1,0 @@
-export { default as MainSelect } from './ui.vue';

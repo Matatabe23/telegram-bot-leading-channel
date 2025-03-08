@@ -1,5 +1,5 @@
 <template>
-	<section class="w-11/12 relative mx-4">
+	<section class="publish-posts-list w-11/12 relative mx-4">
 		<div class="flex justify-between mb-2.5">
 			<div class="mb-3 text-sm md:text-base">
 				<div v-if="totalCount">Всего постов: {{ totalCount }}</div>
@@ -22,11 +22,10 @@
 					<v-text-field
 						label="Фильтр по айди"
 						variant="outlined"
-                        v-model="search"
+						v-model="search"
 						@update:model-value="updateSearch"
 						clearable
 						:loading="appStore.isLoading"
-						:disabled="appStore.isLoading"
 					/>
 					<v-select
 						label="Канал"
@@ -34,7 +33,6 @@
 						:items="formattedChannels"
 						variant="outlined"
 						@update:model-value="updateChannel"
-						:disabled="appStore.isLoading"
 						:loading="appStore.isLoading"
 					/>
 					<v-select
@@ -43,7 +41,6 @@
 						:items="watchedOptions"
 						variant="outlined"
 						@update:model-value="updateWatched"
-						:disabled="appStore.isLoading"
 						:loading="appStore.isLoading"
 					/>
 				</v-card-text>
@@ -76,12 +73,17 @@
 				:disabled="appStore.isLoading"
 				class="text-xs"
 			/>
-			<mainSelect
-				class="mr-5 hidden md:block"
-				:options="perPage"
-				v-model="form.postsPerPage"
-				@onChange="updatePostsPerPage"
-			/>
+
+			<div class="w-[80px] hidden md:block">
+				<v-select
+					class="publish-posts-list__none-message-select"
+					v-model="form.postsPerPage"
+					:items="perPage"
+					variant="outlined"
+					@update:model-value="updatePostsPerPage"
+					:loading="appStore.isLoading"
+				/>
+			</div>
 		</div>
 	</section>
 </template>
@@ -91,7 +93,7 @@
 	import { deletePost, publishInstantly, useSettings, usePosts } from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { storeToRefs } from 'pinia';
-	import { PostCard, MainSelect } from '@/widgets';
+	import { PostCard } from '@/widgets';
 	import { watchedOptions, perPage } from '@/entities';
 	import { useAppStore } from '@/app/app.store';
 	import { useRoute, useRouter } from 'vue-router';
@@ -106,8 +108,8 @@
 	const route = useRoute();
 	const router = useRouter();
 
-    const isFilterModalOpen = ref(false);
-    const search = ref('')
+	const isFilterModalOpen = ref(false);
+	const search = ref('');
 
 	const setPage = (page: number) => {
 		editorStore.setStateValueByKey('form', {
@@ -121,10 +123,10 @@
 		editorStore.getPosts();
 	};
 
-	const updatePostsPerPage = async (value) => {
+	const updatePostsPerPage = async (value: number) => {
 		editorStore.setStateValueByKey('form', {
 			...form.value,
-			postsPerPage: parseInt(value.value, 10),
+			postsPerPage: value,
 			currentPage: 1
 		});
 		editorStore.getPosts();
@@ -243,3 +245,20 @@
 		}
 	});
 </script>
+
+<style scoped lang="scss">
+	.publish-posts-list {
+		&__none-message-select {
+			.v-input__details {
+				min-height: 0;
+                height: 0;
+                max-height: 0;
+				padding: 0;
+			}
+			.v-messages {
+				min-height: 0px;
+				height: 0;
+			}
+		}
+	}
+</style>

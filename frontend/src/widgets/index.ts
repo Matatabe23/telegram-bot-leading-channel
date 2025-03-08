@@ -1,7 +1,6 @@
 export * from './PublishPostsList'
 export * from './PublishPostsPanel'
 export * from './PostCard'
-export * from './MainSelect'
 export * from './AddingNewChannels'
 export * from './AddingPublicationTimeSettings'
 export * from './PaginationPostData'

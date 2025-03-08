@@ -7,9 +7,9 @@ export const watchedOptions = [
 ];
 
 export const perPage = [
-    { value: '3', label: '3' },
-    { value: '5', label: '5' },
-    { value: '10', label: '10' }
+    {  title: '3', value: 3, },
+    { title: '5', value: 5,  },
+    { title: '10', value: 10 }
 ];
 
 export const settingsSelectPublish = [
