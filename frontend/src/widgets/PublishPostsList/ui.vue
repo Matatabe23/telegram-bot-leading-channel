@@ -1,39 +1,57 @@
 <template>
 	<section class="w-11/12 relative mx-4">
-		<div class="flex flex-col md:flex-row gap-4 md:gap-0 justify-between mb-2.5">
+		<div class="flex justify-between mb-2.5">
 			<div class="mb-3 text-sm md:text-base">
 				<div v-if="totalCount">Всего постов: {{ totalCount }}</div>
 				<div v-if="lastPublishDate">Крайняя дата публикации: {{ lastPublishDate }}</div>
 			</div>
-			<div class="flex flex-col md:flex-row md:w-[60vw] gap-2.5">
-				<v-text-field
-					label="Фильтр по айди"
-					variant="outlined"
-					@update:model-value="updateSearch"
-					clearable
-					:loading="appStore.isLoading"
-					:disabled="appStore.isLoading"
-				/>
-				<v-select
-					label="Канал"
-					v-model="form.channel"
-					:items="formattedChannels"
-					variant="outlined"
-					@update:model-value="updateChannel"
-					:disabled="appStore.isLoading"
-					:loading="appStore.isLoading"
-				></v-select>
-				<v-select
-					label="Статус просмотра"
-					v-model="form.watched"
-					:items="watchedOptions"
-					variant="outlined"
-					@update:model-value="updateWatched"
-					:disabled="appStore.isLoading"
-					:loading="appStore.isLoading"
-				></v-select>
-			</div>
+			<v-btn
+				@click="isFilterModalOpen = true"
+				variant="outlined"
+				>Фильтры</v-btn
+			>
 		</div>
+
+		<v-dialog
+			v-model="isFilterModalOpen"
+			max-width="500"
+		>
+			<v-card>
+				<v-card-title>Фильтры</v-card-title>
+				<v-card-text>
+					<v-text-field
+						label="Фильтр по айди"
+						variant="outlined"
+                        v-model="search"
+						@update:model-value="updateSearch"
+						clearable
+						:loading="appStore.isLoading"
+						:disabled="appStore.isLoading"
+					/>
+					<v-select
+						label="Канал"
+						v-model="form.channel"
+						:items="formattedChannels"
+						variant="outlined"
+						@update:model-value="updateChannel"
+						:disabled="appStore.isLoading"
+						:loading="appStore.isLoading"
+					/>
+					<v-select
+						label="Статус просмотра"
+						v-model="form.watched"
+						:items="watchedOptions"
+						variant="outlined"
+						@update:model-value="updateWatched"
+						:disabled="appStore.isLoading"
+						:loading="appStore.isLoading"
+					/>
+				</v-card-text>
+				<v-card-actions>
+					<v-btn @click="isFilterModalOpen = false">Закрыть</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
 
 		<div
 			v-for="post in postsList"
@@ -58,7 +76,6 @@
 				:disabled="appStore.isLoading"
 				class="text-xs"
 			/>
-
 			<mainSelect
 				class="mr-5 hidden md:block"
 				:options="perPage"
@@ -70,7 +87,7 @@
 </template>
 
 <script lang="ts" setup>
-	import { computed, onMounted } from 'vue';
+	import { computed, onMounted, ref } from 'vue';
 	import { deletePost, publishInstantly, useSettings, usePosts } from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { storeToRefs } from 'pinia';
@@ -88,6 +105,9 @@
 	const appStore = useAppStore();
 	const route = useRoute();
 	const router = useRouter();
+
+    const isFilterModalOpen = ref(false);
+    const search = ref('')
 
 	const setPage = (page: number) => {
 		editorStore.setStateValueByKey('form', {

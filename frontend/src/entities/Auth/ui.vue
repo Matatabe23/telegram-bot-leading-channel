@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-	import { ref } from 'vue';
+	import { onMounted, ref } from 'vue';
 	import { login, useSettings } from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { useRouter } from 'vue-router';
@@ -45,10 +45,10 @@
 	const setlogin = async () => {
 		let successToastId: ToastID;
 
-        if(!name.value){
-            toast.error('Укажите логин');
-            return
-        }
+		if (!name.value) {
+			toast.error('Укажите логин');
+			return;
+		}
 
 		try {
 			appStore.isLoading = true;
@@ -72,4 +72,14 @@
 			toast.dismiss(successToastId);
 		}
 	};
+
+	const handleKeyUp = (event) => {
+		if (event.key === 'Enter') {
+			setlogin();
+		}
+	};
+
+	onMounted(() => {
+		document.addEventListener('keyup', handleKeyUp);
+	});
 </script>
