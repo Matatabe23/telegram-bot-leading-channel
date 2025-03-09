@@ -51,7 +51,7 @@ export class PostsController {
 			const waterMark = JSON.parse(body.waterMark);
 			const chatIdList = body.chatIdList !== '' ? body.chatIdList.split(',') : [];
 			const isInstant = body.isInstant === 'true' ? true : false;
-			const tags = body.tags.replace(/\s*,\s*/g, ',').split(',');
+			const tags = body.tags?.replace(/\s*,\s*/g, ',').split(',');
 
 			const result = await this.postsService.unifiedPublication(
 				files,

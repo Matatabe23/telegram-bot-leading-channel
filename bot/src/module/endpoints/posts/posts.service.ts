@@ -167,8 +167,10 @@ export class PostsService {
 		}));
 
 		return {
-			pagination: null,
-			data: { imageList, post: updatedPost },
+			postId: updatedPost.dataValues.id,
+			imageList,
+			channels: updatedPost.dataValues.channels,
+			promt: await this.helpersRepository.getTagsByPostId(post.id),
 			message: 'Успешное обновление поста!'
 		};
 	}
