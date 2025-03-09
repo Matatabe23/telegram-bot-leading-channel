@@ -1,7 +1,7 @@
 import { ApiResponse } from '@nestjs/swagger';
 import { ErrorDto } from 'src/dto/error.dto';
 
-export function GetTags(): MethodDecorator {
+export function ApiGetTags(): MethodDecorator {
 	return function (target, propertyKey, descriptor) {
 		ApiResponse({
 			status: 200,

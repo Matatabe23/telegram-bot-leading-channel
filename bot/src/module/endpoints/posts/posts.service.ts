@@ -14,6 +14,8 @@ import { TGBotPostsRepository } from 'src/module/service/tg-bot/repository/tg-bo
 import { Tags } from 'src/module/db/models/tags.repository';
 import { PostTags } from 'src/module/db/models/post-tags.repository';
 import { HelpersRepository } from 'src/module/service/helpers/helpers.repository';
+import { Holiday } from 'src/module/db/models/holiday.repository';
+import { UpdateHolidaysDto } from './dto/update-holidays.dto';
 
 @Injectable()
 export class PostsService {
@@ -442,16 +444,25 @@ export class PostsService {
 				}
 			: {};
 
+		// Поле для сортировки
+		const order =
+			sortBy === 'postCount'
+				? Sequelize.literal(`postCount ${sortOrder}`)
+				: [[sortBy, sortOrder]];
+
 		const params: any = {
 			where,
 			offset: perPage === -1 ? undefined : offset,
 			limit: perPage === -1 ? undefined : perPage,
-			order: [[sortBy, sortOrder]],
+			order: [order],
 			include: [
 				{
 					model: DataBasePosts,
 					through: { attributes: [] }, // Исключаем поля связи
 					attributes: [] // Не загружаем сами посты
+				},
+				{
+					model: Holiday
 				}
 			],
 			attributes: {
@@ -484,5 +495,39 @@ export class PostsService {
 				currentPage: perPage === -1 ? 1 : page
 			}
 		};
+	}
+
+	async updateHolidayTag(id: number, holidays: UpdateHolidaysDto[]) {
+		// Найдем тег по ID
+		const tag = await Tags.findByPk(id);
+		if (!tag) {
+			throw new Error('Tag not found');
+		}
+
+		// Удаляем старые праздники для данного тега
+		await Holiday.destroy({
+			where: { tagId: id }
+		});
+
+		console.log(holidays);
+
+		// Добавляем новые праздники
+		const newHolidays = holidays.map((holiday) => ({
+			name: holiday.name,
+			startDate: holiday.startDate, // Начало события
+			endDate: holiday.endDate, // Конец события
+			eventName: holiday.eventName, // Название события
+			tagId: id // ID тега
+		}));
+
+		// Сохраняем новые праздники
+		await Holiday.bulkCreate(newHolidays);
+
+		// Возвращаем обновленный тег с новыми праздниками
+		const updatedTag = await Tags.findByPk(id, {
+			include: Holiday // Включаем связанные праздники
+		});
+
+		return updatedTag;
 	}
 }

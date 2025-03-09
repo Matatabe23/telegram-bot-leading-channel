@@ -14,6 +14,7 @@ import { Payments } from './models/payments.repository';
 import { Advertisement } from './models/advertisement.repository';
 import { Tags } from './models/tags.repository';
 import { PostTags } from './models/post-tags.repository';
+import { Holiday } from './models/holiday.repository';
 
 const dbList = [
 	Users,
@@ -26,7 +27,8 @@ const dbList = [
 	Payments,
 	Advertisement,
 	Tags,
-	PostTags
+	PostTags,
+	Holiday
 ];
 
 @Module({

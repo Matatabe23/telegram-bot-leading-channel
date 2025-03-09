@@ -1,3 +1,4 @@
+import { IHoliday } from "@/entities";
 import { $autHost } from "@/shared";
 import { IImageBlock } from '@/shared'
 
@@ -42,6 +43,14 @@ export const updatePosts = async (value: { id: number; channelIds?: number[]; im
 export const receivingTags = async (params: { page: number, perPage: number, search?: string, sortBy?: string, sortOrder?: string }) => {
     const response = await $autHost.get('posts/get-tags', {
         params: params,
+    });
+    return response.data;
+};
+
+export const updateHolidayTag = async (id: number, holidays: IHoliday[]) => {
+    console.log(holidays)
+    const response = await $autHost.post(`posts/update-holiday-tag/${id}`, {
+        holidays: holidays // Массив holidays передается в теле запроса
     });
     return response.data;
 };

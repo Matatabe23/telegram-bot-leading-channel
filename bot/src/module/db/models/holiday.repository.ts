@@ -1,19 +1,23 @@
 import { Column, Model, Table, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { DataBasePosts } from './data-base-posts.repository';
 import { Tags } from './tags.repository';
 
 @Table
-export class PostTags extends Model {
-	@ForeignKey(() => DataBasePosts)
+export class Holiday extends Model {
+	@Column({ primaryKey: true, autoIncrement: true })
+	id: number;
+
 	@Column
-	postId: number;
+	name: string;
+
+	@Column
+	startDate: string;
+
+	@Column
+	endDate: string;
 
 	@ForeignKey(() => Tags)
 	@Column
 	tagId: number;
-
-	@BelongsTo(() => DataBasePosts)
-	post: DataBasePosts;
 
 	@BelongsTo(() => Tags)
 	tag: Tags;

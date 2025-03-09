@@ -28,7 +28,8 @@ import { ApiDeletePost } from './decorators/api-delete-post.decorator';
 import { ApiPublishInstantly } from './decorators/api-publish-instantly.decorator';
 import { ApiChangePage } from './decorators/api-change-page.decorator';
 import { ApiUpdatePost } from './decorators/api-update-post.decorator';
-import { GetTags } from './decorators/get-tags.decorator';
+import { ApiGetTags } from './decorators/api-get-tags.decorator';
+import { UpdateHolidaysDto } from './dto/update-holidays.dto';
 
 @Controller('posts')
 @ApiTags('Посты')
@@ -187,7 +188,7 @@ export class PostsController {
 
 	@Get('get-tags')
 	@UseGuards(AuthGuard)
-	@GetTags()
+	@ApiGetTags()
 	async getTags(
 		@Query('page') page: number,
 		@Query('perPage') perPage: number,
@@ -203,6 +204,27 @@ export class PostsController {
 				sortBy ? sortBy : 'id',
 				sortOrder ? sortOrder : 'ASC'
 			);
+		} catch (e) {
+			throw new HttpException(
+				{
+					status: HttpStatus.INTERNAL_SERVER_ERROR,
+					message: e.message
+				},
+				HttpStatus.INTERNAL_SERVER_ERROR
+			);
+		}
+	}
+
+	@Post('update-holiday-tag/:id')
+	@UseGuards(AuthGuard)
+	async updateHolidayTag(
+		@Param('id') id: number,
+		@Body() body: { holidays: UpdateHolidaysDto[] }
+	) {
+		try {
+			const updatedTag = await this.postsService.updateHolidayTag(id, body.holidays);
+
+			return updatedTag;
 		} catch (e) {
 			throw new HttpException(
 				{
