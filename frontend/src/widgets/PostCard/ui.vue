@@ -38,7 +38,8 @@
 						:loading="appStore.isLoading"
 						>Опубликовать</v-btn
 					>
-                    <v-btn
+					<v-btn
+						v-if="props.post.promt"
 						color="#5865f2"
 						variant="flat"
 						@click="emit('select-promt', props.post.promt)"
@@ -69,6 +70,6 @@
 	const emit = defineEmits<{
 		'delete-post': [value: number];
 		'publish-instantly-post': [value: number];
-        'select-promt': [value: string];
+		'select-promt': [value: string];
 	}>();
 </script>

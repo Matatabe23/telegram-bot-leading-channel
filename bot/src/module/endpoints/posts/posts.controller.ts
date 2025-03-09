@@ -216,7 +216,7 @@ export class PostsController {
 	}
 
 	@Post('update-holiday-tag/:id')
-	@UseGuards(AuthGuard)
+	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_TAGS))
 	async updateHolidayTag(
 		@Param('id') id: number,
 		@Body() body: { holidays: UpdateHolidaysDto[] }

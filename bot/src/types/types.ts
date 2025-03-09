@@ -34,7 +34,9 @@ export enum EPermissions {
 
 	SET_PUBLICATION_TIME = 'set_publication_time', // Редактировать время публикации,
 
-	EDIT_ADVERTISEMENTS = 'edit_advertisements' // Редактировать рекламы
+	EDIT_ADVERTISEMENTS = 'edit_advertisements', // Редактировать рекламы
+
+	EDIT_TAGS = 'editTags' // Редактирование тегов
 }
 
 export enum ESettingChannels {

@@ -36,6 +36,10 @@ export const PERMISSIONS_LIST = [
 	{
 		title: 'Редактировать рекламу',
 		value: EPermissions.EDIT_ADVERTISEMENTS
+	},
+	{
+		title: 'Редактировать теги',
+		value: EPermissions.EDIT_TAGS
 	}
 ];
 

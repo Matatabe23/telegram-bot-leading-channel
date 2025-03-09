@@ -135,7 +135,7 @@
 
 <script lang="ts" setup>
 	import { ref, onMounted } from 'vue';
-	import { receivingTags, updateHolidayTag } from '@/shared';
+	import { checkPermissions, receivingTags, updateHolidayTag } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
 	import { useDebounceFn } from '@vueuse/core';
 	import { ITags } from '@/entities';
@@ -161,9 +161,10 @@
 	const headers = [
 		{ title: 'id', key: 'id' },
 		{ title: 'Имя тега', key: 'name' },
-		// { title: 'Перевод', key: 'translate' },
 		{ title: 'Всего тегов', key: 'postCount' },
-		{ title: 'Период публикации', key: 'holiday', sortable: false }
+		checkPermissions(appStore.data?.EPermissions?.EDIT_TAGS)
+			? { title: 'Период публикации', key: 'holiday', sortable: false }
+			: {}
 	];
 
 	const getTags = async () => {
@@ -216,7 +217,7 @@
 
 			isDateModel.value = false;
 		} catch (error) {
-            // 
+			//
 		}
 	};
 
