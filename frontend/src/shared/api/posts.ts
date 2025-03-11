@@ -49,7 +49,7 @@ export const receivingTags = async (params: { page: number, perPage: number, sea
 
 export const updateHolidayTag = async (id: number, holidays: IHoliday[]) => {
     const response = await $autHost.post(`posts/update-holiday-tag/${id}`, {
-        holidays: holidays // Массив holidays передается в теле запроса
+        holidays: holidays
     });
     return response.data;
 };

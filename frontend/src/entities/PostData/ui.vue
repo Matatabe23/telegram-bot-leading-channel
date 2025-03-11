@@ -62,7 +62,6 @@
 	const useChannelList = ref([]);
 
 	const saveData = (values: any) => {
-        console.log(values)
 		images.value = values.imageList;
 		useChannelList.value = values.channels?.map((item) => item.id);
 	};
