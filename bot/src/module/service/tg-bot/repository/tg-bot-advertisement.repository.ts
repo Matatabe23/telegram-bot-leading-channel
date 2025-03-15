@@ -5,11 +5,13 @@ import { Users } from 'src/module/db/models/users.repository';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { Advertisement } from 'src/module/db/models/advertisement.repository';
 import { EAdvertisementStatus, ETypePostsAdvertisement, ESettingChannels } from 'src/types/types';
-import { ADVERTISEMENT_STATUS, buttonText, priceAdvertising } from 'src/const/const';
+import { ADVERTISEMENT_STATUS, buttonText, DATA_GENERATE, priceAdvertising } from 'src/const/const';
 import { HelpersRepository } from '../../helpers/helpers.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
 import { Op } from 'sequelize';
 import { RegularPublicationBotRepository } from '../../regular-publication-bot/regular-publication-bot.repository';
+import { AdvertisementSchedule } from 'src/module/db/models/advertisement-schedule.repository';
+import { addHours, parseISO } from 'date-fns';
 
 @Injectable()
 export class TGBotAdvertisementRepository {
@@ -195,34 +197,39 @@ export class TGBotAdvertisementRepository {
 
 		if (!postId) return;
 
-		const advertisement = await this.advertisement.findOne({ where: { id: parseInt(postId) } });
+		const advertisement = await this.advertisement.findOne({
+			where: { id: parseInt(postId) },
+			include: [{ model: AdvertisementSchedule }]
+		});
 
-		if (!advertisement) {
+		const cleanData = advertisement ? advertisement.get({ plain: true }) : null;
+
+		if (!cleanData) {
 			await this.bot.sendMessage(chatId, 'Пост не найден.');
 			return;
 		}
 
 		switch (action) {
 			case 'view':
-				await this.handleViewAction(chatId, advertisement);
+				await this.handleViewAction(chatId, cleanData);
 				break;
 			case 'delete':
-				await this.handleDeleteAction(chatId, advertisement);
+				await this.handleDeleteAction(chatId, cleanData);
 				break;
 			case 'moderate':
 				await this.handleModerateAction(chatId, advertisement);
 				break;
 			case 'channel':
-				await this.handleChannelSelection(chatId, advertisement);
+				await this.handleChannelSelection(chatId, cleanData);
 				break;
 			case 'time':
-				await this.handleTimeSelection(chatId, advertisement, channel);
+				await this.handleTimeSelection(chatId, cleanData, channel);
 				break;
 			case 'selectTime':
-				await this.handleSelectTimeSelection(chatId, postId, channel, time);
+				await this.handleSelectTimeSelection(chatId, postId, time, channel);
 				break;
 			case 'clearTime':
-				await this.handleClearTimeAction(chatId, advertisement);
+				await this.handleClearTimeAction(chatId, cleanData);
 		}
 
 		this.bot.answerCallbackQuery(query.id);
@@ -233,7 +240,7 @@ export class TGBotAdvertisementRepository {
 	}
 
 	// Обработка действия "Просмотр"
-	private async handleViewAction(chatId: number, advertisement: any) {
+	private async handleViewAction(chatId: number, advertisement: Advertisement) {
 		const sentMessage = await this.bot.copyMessage(
 			chatId,
 			advertisement.sourceChatId,
@@ -242,9 +249,9 @@ export class TGBotAdvertisementRepository {
 
 		const channel = await this.channels.findAll();
 		const publicationTimes = await Promise.all(
-			JSON.parse(advertisement?.schedule)?.map(async (item) => {
-				const matchedChannel = channel.find((chan) => item.channel === chan.chatId);
-				return `(${item.times} - ${matchedChannel?.name || 'Неизвестный канал'})`;
+			advertisement?.schedules.map((item) => {
+				const matchedChannel = channel.find((chan) => item.sourceChatId === chan.chatId);
+				return `(${item.publicationTime} - ${matchedChannel?.name || 'Неизвестный канал'})`;
 			}) || []
 		);
 
@@ -274,7 +281,7 @@ export class TGBotAdvertisementRepository {
 			});
 		}
 
-		if (advertisement.schedule?.length > 0) {
+		if (advertisement.schedules?.length > 0) {
 			inline_keyboard[1].push({
 				text: 'Очистить время публикации',
 				callback_data: `clearTime_post_${advertisement.id}`
@@ -329,17 +336,20 @@ export class TGBotAdvertisementRepository {
 		advertisement: Advertisement,
 		channel: string
 	) {
-		const howDays = 2;
-
+		console.log(channel);
 		if (!advertisement) {
 			await this.bot.sendMessage(chatId, 'Пост не найден.');
 			return;
 		}
 
-		const unavailableTimes = await this.helpersRepository.getUnavailableTimes(howDays, channel);
+		const unavailableTimes = await this.helpersRepository.getUnavailableTimes(
+			DATA_GENERATE,
+			channel
+		);
+
 		const availableTimes = await this.helpersRepository.generateTimes(
-			howDays,
-			unavailableTimes
+			DATA_GENERATE,
+			unavailableTimes as any
 		);
 
 		if (availableTimes.length === 0) {
@@ -361,76 +371,73 @@ export class TGBotAdvertisementRepository {
 	private async handleSelectTimeSelection(
 		chatId: number,
 		postId: string,
-		channel: string,
-		time: string
+		time: string,
+		channelId: string
 	) {
 		const advertisement = await this.advertisement.findOne({
-			where: { id: postId }
+			where: { id: postId },
+			include: [{ model: AdvertisementSchedule }]
 		});
+
+		if (!advertisement) {
+			await this.bot.sendMessage(chatId, `Объявление не найдено.`);
+			return;
+		}
 
 		const user = await this.users.findOne({ where: { telegramId: chatId } });
 
-		if (user.coin >= priceAdvertising) {
-			const adListUser = await this.advertisement.findAll({
-				where: {
-					sourceChatId: chatId,
-					moderationStatus: { [Op.not]: EAdvertisementStatus.ARCHIVED }
-				}
-			});
-
-			let total = 0;
-
-			adListUser.forEach((ad) => {
-				if (ad.dataValues.schedule) {
-					const scheduleArray = JSON.parse(ad.dataValues.schedule);
-					scheduleArray.forEach((entry) => {
-						if (entry.type !== ETypePostsAdvertisement.RANDOM) {
-							total++;
-						}
-					});
-				}
-			});
-
-			const totalSum = total * priceAdvertising + priceAdvertising;
-			if (totalSum > user.coin) {
-				await this.bot.sendMessage(chatId, `На вашем балансе недостаточно coin.`);
-				return;
-			}
-		} else {
+		if (!user || user.coin < priceAdvertising) {
 			await this.bot.sendMessage(chatId, `На вашем балансе недостаточно coin.`);
 			return;
 		}
 
-		let schedule: { type: ETypePostsAdvertisement; times: string; channel: string }[] = [];
+		const adListUser = await this.advertisement.findAll({
+			where: {
+				sourceChatId: chatId,
+				moderationStatus: { [Op.not]: EAdvertisementStatus.ARCHIVED }
+			},
+			include: [{ model: AdvertisementSchedule }]
+		});
 
-		if (typeof advertisement.schedule === 'string') {
-			schedule = JSON.parse(advertisement.schedule) || [];
-		} else {
-			schedule = advertisement.schedule || [];
+		let total = 0;
+		adListUser.forEach((ad) => {
+			if (ad.schedules) {
+				ad.schedules.forEach((schedule) => {
+					if (schedule.publicationType !== ETypePostsAdvertisement.RANDOM) {
+						total++;
+					}
+				});
+			}
+		});
+
+		const totalSum = total * priceAdvertising + priceAdvertising;
+		if (totalSum > user.coin) {
+			await this.bot.sendMessage(chatId, `На вашем балансе недостаточно coin.`);
+			return;
 		}
 
-		const block: { type: ETypePostsAdvertisement; times: string; channel: string } = {
-			type: ETypePostsAdvertisement.SOLO,
-			times: time,
-			channel: channel
-		};
+		// Преобразуем время в Date
+		const publicationDate = parseISO(time);
 
-		schedule.push(block);
+		// Создаем новую запись в AdvertisementSchedule
+		await AdvertisementSchedule.create({
+			advertisementId: advertisement.id,
+			publicationType: ETypePostsAdvertisement.SOLO,
+			publicationTime: publicationDate,
+			sourceChatId: channelId,
+			deleteTime: null
+		});
 
-		advertisement.schedule = JSON.stringify(schedule);
-
-		await advertisement.save();
 		await this.bot.sendMessage(chatId, `Пост #${advertisement.id} успешно настроен.`);
 		await this.regularPublicationBotRepository.scheduleAdExecution();
 	}
 
 	private async handleClearTimeAction(chatId: number, advertisement: Advertisement) {
-		const selectAdvertisement = await this.advertisement.findOne({
-			where: { id: advertisement.id }
+		await AdvertisementSchedule.destroy({
+			where: { advertisementId: advertisement.id }
 		});
-		selectAdvertisement.schedule = null;
-		selectAdvertisement.save();
-		await this.bot.sendMessage(chatId, 'Время успешно очищенно');
+
+		await this.bot.sendMessage(chatId, 'Все запланированные времена успешно очищены.');
 		await this.regularPublicationBotRepository.scheduleAdExecution();
 	}
 
@@ -449,44 +456,49 @@ export class TGBotAdvertisementRepository {
 		);
 
 		const advertisementDb = await this.advertisement.findOne({
-			where: { id: advertisement.id }
+			where: { id: advertisement.id },
+			include: [
+				{
+					model: AdvertisementSchedule
+				}
+			]
 		});
 
-		if (advertisement.schedule.type === ETypePostsAdvertisement.SOLO) {
-			const oldSchedule = JSON.parse(advertisementDb.dataValues.schedule || '[]');
-			const newSchedule = oldSchedule.filter(
-				(item) =>
-					!(
-						item.times === advertisement.schedule.times &&
-						item.channel === advertisement.schedule.channel
-					)
-			);
+		// if (advertisement.schedule.type === ETypePostsAdvertisement.SOLO) {
+		// 	const oldSchedule = JSON.parse(advertisementDb.dataValues.schedule || '[]');
+		// 	const newSchedule = oldSchedule.filter(
+		// 		(item) =>
+		// 			!(
+		// 				item.times === advertisement.schedule.times &&
+		// 				item.channel === advertisement.schedule.channel
+		// 			)
+		// 	);
 
-			advertisementDb.schedule = JSON.stringify(newSchedule);
-		}
+		// 	advertisementDb.schedule = JSON.stringify(newSchedule);
+		// }
 
-		const newDeleteMessageInfo = [
-			...JSON.parse(advertisementDb.dataValues.deleteMessageInfo || '[]'),
-			{
-				messageId: message.message_id,
-				channel: advertisement.schedule.channel,
-				time: ETypePostsAdvertisement.SOLO
-					? advertisement.schedule.times
-					: new Date()
-							.toLocaleString('sv-SE', { timeZone: 'Europe/Moscow' })
-							.replace('T', ' ')
-			}
-		];
+		// const newDeleteMessageInfo = [
+		// 	...JSON.parse(advertisementDb.dataValues.deleteMessageInfo || '[]'),
+		// 	{
+		// 		messageId: message.message_id,
+		// 		channel: advertisement.schedule.channel,
+		// 		time: ETypePostsAdvertisement.SOLO
+		// 			? advertisement.schedule.times
+		// 			: new Date()
+		// 					.toLocaleString('sv-SE', { timeZone: 'Europe/Moscow' })
+		// 					.replace('T', ' ')
+		// 	}
+		// ];
 
-		advertisementDb.deleteMessageInfo = JSON.stringify(newDeleteMessageInfo);
-		advertisementDb.save();
+		// advertisementDb.deleteMessageInfo = JSON.stringify(newDeleteMessageInfo);
+		// advertisementDb.save();
 	}
 
 	async deleteAdvertisementFromChannel(value: { channel: string; messageId: number }) {
-		try {
-			await this.bot.deleteMessage(value.channel, value.messageId);
-		} catch (error) {
-			console.error(error);
-		}
+		// try {
+		// 	await this.bot.deleteMessage(value.channel, value.messageId);
+		// } catch (error) {
+		// 	console.error(error);
+		// }
 	}
 }

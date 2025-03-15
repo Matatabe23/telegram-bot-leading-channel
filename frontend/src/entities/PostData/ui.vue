@@ -159,7 +159,7 @@
 					id: Number(route.params.id),
 					images: checkListImage.value
 				});
-				saveData(response.data);
+				saveData(response);
 			}
 		} catch (e) {
 			toast.error(e.response.data.message);

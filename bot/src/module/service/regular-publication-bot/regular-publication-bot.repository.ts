@@ -79,51 +79,51 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 	async scheduleAdExecution() {
 		const advertisements = await this.getAdvertisements('daily');
 
-		const scheduleTimes = advertisements
-			.flatMap((ad) => {
-				const schedule = ad.schedule ? JSON.parse(ad.schedule) : null;
+		// const scheduleTimes = advertisements
+		// 	.flatMap((ad) => {
+		// 		const schedule = ad.schedule ? JSON.parse(ad.schedule) : null;
 
-				if (!Array.isArray(schedule)) return []; // Пропускаем, если schedule не массив
+		// 		if (!Array.isArray(schedule)) return []; // Пропускаем, если schedule не массив
 
-				return schedule
-					.filter((item) => {
-						const parsedTime = moment(item.times, 'YYYY-MM-DD HH:mm');
-						return parsedTime.isSame(moment(), 'day'); // Фильтруем только сегодняшние даты
-					})
-					.map((item) => {
-						const parsedTime = moment(item.times, 'YYYY-MM-DD HH:mm');
-						const hours = parsedTime.hour();
-						const minutes = parsedTime.minute();
+		// 		return schedule
+		// 			.filter((item) => {
+		// 				const parsedTime = moment(item.times, 'YYYY-MM-DD HH:mm');
+		// 				return parsedTime.isSame(moment(), 'day'); // Фильтруем только сегодняшние даты
+		// 			})
+		// 			.map((item) => {
+		// 				const parsedTime = moment(item.times, 'YYYY-MM-DD HH:mm');
+		// 				const hours = parsedTime.hour();
+		// 				const minutes = parsedTime.minute();
 
-						// Преобразуем время в МСК и прибавляем 3 часа
-						const moscowTime = moment()
-							.hour(hours)
-							.minute(minutes)
-							.second(0)
-							.millisecond(0);
+		// 				// Преобразуем время в МСК и прибавляем 3 часа
+		// 				const moscowTime = moment()
+		// 					.hour(hours)
+		// 					.minute(minutes)
+		// 					.second(0)
+		// 					.millisecond(0);
 
-						return {
-							time: moscowTime.toDate(),
-							advertisement: { ...ad.dataValues, schedule: item }
-						};
-					});
-			})
-			.filter((item) => item !== null);
+		// 				return {
+		// 					time: moscowTime.toDate(),
+		// 					advertisement: { ...ad.dataValues, schedule: item }
+		// 				};
+		// 			});
+		// 	})
+		// 	.filter((item) => item !== null);
 
-		// Отменяем предыдущие задания
-		this.adJobs.forEach((job) => schedule.cancelJob(job));
-		this.adJobs = [];
+		// // Отменяем предыдущие задания
+		// this.adJobs.forEach((job) => schedule.cancelJob(job));
+		// this.adJobs = [];
 
-		scheduleTimes.forEach((item) => {
-			const job = schedule.scheduleJob(item.time, () => {
-				this.tGBotAdvertisementRepository.publishAdvertisementFromChannel(
-					item.advertisement
-				);
-			});
-			if (job) {
-				this.adJobs.push(job);
-			}
-		});
+		// scheduleTimes.forEach((item) => {
+		// 	const job = schedule.scheduleJob(item.time, () => {
+		// 		this.tGBotAdvertisementRepository.publishAdvertisementFromChannel(
+		// 			item.advertisement
+		// 		);
+		// 	});
+		// 	if (job) {
+		// 		this.adJobs.push(job);
+		// 	}
+		// });
 	}
 
 	private async scheduleWeeklyExecution() {
@@ -142,68 +142,68 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 
 		const advertisements = await this.getAdvertisements('weekly');
 
-		advertisements.forEach((item) => {
-			JSON.parse(item.schedule).forEach((element) => {
-				const nextExecutionTime = getRandomDayAndTime().toDate();
+		// advertisements.forEach((item) => {
+		// 	JSON.parse(item.schedule).forEach((element) => {
+		// 		const nextExecutionTime = getRandomDayAndTime().toDate();
 
-				const newAdvertisements = {
-					...item.dataValues,
-					schedule: element
-				};
+		// 		const newAdvertisements = {
+		// 			...item.dataValues,
+		// 			schedule: element
+		// 		};
 
-				if (newAdvertisements.schedule.type !== ETypePostsAdvertisement.RANDOM) return;
+		// 		if (newAdvertisements.schedule.type !== ETypePostsAdvertisement.RANDOM) return;
 
-				const job = schedule.scheduleJob(nextExecutionTime, () => {
-					this.tGBotAdvertisementRepository.publishAdvertisementFromChannel(
-						newAdvertisements
-					);
-				});
-				if (job) {
-					this.adJobs.push(job);
-				}
-			});
-		});
+		// 		const job = schedule.scheduleJob(nextExecutionTime, () => {
+		// 			this.tGBotAdvertisementRepository.publishAdvertisementFromChannel(
+		// 				newAdvertisements
+		// 			);
+		// 		});
+		// 		if (job) {
+		// 			this.adJobs.push(job);
+		// 		}
+		// 	});
+		// });
 	}
 
 	async processOldAdvertisements() {
 		const advertisements = await Advertisement.findAll();
 		const now = new Date();
 
-		for (const ad of advertisements) {
-			if (!ad.dataValues.deleteMessageInfo) continue;
+		// for (const ad of advertisements) {
+		// 	if (!ad.dataValues.deleteMessageInfo) continue;
 
-			try {
-				const messages = JSON.parse(ad.dataValues.deleteMessageInfo) as {
-					messageId: number;
-					channel: string;
-					time: string;
-				}[];
+		// 	try {
+		// 		const messages = JSON.parse(ad.dataValues.deleteMessageInfo) as {
+		// 			messageId: number;
+		// 			channel: string;
+		// 			time: string;
+		// 		}[];
 
-				const filteredMessages = [];
+		// 		const filteredMessages = [];
 
-				for (const message of messages) {
-					const messageTime = parseISO(message.time);
-					if (differenceInDays(now, messageTime) >= deleteAdvertisementsMessagePeriod) {
-						await this.tGBotAdvertisementRepository.deleteAdvertisementFromChannel({
-							channel: message.channel,
-							messageId: message.messageId
-						});
-					} else {
-						filteredMessages.push(message);
-					}
-				}
+		// 		for (const message of messages) {
+		// 			const messageTime = parseISO(message.time);
+		// 			if (differenceInDays(now, messageTime) >= deleteAdvertisementsMessagePeriod) {
+		// 				await this.tGBotAdvertisementRepository.deleteAdvertisementFromChannel({
+		// 					channel: message.channel,
+		// 					messageId: message.messageId
+		// 				});
+		// 			} else {
+		// 				filteredMessages.push(message);
+		// 			}
+		// 		}
 
-				if (filteredMessages.length !== messages.length) {
-					ad.deleteMessageInfo = JSON.stringify(filteredMessages);
-					await ad.save();
-				}
-			} catch (error) {
-				console.error(
-					`Ошибка парсинга deleteMessageInfo для объявления ID ${ad.id}:`,
-					error
-				);
-			}
-		}
+		// 		if (filteredMessages.length !== messages.length) {
+		// 			ad.deleteMessageInfo = JSON.stringify(filteredMessages);
+		// 			await ad.save();
+		// 		}
+		// 	} catch (error) {
+		// 		console.error(
+		// 			`Ошибка парсинга deleteMessageInfo для объявления ID ${ad.id}:`,
+		// 			error
+		// 		);
+		// 	}
+		// }
 	}
 
 	private async getPublishTimesFromDB(): Promise<any> {
@@ -232,34 +232,34 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 		today.setHours(today.getHours() + 3);
 		const todayDate = today.toISOString().split('T')[0];
 
-		const advertisements = await this.advertisement.findAll({
-			where: {
-				schedule: {
-					[Op.ne]: null
-				},
-				moderationStatus: EAdvertisementStatus.APPROVED
-			}
-		});
+		// const advertisements = await this.advertisement.findAll({
+		// 	where: {
+		// 		schedule: {
+		// 			[Op.ne]: null
+		// 		},
+		// 		moderationStatus: EAdvertisementStatus.APPROVED
+		// 	}
+		// });
 
-		try {
-			return advertisements.filter((ad) => {
-				const schedule = JSON.parse(ad.schedule);
+		// try {
+		// 	return advertisements.filter((ad) => {
+		// 		const schedule = JSON.parse(ad.schedule);
 
-				if (periodType === 'weekly') {
-					return (
-						Array.isArray(schedule) &&
-						schedule.some((entry) => entry.type === ETypePostsAdvertisement.RANDOM)
-					);
-				} else if (periodType === 'daily') {
-					return schedule.some((entry) => {
-						const date = new Date(`${entry.times} UTC`);
+		// 		if (periodType === 'weekly') {
+		// 			return (
+		// 				Array.isArray(schedule) &&
+		// 				schedule.some((entry) => entry.type === ETypePostsAdvertisement.RANDOM)
+		// 			);
+		// 		} else if (periodType === 'daily') {
+		// 			return schedule.some((entry) => {
+		// 				const date = new Date(`${entry.times} UTC`);
 
-						return date.toISOString().split('T')[0] === todayDate;
-					});
-				}
-			});
-		} catch (e) {
-			console.error(`Ошибка получения объявлений: ${e.message}`);
-		}
+		// 				return date.toISOString().split('T')[0] === todayDate;
+		// 			});
+		// 		}
+		// 	});
+		// } catch (e) {
+		// 	console.error(`Ошибка получения объявлений: ${e.message}`);
+		// }
 	}
 }

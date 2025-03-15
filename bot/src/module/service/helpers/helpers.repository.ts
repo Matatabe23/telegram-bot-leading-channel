@@ -9,6 +9,9 @@ import { Channels } from 'src/module/db/models/channels.repository';
 import { Tags } from 'src/module/db/models/tags.repository';
 import { PostTags } from 'src/module/db/models/post-tags.repository';
 import { DataBasePosts } from 'src/module/db/models/data-base-posts.repository';
+import { AdvertisementSchedule } from 'src/module/db/models/advertisement-schedule.repository';
+import { Op } from 'sequelize';
+import { DATA_GENERATE } from 'src/const/const';
 
 @Injectable()
 export class HelpersRepository {
@@ -62,15 +65,29 @@ export class HelpersRepository {
 		}
 	}
 
-	async getUnavailableTimes(daysCount: number, channel: string): Promise<string[]> {
-		const advertisements = await this.advertisement.findAll();
+	async getUnavailableTimes(daysCount: number, channel: string) {
+		const now = new Date();
+		const twoDaysLater = new Date();
+		twoDaysLater.setDate(now.getDate() + DATA_GENERATE);
+
+		const advertisements = await this.advertisement.findAll({
+			include: [
+				{
+					model: AdvertisementSchedule,
+					where: {
+						publicationTime: {
+							[Op.between]: [now, twoDaysLater]
+						}
+					}
+				}
+			]
+		});
 
 		const advertisementTimes = advertisements.flatMap((ad) => {
-			const scheduleArray = Array.isArray(ad.schedule)
-				? ad.schedule
-				: JSON.parse(ad.schedule) || [];
-
-			return scheduleArray.map((item) => (item.channel === channel ? item.times : undefined));
+			return ad
+				.get({ plain: true })
+				.schedules.filter((item) => item.sourceChatId.toString() === channel)
+				.map((item) => item.publicationTime); // Извлекаем только publicationTime
 		});
 
 		const regularTimes = await this.regularPublicationTime.findAll({
@@ -94,12 +111,14 @@ export class HelpersRepository {
 				const date = new Date(currentDate);
 				date.setDate(currentDate.getDate() + i);
 
-				const day = String(date.getDate()).padStart(2, '0');
-				const month = String(date.getMonth() + 1).padStart(2, '0');
-				const year = date.getFullYear();
+				// Устанавливаем время
+				date.setHours(Number(time.hour));
+				date.setMinutes(Number(time.minute));
+				date.setSeconds(0);
+				date.setMilliseconds(0);
 
-				const formattedTime = `${year}-${month}-${day} ${time.hour}:${time.minute}`;
-				formattedTimes.push(formattedTime);
+				// Добавляем объект Date в массив
+				formattedTimes.push(date);
 			}
 
 			return formattedTimes;
@@ -109,17 +128,22 @@ export class HelpersRepository {
 		return [...advertisementTimes, ...regularTimesFormatted].filter((item) => item);
 	}
 
-	generateTimes(days: number, unavailableTimes: string[]): string[] {
+	generateTimes(days: number, unavailableTimes: Date[]): string[] {
 		const availableTimes: string[] = [];
 		const now = new Date();
 
 		const moscowOffset = 3 * 60 * 60 * 1000;
 		const moscowNow = new Date(now.getTime() + moscowOffset);
 
+		// Преобразуем даты в формат 'YYYY-MM-DD HH:mm'
 		const normalizedUnavailableTimes = unavailableTimes.map((time) => {
-			const [date, timePart] = time.split(' ');
-			const [hour, minute] = timePart.split(':').map((part) => part.padStart(2, '0'));
-			return `${date} ${hour}:${minute}`;
+			const year = time.getFullYear();
+			const month = String(time.getMonth() + 1).padStart(2, '0');
+			const day = String(time.getDate()).padStart(2, '0');
+			const hour = String(time.getHours()).padStart(2, '0');
+			const minute = String(time.getMinutes()).padStart(2, '0');
+
+			return `${year}-${month}-${day} ${hour}:${minute}`;
 		});
 
 		for (let day = 0; day < days; day++) {

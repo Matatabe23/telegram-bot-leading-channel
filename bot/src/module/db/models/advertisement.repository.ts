@@ -1,6 +1,7 @@
-import { Column, ForeignKey, Model, Table, BelongsTo, DataType } from 'sequelize-typescript';
+import { Column, ForeignKey, Model, Table, BelongsTo, HasMany } from 'sequelize-typescript';
 import { Users } from './users.repository';
 import { EAdvertisementStatus } from 'src/types/types';
+import { AdvertisementSchedule } from './advertisement-schedule.repository'; // Импортируем модель AdvertisementSchedule
 
 @Table
 export class Advertisement extends Model {
@@ -17,20 +18,14 @@ export class Advertisement extends Model {
 	moderationStatus: string;
 	defaultValue = EAdvertisementStatus.CREATED;
 
-	@Column({
-		type: DataType.TEXT
-	})
-	schedule: string;
-
-	@Column({
-		type: DataType.TEXT
-	})
-	deleteMessageInfo: string;
-
 	@ForeignKey(() => Users)
 	@Column
 	userId: number;
 
 	@BelongsTo(() => Users)
 	user: Users;
+
+	// Связь с таблицей AdvertisementSchedules (один ко многим)
+	@HasMany(() => AdvertisementSchedule)
+	schedules: AdvertisementSchedule[];
 }
