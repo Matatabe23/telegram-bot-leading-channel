@@ -1,108 +1,123 @@
 <template>
-	<section class="publishing-panel md:flex flex-col w-full mb-12 p-4 hidden">
-		<div class="border-2 rounded-2xl">
-			<div class="flex flex-wrap justify-center items-center gap-2 overflow-y-auto relative">
-				<div
-					v-for="(photo, index) in state.images"
-					:key="index"
-					class="w-[25vh] h-[40vh] relative"
-				>
-					<img
-						:src="photo"
-						alt="Photo"
-						class="object-contain w-full h-full"
-					/>
-				</div>
-			</div>
+	<v-dialog
+		v-model="isOpen"
+		width="800"
+		persistent
+		transition="dialog-transition"
+	>
+		<template #default>
+			<v-card class="rounded-2xl p-4 flex flex-col justify-between max-h-[90vh]">
+				<!-- Контент модалки -->
+				<div class="overflow-y-auto flex-grow mt-2">
+					<div class="flex flex-wrap justify-center items-center gap-2 relative">
+						<div
+							v-for="(photo, index) in state.images"
+							:key="index"
+							class="w-[25vh] h-[40vh] relative"
+						>
+							<img
+								:src="photo"
+								alt="Photo"
+								class="object-contain w-full h-full"
+							/>
+						</div>
+					</div>
 
-			<div
-				class="flex flex-col items-center justify-center gap-2 pt-4 border-t-3 border-gray-500"
-			>
-				<div class="grid gap-2 md:flex justify-evenly mb-4 w-full">
+					<div class="flex flex-col items-center justify-center pt-4">
+						<div class="publishing-panel__select-settings w-full">
+							<v-file-input
+								v-model="state.imagePost"
+								:loading="appStore.isLoading"
+								color="#5865f2"
+								multiple
+								chips
+								prepend-icon=""
+								label="Загрузить файлы"
+								@update:modelValue="handleFileInput"
+								:item-value="(file) => file.name"
+							>
+								<template v-slot:selection="{ fileNames }">
+									<template
+										v-for="(fileName, index) in fileNames"
+										:key="fileName"
+									>
+										<!-- Отображаем только один файл -->
+										<v-chip
+											v-if="index === 0"
+											class="me-2"
+											color="#5865f2"
+											size="small"
+											label
+										>
+											{{ fileName }}
+										</v-chip>
+
+										<!-- Отображаем количество дополнительных файлов -->
+										<span
+											v-else-if="index === 1"
+											class="text-overline text-grey-darken-3 mx-2"
+										>
+											+{{ fileNames.length - 1 }} File(s)
+										</span>
+									</template>
+								</template>
+							</v-file-input>
+						</div>
+
+						<div class="publishing-panel__select-settings w-full">
+							<v-select
+								label="Настройки"
+								:items="settingsSelectPublish"
+								multiple
+								variant="outlined"
+								v-model="state.settingsArray"
+								:disabled="appStore.isLoading"
+								:loading="appStore.isLoading"
+							/>
+						</div>
+
+						<div class="publishing-panel__select-settings w-full">
+							<v-select
+								label="Каналы для публикации"
+								:items="channelsListSelect"
+								multiple
+								variant="outlined"
+								v-model="state.form.useChannelList"
+								:disabled="appStore.isLoading"
+							/>
+						</div>
+					</div>
+				</div>
+
+				<!-- Нижняя правая кнопка -->
+				<div class="flex justify-end p-4 gap-2">
 					<v-btn
-						color="#5865f2"
 						variant="flat"
-						@click="selectFile"
+						color="#5865f2"
+						@click="isOpen = false"
 						:loading="appStore.isLoading"
 					>
-						<input
-							id="file-upload"
-							type="file"
-							ref="fileInput"
-							multiple
-							@change="handleFileUpload"
-							class="hidden"
-						/>
-						<label class="publishing-panel__custom-file-upload">
-							<i class="fas fa-upload"></i> Загрузить файлы
-						</label>
+						Закрыть
 					</v-btn>
 					<v-btn
+						variant="flat"
 						color="#5865f2"
-						variant="flat"
-						@click="selectFolder"
-						:loading="appStore.isLoading"
-					>
-						<input
-							type="file"
-							id="file-upload"
-							ref="folderInput"
-							webkitdirectory
-							@change="handleFolderSelection"
-							class="hidden"
-						/>
-						<label class="publishing-panel__custom-file-upload">
-							<i class="fas fa-upload"></i> Загрузить несколько папок
-						</label>
-					</v-btn>
-					<v-btn
-						variant="flat"
 						@click="publicationPost"
 						:disabled="state.form.useChannelList.length === 0"
-						color="#5865f2"
 						:loading="appStore.isLoading"
+						v-if="checkPermissions(appStore.data?.EPermissions?.PUBLISH_POSTS)"
 					>
 						Опубликовать
 					</v-btn>
 				</div>
-
-				<div class="flex flex-col md:flex-row justify-center gap-4 items-center w-full">
-					<div class="publishing-panel__select-settings w-full">
-						<v-select
-							label="Настройки"
-							:items="settingsSelectPublish"
-							multiple
-							variant="outlined"
-							v-model="state.settingsArray"
-							:disabled="appStore.isLoading"
-							:loading="appStore.isLoading"
-						/>
-					</div>
-					<div class="publishing-panel__select-settings w-full">
-						<v-select
-							label="Каналы для публикации"
-							:items="channelsListSelect"
-							multiple
-							variant="outlined"
-							v-model="state.form.useChannelList"
-							:disabled="appStore.isLoading"
-						/>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- <ProcentLoader
-			:overlay="state.processLoader.overlay"
-			:total="state.processLoader.total"
-			:loaded="state.processLoader.loaded"
-		/> -->
-	</section>
+			</v-card>
+		</template>
+	</v-dialog>
 </template>
 
 <script lang="ts" setup>
-	import { onMounted, reactive, ref, watch, computed } from 'vue';
-	import { unifiedPublication } from '@/shared';
+	import { onMounted, reactive, watch, computed } from 'vue';
+	import { checkPermissions, unifiedPublication } from '@/shared';
 	import { IPublish } from '@/entities';
 	import { useToast } from 'vue-toastification';
 	import { usePosts } from '@/shared';
@@ -118,8 +133,7 @@
 	const toast = useToast();
 	const editorStore = usePosts();
 
-	const folderInput = ref<any>('');
-	const fileInput = ref<any>('');
+	const isOpen = defineModel<boolean>('isOpen');
 
 	const state: IPublish = reactive({
 		images: [],
@@ -137,19 +151,23 @@
 		}
 	});
 
-	const handleFileUpload = async (event: any) => {
-		const files = event.target.files;
-		for (let i = 0; i < files.length; i++) {
-			const file = files[i];
+	const handleFileInput = (files: File[] | null) => {
+		state.images = [];
+
+		if (!files) {
+			state.imagePost = [];
+			return;
+		}
+
+		files.forEach((file) => {
 			const reader = new FileReader();
 			reader.onload = () => {
 				if (typeof reader.result === 'string') {
 					state.images.push(reader.result);
 				}
 			};
-			state.imagePost.push(file);
 			reader.readAsDataURL(file);
-		}
+		});
 	};
 
 	const publicationPost = async () => {
@@ -193,64 +211,6 @@
 			state.form.useChannelList = JSON.parse(useChannelList).split(',');
 	};
 
-	const selectFolder = () => {
-		folderInput.value.click();
-	};
-
-	const selectFile = () => {
-		fileInput.value.click();
-	};
-
-	const handleFolderSelection = async (event: any) => {
-		try {
-			const files = event.target.files;
-			if (files.length === 0) return;
-
-			const groupedFiles: any = {};
-
-			for (let i = 0; i < files.length; i++) {
-				const file = files[i];
-				const match = file.webkitRelativePath.match(/\/(\d+)\//);
-				const number = match ? parseInt(match[1]) : null;
-
-				if (!number) {
-					toast.error('Ошибка в работе с файлами');
-					return;
-				}
-
-				if (number !== null) {
-					if (!groupedFiles[number]) {
-						groupedFiles[number] = [];
-					}
-					groupedFiles[number].push(file);
-				}
-			}
-
-			const folderContent = Object.values(groupedFiles);
-
-			state.processLoader.overlay = true;
-			state.processLoader.total = folderContent.length;
-
-			for (let i = 0; i < folderContent.length; i++) {
-				const file = folderContent[i] as FileList;
-				await unifiedPublication(
-					file,
-					state.settingsArray.includes('waterMark'),
-					state.form.useChannelList,
-                    false
-				);
-				state.processLoader.loaded += 1;
-			}
-
-			editorStore.getPosts();
-			toast.success('Успешная публикация');
-		} catch (e: any) {
-			toast.error(e.response.data.message);
-		} finally {
-			state.processLoader.overlay = false;
-		}
-	};
-
 	watch(
 		() => state.settingsArray,
 		(value) => {
@@ -288,6 +248,12 @@
 
 		#file-upload {
 			@apply hidden;
+		}
+
+		.v-input__control {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
 		}
 	}
 </style>

@@ -30,7 +30,16 @@
 			</v-app-bar-nav-icon>
 			Пользователей онлайн: {{ onlineUsers }}
 
-			<div class="ml-auto mr-4 cursor-pointer">
+			<div class="flex gap-2 ml-auto mr-4 cursor-pointer">
+				<v-btn
+					variant="flat"
+					@click="isPublishPanel = true"
+					color="#5865f2"
+					v-if="checkPermissions(appStore.data?.EPermissions?.PUBLISH_POSTS)"
+				>
+					Новая публикация
+				</v-btn>
+
 				<v-menu location="bottom">
 					<template v-slot:activator="{ props }">
 						<v-avatar
@@ -58,6 +67,8 @@
 		<v-main>
 			<slot></slot>
 		</v-main>
+
+		<PublishPostsPanel v-model:isOpen="isPublishPanel" />
 	</v-app>
 </template>
 
@@ -66,6 +77,7 @@
 	import { useRouter } from 'vue-router';
 	import { checkPermissions, Icons, useSocket } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
+	import { PublishPostsPanel } from '@/widgets';
 
 	const router = useRouter();
 	const appStore = useAppStore();
@@ -73,6 +85,7 @@
 
 	const drawer = ref(false);
 	const onlineUsers = ref(1);
+	const isPublishPanel = ref(false);
 
 	const goTo = (path: string) => {
 		router.push(path);
@@ -99,10 +112,10 @@
 			path: '/advertisement',
 			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_ADVERTISEMENTS)
 		},
-        {
+		{
 			title: 'Теги',
 			path: '/tags',
-            visible: true
+			visible: true
 		},
 		{
 			title: 'Настройки',
