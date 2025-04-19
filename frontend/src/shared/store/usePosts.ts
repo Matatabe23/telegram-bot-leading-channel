@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { IStoreStatePosts } from '@/entities';
+import { IStoreStatePosts, perPage } from '@/entities';
 import { receiving } from '@/shared';
 
 
@@ -10,7 +10,7 @@ export const usePosts = defineStore('posts', {
         publishTime: [],
         form: {
             currentPage: 1,
-            postsPerPage: 3,
+            postsPerPage: perPage[0].value,
             watched: '',
             channel: '',
             search: ''

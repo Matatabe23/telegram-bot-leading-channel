@@ -7,7 +7,7 @@ export const watchedOptions = [
 ];
 
 export const perPage = [
-    {  title: '3', value: 3, },
+    {  title: '4', value: 4, },
     { title: '5', value: 5,  },
     { title: '10', value: 10 }
 ];
