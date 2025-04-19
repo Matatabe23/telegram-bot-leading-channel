@@ -41,10 +41,7 @@ export class TGBotAdvertisementRepository {
 
 		if (!user?.isTeamMember) {
 			const count = await this.advertisement.count({
-				where: {
-					sourceChatId: chatId,
-					userId: user?.id
-				}
+				where: { sourceChatId: chatId, userId: user?.id }
 			});
 
 			if (count >= 5) {
@@ -59,13 +56,24 @@ export class TGBotAdvertisementRepository {
 		await this.bot.sendMessage(chatId, 'Пожалуйста, отправьте рекламу в течение 1 минуты.');
 
 		const timeoutId = setTimeout(async () => {
+			this.bot.removeListener('message', onMessage);
 			await this.bot.sendMessage(chatId, 'Время истекло. Реклама не была получена.');
 		}, this.timeout);
 
+		const collectedFiles: any[] = [];
+
 		const onMessage = async (message: TelegramBot.Message) => {
 			if (message.chat.id !== chatId) return;
+			console.log(message);
 
-			if (!message.text && !message.caption) {
+			if (
+				!message.text &&
+				!message.caption &&
+				!message.photo &&
+				!message.video &&
+				!message.document &&
+				!message.voice
+			) {
 				return;
 			}
 
@@ -78,21 +86,36 @@ export class TGBotAdvertisementRepository {
 				return;
 			}
 
+			// Добавляем файлы в массив с лучшим качеством
+			if (message.photo) {
+				const bestPhoto = message.photo[message.photo.length - 1]; // Самое большое фото
+				collectedFiles.push({ type: 'photo', file_id: bestPhoto.file_id });
+			}
+			if (message.video) {
+				collectedFiles.push({ type: 'video', file_id: message.video.file_id });
+			}
+			if (message.document) {
+				collectedFiles.push({ type: 'document', file_id: message.document.file_id });
+			}
+			if (message.voice) {
+				collectedFiles.push({ type: 'voice', file_id: message.voice.file_id });
+			}
+
+			// Копируем сообщение в чат
 			const sentMessage = await this.bot.copyMessage(chatId, chatId, message.message_id);
 
 			await this.advertisement.create({
 				sourceChatId: chatId,
 				messageId: sentMessage.message_id,
 				userId: user?.id,
+				sourceMessage: JSON.stringify(message),
+				messageGroupId: message?.media_group_id,
 				moderationStatus: EAdvertisementStatus.CREATED
 			});
 
 			await this.bot.sendMessage(chatId, 'Реклама получена и сохранена.', {
 				reply_to_message_id: sentMessage.message_id
 			});
-
-			clearTimeout(timeoutId);
-			this.bot.removeListener('message', onMessage);
 		};
 
 		this.bot.on('message', onMessage);

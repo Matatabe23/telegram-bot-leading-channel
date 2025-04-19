@@ -1,23 +1,12 @@
 <template>
 	<v-container>
-		<div class="md:flex items-center gap-4 w-full lg:w-4/6">
-			<v-text-field
-				clearable
-				label="Название тега"
-				variant="outlined"
-				v-model="search"
-				@update:model-value="updateSearch"
-				:loading="appStore.isLoading"
-			/>
-		</div>
-
-		<!-- Таблица -->
 		<v-data-table-server
-			:loading="appStore.isLoading"
+			:loading="isLoading"
 			:headers="headers"
 			:items="Tags"
 			item-key="id"
 			class="elevation-1 my-2"
+			loading-text="Загрузка данных..."
 			v-model:items-per-page="perPage"
 			v-model:page="currentPage"
 			:items-length="totalItems"
@@ -25,6 +14,27 @@
 			@update:page="getTags()"
 			@update:items-per-page="getTags()"
 		>
+			<template v-slot:loading>
+				<v-skeleton-loader type="table-row@10"></v-skeleton-loader>
+			</template>
+
+			<template v-slot:tfoot>
+				<tr>
+					<td></td>
+					<td>
+						<v-text-field
+							class="ma-2"
+							density="compact"
+							placeholder="Имя тега..."
+							hide-details
+							v-model="search"
+							@update:model-value="updateSearch"
+							:loading="isLoading"
+						></v-text-field>
+					</td>
+				</tr>
+			</template>
+
 			<template v-slot:item.holiday="{ item }">
 				<v-btn
 					@click="setTag(item)"
@@ -147,6 +157,7 @@
 	const totalItems = ref(0);
 	const sortBy = ref([]);
 	const search = ref('');
+	const isLoading = ref(false);
 	const Tags = ref<ITags[]>([]);
 
 	const isDateModel = ref(false);
@@ -168,15 +179,22 @@
 	];
 
 	const getTags = async () => {
-		const result = await receivingTags({
-			page: currentPage.value,
-			perPage: perPage.value,
-			sortBy: sortBy.value?.[0]?.key,
-			sortOrder: sortBy.value?.[0]?.order || 'asc',
-			search: search.value
-		});
-		Tags.value = result.tags;
-		totalItems.value = result.pagination?.totalItems;
+		try {
+			isLoading.value = true;
+			const result = await receivingTags({
+				page: currentPage.value,
+				perPage: perPage.value,
+				sortBy: sortBy.value?.[0]?.key,
+				sortOrder: sortBy.value?.[0]?.order || 'asc',
+				search: search.value
+			});
+			Tags.value = result.tags;
+			totalItems.value = result.pagination?.totalItems;
+		} catch (e) {
+			//
+		} finally {
+			isLoading.value = false;
+		}
 	};
 
 	const setSort = (sort) => {

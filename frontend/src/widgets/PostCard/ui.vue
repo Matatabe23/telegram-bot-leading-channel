@@ -14,7 +14,7 @@
 				<div class="flex gap-2 flex-wrap md:flex-nowrap">
 					<v-btn
 						v-if="checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
-						color="#5865f2"
+						color="red"
 						variant="flat"
 						@click="emit('delete-post', props.post.id)"
 						class="w-full md:w-auto"
@@ -31,7 +31,7 @@
 					>
 					<v-btn
 						v-if="checkPermissions(appStore.data?.EPermissions?.PUBLISH_POSTS)"
-						color="#5865f2"
+						color="green"
 						variant="flat"
 						@click="emit('publish-instantly-post', props.post.id)"
 						class="w-full md:w-auto"

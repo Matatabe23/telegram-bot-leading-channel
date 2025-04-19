@@ -26,7 +26,7 @@ export class TGBotRepository {
 			const chatId = msg.chat.id;
 			const text = msg.text;
 			const session = this.tgBotService.getSession(chatId);
-			console.log(msg);
+			// console.log(msg);
 
 			this.logger.log(`Получено сообщение из чата ${chatId}: ${text}`);
 

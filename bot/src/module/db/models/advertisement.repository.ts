@@ -14,6 +14,12 @@ export class Advertisement extends Model {
 	@Column
 	messageId: number;
 
+	@Column({ type: 'TEXT' })
+	sourceMessage: string;
+
+	@Column({ type: 'BIGINT' })
+	messageGroupId?: string;
+
 	@Column
 	moderationStatus: string;
 	defaultValue = EAdvertisementStatus.CREATED;

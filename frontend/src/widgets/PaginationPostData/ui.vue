@@ -7,18 +7,20 @@
 			@click="$emit('backPage')"
 			color="#5865f2"
 			:loading="appStore.isLoading"
-			><Icons
-				icon="ARROW_STROKE"
-				class="rotate-90"
-		/></v-btn>
+		>
+			<v-icon>mdi-arrow-left</v-icon>
+		</v-btn>
+
 		<v-btn
 			v-if="checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
 			variant="flat"
 			@click="$emit('delPost')"
-			color="#5865f2"
+			color="red"
 			:loading="appStore.isLoading"
-			><Icons icon="TRASH"
-		/></v-btn>
+		>
+			<v-icon>mdi-trash-can-outline</v-icon>
+		</v-btn>
+
 		<div class="min-w-[30%] text-white">
 			<v-select
 				v-if="checkPermissions(appStore.data?.EPermissions?.EDIT_POSTS)"
@@ -32,24 +34,26 @@
 				:loading="appStore.isLoading"
 			></v-select>
 		</div>
+
 		<v-btn
 			v-if="checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
 			variant="flat"
 			@click="$emit('deleteSelectedImg')"
-			color="#5865f2"
+			color="red"
 			:disabled="checkListImageLenght === 0"
 			:loading="appStore.isLoading"
-			><Icons icon="USER_DELETE"
-		/></v-btn>
+		>
+			<v-icon>mdi-selection-remove</v-icon>
+		</v-btn>
+
 		<v-btn
 			variant="flat"
 			@click="$emit('nextPage')"
 			color="#5865f2"
 			:loading="appStore.isLoading"
-			><Icons
-				icon="ARROW_STROKE"
-				class="-rotate-90"
-		/></v-btn>
+		>
+			<v-icon>mdi-arrow-right</v-icon>
+		</v-btn>
 	</div>
 
 	<div
@@ -65,43 +69,47 @@
 				@update:model-value="$emit('updateChannelList', $event)"
 			></v-select>
 		</div>
+
 		<div class="flex w-full justify-evenly">
 			<v-btn
 				variant="flat"
 				@click="$emit('backPage')"
 				color="#5865f2"
-				><Icons
-					icon="ARROW_STROKE"
-					class="rotate-90"
-			/></v-btn>
+			>
+				<v-icon >mdi-arrow-left</v-icon>
+			</v-btn>
+
 			<v-btn
 				variant="flat"
 				@click="$emit('delPost')"
-				color="#5865f2"
-				><Icons icon="TRASH"
-			/></v-btn>
+				color="red"
+			>
+				<v-icon>mdi-trash-can-outline</v-icon>
+			</v-btn>
+
 			<v-btn
 				variant="flat"
 				@click="$emit('deleteSelectedImg')"
-				color="#5865f2"
+				color="red"
 				:disabled="checkListImageLenght === 0"
-				><Icons icon="USER_DELETE"
-			/></v-btn>
+			>
+				<v-icon>mdi-selection-remove</v-icon>
+			</v-btn>
+
 			<v-btn
 				variant="flat"
 				@click="$emit('nextPage')"
 				color="#5865f2"
-				><Icons
-					icon="ARROW_STROKE"
-					class="-rotate-90"
-			/></v-btn>
+			>
+				<v-icon >mdi-arrow-right</v-icon>
+			</v-btn>
 		</div>
 	</div>
 </template>
 
 <script lang="ts" setup>
 	import { computed } from 'vue';
-	import { Icons, useSettings, checkPermissions } from '@/shared';
+	import { useSettings, checkPermissions } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
 
 	const { listChannels } = useSettings();
