@@ -28,7 +28,8 @@
 					class="h-6 w-6"
 				/>
 			</v-app-bar-nav-icon>
-			Пользователей онлайн: {{ onlineUsers }}
+
+			<span class="hidden md:block"> Пользователей онлайн: {{ onlineUsers }} </span>
 
 			<div class="flex gap-2 ml-auto mr-4 cursor-pointer">
 				<v-btn
@@ -106,11 +107,6 @@
 			title: 'Роли',
 			path: '/roles',
 			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_ROLES)
-		},
-		{
-			title: 'Реклама',
-			path: '/advertisement',
-			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_ADVERTISEMENTS)
 		},
 		{
 			title: 'Теги',

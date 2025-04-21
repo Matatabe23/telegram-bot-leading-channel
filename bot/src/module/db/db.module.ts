@@ -11,11 +11,9 @@ import { Channels } from './models/channels.repository';
 import { ChannelPosts } from './models/channel-posts.repository';
 import { RolesSettings } from './models/roles-settings.repository';
 import { Payments } from './models/payments.repository';
-import { Advertisement } from './models/advertisement.repository';
 import { Tags } from './models/tags.repository';
 import { PostTags } from './models/post-tags.repository';
 import { Holiday } from './models/holiday.repository';
-import { AdvertisementSchedule } from './models/advertisement-schedule.repository';
 
 const dbList = [
 	Users,
@@ -26,11 +24,9 @@ const dbList = [
 	ChannelPosts,
 	RolesSettings,
 	Payments,
-	Advertisement,
 	Tags,
 	PostTags,
-	Holiday,
-	AdvertisementSchedule
+	Holiday
 ];
 
 @Module({

@@ -21,7 +21,6 @@ import { RolesModule } from './module/endpoints/roles/roles.module';
 import { InitDataModule } from './module/service/init-data/init-data.module';
 import { HelpersModule } from './module/service/helpers/helpers.module';
 import { PaymentsModule } from './module/service/payments/payments.module';
-import { AdvertisementModule } from './module/endpoints/advertisement/advertisement.module';
 import { WebSocketModule } from './module/websocket/websocket.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
@@ -41,7 +40,6 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 		SettingsModule,
 		FilesModule,
 		RolesModule,
-		AdvertisementModule,
 
 		S3Module,
 		FileModule,

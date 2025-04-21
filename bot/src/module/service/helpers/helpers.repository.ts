@@ -3,15 +3,10 @@ import { InjectModel } from '@nestjs/sequelize';
 import { EPermissions } from 'src/types/types';
 import { Payments } from 'src/module/db/models/payments.repository';
 import { RolesSettings } from 'src/module/db/models/roles-settings.repository';
-import { Advertisement } from 'src/module/db/models/advertisement.repository';
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
-import { Channels } from 'src/module/db/models/channels.repository';
 import { Tags } from 'src/module/db/models/tags.repository';
 import { PostTags } from 'src/module/db/models/post-tags.repository';
 import { DataBasePosts } from 'src/module/db/models/data-base-posts.repository';
-import { AdvertisementSchedule } from 'src/module/db/models/advertisement-schedule.repository';
-import { Op } from 'sequelize';
-import { DATA_GENERATE } from 'src/const/const';
 
 @Injectable()
 export class HelpersRepository {
@@ -20,8 +15,6 @@ export class HelpersRepository {
 		private readonly rolesSettings: typeof RolesSettings,
 		@InjectModel(Payments)
 		private readonly payments: typeof Payments,
-		@InjectModel(Advertisement)
-		private readonly advertisement: typeof Advertisement,
 		@InjectModel(RegularPublicationTime)
 		private readonly regularPublicationTime: typeof RegularPublicationTime,
 		@InjectModel(Tags)
@@ -63,69 +56,6 @@ export class HelpersRepository {
 		} catch (error) {
 			console.error('Ошибка при сохранении данных о платеже:', error);
 		}
-	}
-
-	async getUnavailableTimes(daysCount: number, channel: string) {
-		const now = new Date();
-		const twoDaysLater = new Date();
-		twoDaysLater.setDate(now.getDate() + DATA_GENERATE);
-
-		const advertisements = await this.advertisement.findAll({
-			include: [
-				{
-					model: AdvertisementSchedule,
-					where: {
-						publicationTime: {
-							[Op.between]: [now, twoDaysLater]
-						}
-					}
-				}
-			]
-		});
-
-		const advertisementTimes = advertisements.flatMap((ad) => {
-			return ad
-				.get({ plain: true })
-				.schedules.filter((item) => item.sourceChatId.toString() === channel)
-				.map((item) => item.publicationTime); // Извлекаем только publicationTime
-		});
-
-		const regularTimes = await this.regularPublicationTime.findAll({
-			attributes: ['hour', 'minute'],
-			include: [
-				{
-					model: Channels,
-					attributes: [],
-					where: {
-						chatId: channel
-					}
-				}
-			]
-		});
-
-		const regularTimesFormatted = regularTimes.flatMap((time) => {
-			const currentDate = new Date();
-			const formattedTimes = [];
-
-			for (let i = 0; i < daysCount; i++) {
-				const date = new Date(currentDate);
-				date.setDate(currentDate.getDate() + i);
-
-				// Устанавливаем время
-				date.setHours(Number(time.hour));
-				date.setMinutes(Number(time.minute));
-				date.setSeconds(0);
-				date.setMilliseconds(0);
-
-				// Добавляем объект Date в массив
-				formattedTimes.push(date);
-			}
-
-			return formattedTimes;
-		});
-
-		// Объединяем все занятые часы
-		return [...advertisementTimes, ...regularTimesFormatted].filter((item) => item);
 	}
 
 	generateTimes(days: number, unavailableTimes: Date[]): string[] {

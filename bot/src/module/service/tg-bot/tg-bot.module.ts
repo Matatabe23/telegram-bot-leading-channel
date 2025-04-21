@@ -8,7 +8,6 @@ import { WaterMarkModule } from '../water-mark/water-mark.module';
 import { TGBotUsersRepository } from './repository/tg-bot-users.repository';
 import { TGBotService } from './tg-bot.service';
 import { TGBotPostsRepository } from './repository/tg-bot-posts.repository';
-import { TGBotAdvertisementRepository } from './repository/tg-bot-advertisement.repository';
 import { HelpersModule } from '../helpers/helpers.module';
 import { RegularPublicationBotModule } from 'src/module/service/regular-publication-bot/regular-publication-bot.module';
 
@@ -22,19 +21,7 @@ import { RegularPublicationBotModule } from 'src/module/service/regular-publicat
 		HelpersModule,
 		forwardRef(() => RegularPublicationBotModule)
 	],
-	providers: [
-		TGBotService,
-		TGBotRepository,
-		TGBotUsersRepository,
-		TGBotPostsRepository,
-		TGBotAdvertisementRepository
-	],
-	exports: [
-		TGBotService,
-		TGBotRepository,
-		TGBotUsersRepository,
-		TGBotPostsRepository,
-		TGBotAdvertisementRepository
-	]
+	providers: [TGBotService, TGBotRepository, TGBotUsersRepository, TGBotPostsRepository],
+	exports: [TGBotService, TGBotRepository, TGBotUsersRepository, TGBotPostsRepository]
 })
 export class TGBotModule {}

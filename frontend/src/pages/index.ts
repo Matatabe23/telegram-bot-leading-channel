@@ -5,5 +5,4 @@ export * from './PostData';
 export * from './Profile'
 export * from './Roles'
 export * from './Users'
-export * from './Advertisement'
 export * from './Tags'

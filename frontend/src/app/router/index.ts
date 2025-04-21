@@ -8,7 +8,6 @@ import {
     Profile,
     Roles,
     Users,
-    Advertisement,
     Tags
 } from '@/pages';
 
@@ -44,10 +43,6 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/users',
         component: Users,
-    },
-    {
-        path: '/advertisement',
-        component: Advertisement,
     },
     {
         path: '/tags',

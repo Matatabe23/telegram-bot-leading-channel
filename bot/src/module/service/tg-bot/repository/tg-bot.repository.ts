@@ -3,7 +3,6 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { TGBotUsersRepository } from './tg-bot-users.repository';
 import { YuKassaRepository } from '../../payments/repository/yu-kassa.repository';
-import { TGBotAdvertisementRepository } from './tg-bot-advertisement.repository';
 import { buttonText } from 'src/const/const';
 
 @Injectable()
@@ -14,8 +13,7 @@ export class TGBotRepository {
 	constructor(
 		private readonly tgBotService: TGBotService,
 		private readonly tGBotUsersRepository: TGBotUsersRepository,
-		private readonly yuKassaRepository: YuKassaRepository,
-		private readonly tGBotAdvertisementRepository: TGBotAdvertisementRepository
+		private readonly yuKassaRepository: YuKassaRepository
 	) {
 		this.bot = this.tgBotService.getBot();
 		this.initializeMessageHandlers();
@@ -41,16 +39,6 @@ export class TGBotRepository {
 						this.bot.sendMessage(chatId, 'Данная функция пока не доступна');
 						// session.step = 'pay';
 						// await this.yuKassaRepository.pay(chatId);
-						break;
-
-					case buttonText.addAdvertisements:
-						session.step = 'addAdvertisements';
-						await this.tGBotAdvertisementRepository.addAdvertisement(msg);
-						break;
-
-					case '🗂 Мои объявления':
-						session.step = buttonText.viewAdvertisements;
-						await this.tGBotAdvertisementRepository.viewAdvertisements(msg);
 						break;
 				}
 

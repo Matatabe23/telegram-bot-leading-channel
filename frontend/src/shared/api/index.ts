@@ -3,7 +3,6 @@ export * from './posts';
 export * from './settings';
 export * from './files';
 export * from './roles';
-export * from './advertisement';
 export * from './socket';
 
 import axios from 'axios';
