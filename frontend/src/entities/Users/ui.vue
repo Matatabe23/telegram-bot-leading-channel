@@ -64,6 +64,7 @@
 					hide-details
 					@change="updateDataUsers(item, { isTeamMember: true })"
 					:model-value="item.isTeamMember"
+                    color="success"
 				/>
 			</template>
 

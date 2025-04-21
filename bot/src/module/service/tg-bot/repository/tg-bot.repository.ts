@@ -3,7 +3,6 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { TGBotService } from 'src/module/service/tg-bot/tg-bot.service';
 import { TGBotUsersRepository } from './tg-bot-users.repository';
 import { YuKassaRepository } from '../../payments/repository/yu-kassa.repository';
-import { buttonText } from 'src/const/const';
 
 @Injectable()
 export class TGBotRepository {
@@ -33,14 +32,6 @@ export class TGBotRepository {
 					msg.from.id,
 					msg.from.username || msg.from.first_name
 				);
-
-				switch (text) {
-					case buttonText.pay:
-						this.bot.sendMessage(chatId, 'Данная функция пока не доступна');
-						// session.step = 'pay';
-						// await this.yuKassaRepository.pay(chatId);
-						break;
-				}
 
 				this.tgBotService.setSession(chatId, session);
 			} catch (error) {

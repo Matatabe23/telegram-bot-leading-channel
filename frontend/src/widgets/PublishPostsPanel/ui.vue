@@ -7,6 +7,14 @@
 	>
 		<template #default>
 			<v-card class="rounded-2xl p-4 flex flex-col justify-between max-h-[90vh]">
+				<button
+					class="absolute top-2 right-4 z-10 w-min"
+					@click="isOpen = false"
+					:loading="appStore.isLoading"
+				>
+					<v-icon>mdi-close</v-icon>
+				</button>
+
 				<!-- Контент модалки -->
 				<div class="overflow-y-auto flex-grow mt-2">
 					<div class="flex flex-wrap justify-center items-center gap-2 relative">
@@ -93,15 +101,7 @@
 				<div class="flex justify-end p-4 gap-2">
 					<v-btn
 						variant="flat"
-						color="#5865f2"
-						@click="isOpen = false"
-						:loading="appStore.isLoading"
-					>
-						Закрыть
-					</v-btn>
-					<v-btn
-						variant="flat"
-						color="#5865f2"
+						color="green"
 						@click="publicationPost"
 						:disabled="state.form.useChannelList.length === 0"
 						:loading="appStore.isLoading"

@@ -2,7 +2,7 @@
 	<section class="publish-posts-list w-11/12 relative mx-4">
 		<div class="flex justify-between mb-2.5">
 			<div class="mb-3 text-sm md:text-base">
-				<div v-if="totalCount">Всего постов: {{ totalCount }}</div>
+				<div v-if="editorStore.totalCount">Всего постов: {{ editorStore.totalCount }}</div>
 				<div v-if="lastPublishDate">Крайняя дата публикации: {{ lastPublishDate }}</div>
 			</div>
 			<v-btn
@@ -29,7 +29,7 @@
 					/>
 					<v-select
 						label="Канал"
-						v-model="form.channel"
+						v-model="editorStore.form.channel"
 						:items="formattedChannels"
 						variant="outlined"
 						@update:model-value="updateChannel"
@@ -37,7 +37,7 @@
 					/>
 					<v-select
 						label="Статус просмотра"
-						v-model="form.watched"
+						v-model="editorStore.form.watched"
 						:items="watchedOptions"
 						variant="outlined"
 						@update:model-value="updateWatched"
@@ -62,42 +62,45 @@
 			</v-card>
 		</v-dialog>
 
-		<div
-			v-for="post in postsList"
-			:key="post.id"
-		>
-			<postCard
-				:post="post"
-				@delete-post="delPost"
-				@publish-instantly-post="publishInstantlyPost"
-				@select-promt="setPromt"
-			/>
-		</div>
+		<v-data-iterator :items="editorStore.postsList">
+			<template v-slot:default="{ items }">
+				<template
+					v-for="(item, i) in items"
+					:key="item.id || i"
+				>
+					<PostCard
+						:post="item.raw"
+						@delete-post="delPost"
+						@publish-instantly-post="publishInstantlyPost"
+						@select-promt="setPromt"
+					/>
+				</template>
+			</template>
 
-		<div
-			class="flex justify-center items-center my-5"
-			v-if="postsList.length"
-		>
-			<v-pagination
-				v-model="form.currentPage"
-				:length="lastPage"
-				:total-visible="appStore.isMd ? 7 : 3"
-				@update:model-value="setPage"
-				:disabled="appStore.isLoading"
-				class="text-xs"
-			/>
+			<template v-slot:footer>
+				<div class="flex justify-center items-center my-5" v-if="editorStore.postsList?.length > 0">
+					<v-pagination
+						v-model="editorStore.form.currentPage"
+						:length="lastPage"
+						:total-visible="width >= 1366 ? 7 : 3"
+						@update:model-value="setPage"
+						:disabled="appStore.isLoading"
+						class="text-xs"
+					/>
 
-			<div class="w-[80px] hidden md:block">
-				<v-select
-					class="publish-posts-list__none-message-select"
-					v-model="form.postsPerPage"
-					:items="perPage"
-					variant="outlined"
-					@update:model-value="updatePostsPerPage"
-					:loading="appStore.isLoading"
-				/>
-			</div>
-		</div>
+					<div class="w-[80px] hidden md:block ml-4">
+						<v-select
+							class="publish-posts-list__none-message-select"
+							v-model="editorStore.form.postsPerPage"
+							:items="perPage"
+							variant="outlined"
+							@update:model-value="updatePostsPerPage"
+							:loading="appStore.isLoading"
+						/>
+					</div>
+				</div>
+			</template>
+		</v-data-iterator>
 	</section>
 </template>
 
@@ -110,16 +113,17 @@
 	import { watchedOptions, perPage } from '@/entities';
 	import { useAppStore } from '@/app/app.store';
 	import { useRoute, useRouter } from 'vue-router';
-	import { useDebounceFn } from '@vueuse/core';
+	import { useDebounceFn, useWindowSize } from '@vueuse/core';
 
 	const settingsStore = useSettings();
 	const { listChannels } = storeToRefs(settingsStore);
 	const toast = useToast();
 	const editorStore = usePosts();
-	const { postsList, totalCount, publishTime, form } = storeToRefs(editorStore);
 	const appStore = useAppStore();
 	const route = useRoute();
 	const router = useRouter();
+
+	const { width } = useWindowSize();
 
 	const isFilterModalOpen = ref(false);
 	const search = ref('');
@@ -128,7 +132,7 @@
 	const selectPromt = ref('');
 
 	const lastPage = computed(() => {
-		return Math.ceil(totalCount.value / form.value.postsPerPage);
+		return Math.ceil(editorStore.totalCount / editorStore.form.postsPerPage);
 	});
 
 	const formattedChannels = computed(() => {
@@ -142,10 +146,10 @@
 	});
 
 	const lastPublishDate = computed(() => {
-		if (!publishTime.value.length) return '';
+		if (!editorStore.publishTime.length) return '';
 
-		const postsPerDay = publishTime.value.length;
-		const totalDays = Math.ceil(totalCount.value / postsPerDay);
+		const postsPerDay = editorStore.publishTime.length;
+		const totalDays = Math.ceil(editorStore.totalCount / postsPerDay);
 
 		const startDate = new Date();
 		const lastPostDate = new Date(startDate);
@@ -161,7 +165,7 @@
 
 	const setPage = (page: number) => {
 		editorStore.setStateValueByKey('form', {
-			...form.value,
+			...editorStore.form,
 			currentPage: page === 0 ? 1 : page
 		});
 		router.push({
@@ -173,7 +177,7 @@
 
 	const updatePostsPerPage = async (value: number) => {
 		editorStore.setStateValueByKey('form', {
-			...form.value,
+			...editorStore.form,
 			postsPerPage: value,
 			currentPage: 1
 		});
@@ -214,7 +218,7 @@
 
 	const updateWatched = async (value: string) => {
 		localStorage.setItem('watched', value);
-		await editorStore.setStateValueByKey('form', { ...form.value, watched: value });
+		await editorStore.setStateValueByKey('form', { ...editorStore.form, watched: value });
 		await editorStore.getPosts();
 
 		if (editorStore.postsList.length === 0) {
@@ -224,7 +228,7 @@
 
 	const updateChannel = async (value: string) => {
 		localStorage.setItem('channel', value);
-		await editorStore.setStateValueByKey('form', { ...form.value, channel: value });
+		await editorStore.setStateValueByKey('form', { ...editorStore.form, channel: value });
 		await editorStore.getPosts();
 
 		if (editorStore.postsList.length === 0) {
@@ -235,7 +239,7 @@
 	const updateSearch = useDebounceFn(async (value: string) => {
 		try {
 			appStore.isLoading = true;
-			await editorStore.setStateValueByKey('form', { ...form.value, search: value });
+			await editorStore.setStateValueByKey('form', { ...editorStore.form, search: value });
 			await editorStore.getPosts();
 
 			if (editorStore.postsList.length === 0) {
@@ -254,7 +258,7 @@
 		const currentPage = parseInt(route.query.page as string, 10) || 1;
 
 		await editorStore.setStateValueByKey('form', {
-			...form.value,
+			...editorStore.form,
 			watched,
 			channel,
 			currentPage

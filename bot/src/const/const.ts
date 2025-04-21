@@ -1,4 +1,4 @@
-import { EPermissions, EAdvertisementStatus } from 'src/types/types';
+import { EPermissions } from 'src/types/types';
 
 export const PERMISSIONS_LIST = [
 	{
@@ -34,10 +34,6 @@ export const PERMISSIONS_LIST = [
 		value: EPermissions.SET_PUBLICATION_TIME
 	},
 	{
-		title: 'Редактировать рекламу',
-		value: EPermissions.EDIT_ADVERTISEMENTS
-	},
-	{
 		title: 'Редактировать теги',
 		value: EPermissions.EDIT_TAGS
 	}
@@ -59,32 +55,3 @@ export const priceList = {
 		]
 	})
 };
-
-export const instructions = [
-	'Команды бота:',
-	'',
-	'/pay - Купить coin для оплаты рекламы',
-	'/addAdvertisement - Добавить рекламу',
-	'/getMyListAdvertisement - Получить список моей рекламы'
-];
-
-export const ADVERTISEMENT_STATUS = [
-	{ value: EAdvertisementStatus.CREATED, title: 'Пост создан' },
-	{ value: EAdvertisementStatus.PENDING_VERIFICATION, title: 'Ожидает верификации' },
-	{ value: EAdvertisementStatus.REJECTED, title: 'Отказ' },
-	{ value: EAdvertisementStatus.APPROVED, title: 'Подтверждено' },
-	{ value: EAdvertisementStatus.ARCHIVED, title: 'Архивировано' },
-	{ value: EAdvertisementStatus.PUBLISHED, title: 'Опубликовано' },
-	{ value: EAdvertisementStatus.DRAFT, title: 'Черновик' }
-];
-
-export const buttonText = {
-	pay: '🏦 Оплатить',
-	addAdvertisements: '📌 Добавить объявление',
-	viewAdvertisements: '🗂 Мои объявления'
-};
-
-export const priceAdvertising = 50;
-export const deleteAdvertisementsMessagePeriod = 14;
-
-export const DATA_GENERATE = 2;

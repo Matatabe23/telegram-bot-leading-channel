@@ -46,12 +46,7 @@
 					label="Приватность чата"
 					@change="updateDefaultChannel(channel, IEditChannelType.PRIVATED)"
 					:model-value="channel.settings.includes(IEditChannelType.PRIVATED)"
-				/>
-                <VSwitch
-					hide-details
-					label="Реклама в чате"
-					@change="updateDefaultChannel(channel, IEditChannelType.ADVERTISEMENT)"
-					:model-value="channel.settings.includes(IEditChannelType.ADVERTISEMENT)"
+					color="success"
 				/>
 
 				<v-btn
@@ -114,14 +109,14 @@
 
 	const delChannel = async (id: number) => {
 		try {
-            appStore.isLoading = false
+			appStore.isLoading = false;
 			const result = await deleteChannel(id);
 			toast.success(result);
 			await settingsStore.getListChannels();
 		} catch (e) {
 			toast.error(e.response.data.message);
 		} finally {
-            appStore.isLoading = false
+			appStore.isLoading = false;
 		}
 	};
 

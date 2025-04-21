@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { buttonText } from 'src/const/const';
 
 interface SessionData {
 	step: string;
@@ -42,22 +41,7 @@ export class TGBotService {
 	private initializeDefaultMenu() {
 		this.bot.onText(/\/start/, async (msg) => {
 			const chatId = msg.chat.id;
-			await this.bot.sendMessage(
-				chatId,
-				'Добро пожаловать! Выберите действие из меню ниже.',
-				{
-					reply_markup: {
-						keyboard: [
-							[{ text: buttonText.pay }],
-							[
-								{ text: buttonText.addAdvertisements },
-								{ text: buttonText.viewAdvertisements }
-							]
-						],
-						resize_keyboard: true
-					}
-				}
-			);
+			await this.bot.sendMessage(chatId, 'Добро пожаловать');
 		});
 	}
 }

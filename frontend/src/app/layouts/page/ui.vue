@@ -12,12 +12,15 @@
 					link
 					@click="goTo(page.path)"
 				>
-					<v-list-item-content>
+					<v-list-item-content class="flex gap-2">
+						<v-icon>{{ page.icon }}</v-icon>
+
 						<v-list-item-title>{{ page.title }}</v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
 			</v-list>
 		</v-navigation-drawer>
+
 		<v-app-bar
 			v-if="!isHomePage"
 			app
@@ -96,26 +99,31 @@
 		{
 			title: 'Главная страница',
 			path: '/publishing-page',
+			icon: 'mdi-home',
 			visible: true
 		},
 		{
 			title: 'Аккаунты',
 			path: '/users',
+			icon: 'mdi-account-multiple',
 			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_USERS)
 		},
 		{
 			title: 'Роли',
 			path: '/roles',
+			icon: 'mdi-account-cog',
 			visible: checkPermissions(appStore.data?.EPermissions?.EDIT_ROLES)
 		},
 		{
 			title: 'Теги',
 			path: '/tags',
+			icon: 'mdi-tag-multiple',
 			visible: true
 		},
 		{
 			title: 'Настройки',
 			path: '/settings',
+			icon: 'mdi-cog',
 			visible:
 				checkPermissions(appStore.data?.EPermissions?.CREATE_CHANNEL) ||
 				checkPermissions(appStore.data?.EPermissions?.SET_PUBLICATION_TIME)

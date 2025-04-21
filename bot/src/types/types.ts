@@ -4,21 +4,6 @@ export interface IImageBlock {
 	dataBasePostId: number;
 }
 
-export enum EAdvertisementStatus {
-	CREATED = 'created',
-	PENDING_VERIFICATION = 'pending_verification',
-	REJECTED = 'rejected',
-	APPROVED = 'approved',
-	ARCHIVED = 'archived',
-	PUBLISHED = 'published',
-	DRAFT = 'draft'
-}
-export enum ETypePostsAdvertisement {
-	SOLO = 'solo', // Однократная публикация в указанное время
-	DAILY = 'daily', // Публикация каждый день в указанное время
-	RANDOM = 'random' // Случайная публикация (Ограничение неделя)
-}
-
 export enum EPermissions {
 	EDIT_ROLES = 'edit_roles', // Редактировать роли
 
@@ -34,12 +19,9 @@ export enum EPermissions {
 
 	SET_PUBLICATION_TIME = 'set_publication_time', // Редактировать время публикации,
 
-	EDIT_ADVERTISEMENTS = 'edit_advertisements', // Редактировать рекламы
-
 	EDIT_TAGS = 'editTags' // Редактирование тегов
 }
 
 export enum ESettingChannels {
-	PRIVATED = 'privated',
-	ADVERTISEMENT = 'advertisement'
+	PRIVATED = 'privated'
 }
