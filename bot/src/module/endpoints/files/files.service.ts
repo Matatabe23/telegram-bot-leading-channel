@@ -8,7 +8,7 @@ export class FilesService {
 	async uploadFilesToS3(files: Express.Multer.File[], nameFiles: string) {
 		return {
 			pagination: null,
-			data: `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${await this.s3Repository.uploadImageToS3(files[0], nameFiles)}`,
+			data: `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${await this.s3Repository.uploadFileToS3(files[0], nameFiles)}`,
 			message: 'Успешное сохранение изображения в базу данных'
 		};
 	}

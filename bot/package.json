@@ -42,6 +42,7 @@
 		"date-fns": "^4.1.0",
 		"jimp": "^0.22.12",
 		"jsonwebtoken": "^9.0.2",
+		"mime-types": "^3.0.1",
 		"moment": "^2.30.1",
 		"moment-timezone": "^0.5.45",
 		"mysql2": "^3.11.0",

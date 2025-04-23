@@ -2,7 +2,6 @@
 	<v-dialog
 		v-model="isOpen"
 		width="800"
-		persistent
 		transition="dialog-transition"
 	>
 		<template #default>

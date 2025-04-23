@@ -45,7 +45,7 @@
 					hide-details
 					label="Приватность чата"
 					@change="updateDefaultChannel(channel, IEditChannelType.PRIVATED)"
-					:model-value="channel.settings.includes(IEditChannelType.PRIVATED)"
+					:model-value="channel.settings?.includes(IEditChannelType.PRIVATED)"
 					color="success"
 				/>
 
@@ -122,7 +122,7 @@
 
 	const updateDefaultChannel = async (channel: IListChannels, type: IEditChannelType) => {
 		try {
-			const settings = channel.settings.length > 0 ? [...channel.settings.split(',')] : [];
+			const settings = channel.settings?.length > 0 ? [...channel.settings.split(',')] : [];
 
 			if (settings.includes(type)) {
 				const index = settings.indexOf(type);
@@ -136,7 +136,7 @@
 			await editChannel(channel.id, settings);
 			settingsStore.getListChannels();
 		} catch (e) {
-			toast.error(e.response.data.message);
+			toast.error(e?.response?.data?.message);
 		}
 	};
 

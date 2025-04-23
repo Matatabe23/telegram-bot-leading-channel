@@ -9,7 +9,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getS3ClientConfig } from 'src/config/s3.config';
 import { ConfigService } from '@nestjs/config';
-import * as sharp from 'sharp';
+import { lookup } from 'mime-types';
 
 @Injectable()
 export class S3Repository {
@@ -21,25 +21,25 @@ export class S3Repository {
 		this.s3Client = new S3Client(getS3ClientConfig());
 	}
 
-	async uploadImageToS3(imagePath: any, nameFiles: string): Promise<string> {
+	async uploadFileToS3(file: { buffer: Buffer }, fileName: string): Promise<string> {
 		try {
-			const webpFileName = nameFiles.replace(/\.[^/.]+$/, '.webp');
-			const webpBuffer = await sharp(imagePath.buffer).webp({ quality: 80 }).toBuffer();
+			const finalContentType = lookup(fileName) || 'application/octet-stream';
 
 			const params = {
 				Bucket: process.env.S3_BUCKET_NAME,
-				Key: webpFileName,
-				Body: webpBuffer,
-				ContentType: 'image/webp',
+				Key: fileName,
+				Body: file.buffer,
+				ContentType: finalContentType,
 				ContentDisposition: 'inline'
 			};
 
 			const uploadCommand = new PutObjectCommand(params);
-
 			await this.s3Client.send(uploadCommand);
-			return webpFileName;
+
+			return fileName;
 		} catch (err) {
-			this.logger.error('Ошибка загрузки изображения:', err);
+			this.logger.error('Ошибка загрузки файла в S3:', err);
+			console.log(err);
 			throw err;
 		}
 	}
