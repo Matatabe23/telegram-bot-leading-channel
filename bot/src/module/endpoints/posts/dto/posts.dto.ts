@@ -43,14 +43,4 @@ export class PostsDto {
 	})
 	@IsArray()
 	channels: ChannelsDto[];
-
-	constructor(data: any) {
-		this.id = data.id;
-		this.watched = data.watched;
-		this.waterMark = data.waterMark;
-		this.images = data.images ? data.images.map((image: any) => new ImageDataDto(image)) : [];
-		this.channels = data.channels
-			? data.channels.map((channel: any) => new ChannelsDto(channel))
-			: [];
-	}
 }

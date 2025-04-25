@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -14,6 +15,33 @@ async function bootstrap() {
 		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 		allowedHeaders: 'Content-Type, Authorization'
 	});
+
+	app.useGlobalPipes(
+		new ValidationPipe({
+			transform: true,
+			forbidNonWhitelisted: true,
+			whitelist: true,
+			exceptionFactory: (errors) => {
+				const formattedErrors = {};
+
+				for (const error of errors) {
+					if (error.constraints) {
+						formattedErrors[error.property] = Object.values(error.constraints);
+					}
+
+					if (error.children && error.children.length) {
+						formattedErrors[error.property] = error.children.map((child) => {
+							return {
+								[child.property]: Object.values(child.constraints || {})
+							};
+						});
+					}
+				}
+
+				throw new BadRequestException(formattedErrors);
+			}
+		})
+	);
 
 	app.setGlobalPrefix('');
 

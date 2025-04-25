@@ -47,3 +47,8 @@ export interface IAddingPublicationTimeSettings {
     listPublicationTimes: IGetListRegularPublicationTimes[],
     timeType: string
 }
+
+export enum ETabs {
+    ADD_CHANNEL = 'addChannel',
+    ADD_TIME_PUBLICH = 'addTimePublish'
+}

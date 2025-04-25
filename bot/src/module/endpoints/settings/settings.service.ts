@@ -4,7 +4,6 @@ import { RegularPublicationBotRepository } from 'src/module/service/regular-publ
 
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
-import { Sequelize } from 'sequelize';
 
 @Injectable()
 export class SettingsService {
@@ -16,58 +15,17 @@ export class SettingsService {
 		private readonly regularPublicationBotRepository: RegularPublicationBotRepository
 	) {}
 
-	async addingPublicationTime(hour: string, minute: string, channelId: string) {
-		if (hour === '' || isNaN(Number(hour)) || Number(hour) < 0 || Number(hour) > 24) {
-			throw new NotFoundException('Некорректные данные');
-		}
-		if (minute === '' || isNaN(Number(minute)) || Number(minute) < 0 || Number(minute) > 59) {
-			throw new NotFoundException('Некорректные данные');
-		}
-		if (!channelId) {
-			throw new NotFoundException('Некорректный айди чата');
-		}
-
-		await this.regularPublicationTime.create({
-			hour: hour,
-			minute: minute,
-			channelId: channelId
-		});
-
-		this.regularPublicationBotRepository.scheduleFunctionExecution();
-
-		return 'Успешное добавление!';
-	}
-
-	async getListRegularPublicationTimes(channelId: string) {
-		const list = await this.regularPublicationTime.findAll({
-			where: { channelId: channelId },
-			order: [[Sequelize.literal('CAST(hour AS UNSIGNED)'), 'ASC']]
-		});
-		return list;
-	}
-
-	async deleteItemPublicationTimes(id: string) {
-		const times = await this.regularPublicationTime.findByPk(id);
-		if (!times) {
-			throw new NotFoundException('Некорректные данные');
-		}
-
-		await this.regularPublicationTime.destroy({ where: { id } });
-		this.regularPublicationBotRepository.scheduleFunctionExecution();
-
-		return 'Успешное удаление';
-	}
-
-	async addingNewChannels(name: string, chatId: string) {
-		if (!name || !chatId) throw new NotFoundException('Некорректные данные');
-
-		await this.channels.create({
+	async channelCreate(name: string, chatId: string) {
+		const channel = await this.channels.create({
 			name: name,
 			chatId: chatId,
 			settings: ''
 		});
 
-		return 'Успешное добавление!';
+		return {
+			message: 'Успешное добавление!',
+			data: channel
+		};
 	}
 
 	async getListChannel() {
@@ -78,25 +36,90 @@ export class SettingsService {
 				}
 			]
 		});
-		return list;
+		return {
+			message: 'Успешное получение списка',
+			data: list
+		};
+	}
+
+	async getChannel(id: number) {
+		const list = await this.channels.findOne({
+			where: { id: id },
+			include: [
+				{
+					model: RegularPublicationTime
+				}
+			]
+		});
+		return {
+			message: 'Канал успешно получен',
+			data: list
+		};
+	}
+
+	async updateChannel(id: number, data: any) {
+		const channel = await this.channels.findByPk(id);
+		if (!channel) {
+			throw new NotFoundException('Канал не найден');
+		}
+
+		const updateData: Record<string, any> = {};
+		for (const key in data) {
+			if (data[key] !== undefined && data[key] !== null && data[key] !== '') {
+				updateData[key] = data[key];
+			}
+		}
+
+		if (Object.keys(updateData).length > 0) {
+			await this.channels.update(updateData, { where: { id } });
+		}
+
+		if (Array.isArray(data.regularPublicationTimes)) {
+			await this.regularPublicationTime.destroy({ where: { channelId: id } });
+
+			for (const time of data.regularPublicationTimes) {
+				await this.regularPublicationTime.create({
+					channelId: id,
+					hour: time.hour,
+					minute: time.minute
+				});
+			}
+		}
+
+		this.regularPublicationBotRepository.scheduleFunctionExecution();
+
+		const updated = await this.channels.findOne({
+			where: { id },
+			include: [{ model: RegularPublicationTime }]
+		});
+
+		return {
+			message: 'Канал и расписание успешно обновлены',
+			data: updated
+		};
 	}
 
 	async deleteChannel(id: string) {
-		const times = await this.channels.findByPk(id);
+		const channel = await this.channels.findByPk(id);
+		if (!channel) {
+			throw new NotFoundException('Канал не найден');
+		}
+
+		await this.regularPublicationTime.destroy({ where: { channelId: id } });
+		await this.channels.destroy({ where: { id } });
+
+		return { message: 'Канал и связанные записи успешно удалены' };
+	}
+
+	async deleteTime(id: string) {
+		const times = await this.regularPublicationTime.findByPk(id);
 		if (!times) {
 			throw new NotFoundException('Некорректные данные');
 		}
 
-		await this.channels.destroy({ where: { id } });
+		await this.regularPublicationTime.destroy({ where: { id } });
+		this.regularPublicationBotRepository.scheduleFunctionExecution();
 
-		return 'Успешное удаление';
-	}
-
-	async editChannel(id: number, settings: string[]) {
-		const settingsString = settings.join(',');
-
-		await this.channels.update({ settings: settingsString }, { where: { id } });
-
-		return 'Успешное обновление';
+		return { message: 'Время успешно удалено' };
 	}
 }

@@ -1,68 +1,72 @@
 <template>
-	<div class="flex flex-col items-center text-center m-5">
-		<div class="bg-gray-800 text-white border border-gray-600 p-5 rounded-lg shadow-lg md:w-80">
-			<h3 class="text-lg font-bold">Добавить новый канал</h3>
-
-			<div class="mt-4 space-y-4">
-				<v-text-field
-					clearable
-					label="Имя канала"
-					variant="outlined"
-					v-model="state.form.name"
-					class="w-full"
-				></v-text-field>
-				<v-text-field
-					clearable
-					label="айди чата"
-					variant="outlined"
-					v-model="state.form.chatId"
-					class="w-full"
-				></v-text-field>
-			</div>
-
+	<div class="flex flex-col items-center w-full text-center">
+		<div class="flex flex-col md:flex-row gap-2 w-full my-4">
+			<v-text-field
+				clearable
+				label="Имя канала"
+				variant="outlined"
+				v-model="state.form.name"
+				class="w-full"
+			></v-text-field>
+			<v-text-field
+				clearable
+				label="айди чата"
+				variant="outlined"
+				v-model="state.form.chatId"
+				class="w-full"
+			></v-text-field>
 			<v-btn
 				color="#5865f2"
 				variant="flat"
 				@click="saveChannel"
-				class="mt-4 text-white bg-indigo-600 hover:bg-indigo-700"
+				class="text-white bg-indigo-600 hover:bg-indigo-700 md:mt-3"
 				>Сохранить</v-btn
 			>
+		</div>
 
-			<h3
-				v-if="listChannels.length"
-				class="mt-6 text-lg font-bold"
-			>
-				Список чатов
-			</h3>
-			<div
+		<v-expansion-panels
+			v-model="panel"
+			multiple
+			class="detal-task__expansion-panels"
+		>
+			<v-expansion-panel
 				v-for="channel in listChannels"
 				:key="channel.id"
-				class="mt-4 flex flex-col items-center gap-2 p-4 border border-gray-600 rounded-md bg-gray-700 text-white shadow-md w-full"
+				:title="channel.name"
+				:value="channel.id"
 			>
-				<div>Имя чата: {{ channel.name }}</div>
-				<div>Айди чата: {{ channel.chatId }}</div>
-				<VSwitch
-					hide-details
-					label="Приватность чата"
-					@change="updateDefaultChannel(channel, IEditChannelType.PRIVATED)"
-					:model-value="channel.settings?.includes(IEditChannelType.PRIVATED)"
-					color="success"
-				/>
+				<v-expansion-panel-text>
+					<div class="flex flex-col md:flex-row justify-between items-center">
+						<v-text-field
+							:model-value="channel.chatId"
+							variant="solo-filled"
+							label="Айди чата"
+							class="md:max-w-[50%] w-full"
+						/>
 
-				<v-btn
-					color="#5865f2"
-					variant="flat"
-					@click="delChannel(channel.id)"
-					class="text-white bg-indigo-600 hover:bg-indigo-700"
-					>Удалить</v-btn
-				>
-			</div>
-		</div>
+						<v-btn
+							color="#5865f2"
+							variant="flat"
+							@click="delChannel(channel.id)"
+							class="text-white bg-indigo-600 hover:bg-indigo-700 w-full md:w-auto"
+							>Удалить</v-btn
+						>
+					</div>
+					<VSwitch
+						hide-details
+						label="Приватность чата"
+						@change="updateDefaultChannel(channel, IEditChannelType.PRIVATED)"
+						:model-value="channel.settings?.includes(IEditChannelType.PRIVATED)"
+						color="success"
+					/>
+				</v-expansion-panel-text>
+			</v-expansion-panel>
+		</v-expansion-panels>
 	</div>
 </template>
 
 <script lang="ts" setup>
-	import { reactive, watch } from 'vue';
+	import { reactive, ref, watch } from 'vue';
 	import { addingNewChannels, deleteChannel, editChannel, useSettings } from '@/shared';
 	import { IStateChannels, IEditChannelType, IListChannels } from '@/entities';
 	import { useToast } from 'vue-toastification';
@@ -78,6 +82,8 @@
 	defineEmits<{
 		'get-list': [];
 	}>();
+
+	const panel = ref([]);
 
 	const state: IStateChannels = reactive({
 		form: {
@@ -133,11 +139,15 @@
 				settings.push(type);
 			}
 
-			await editChannel(channel.id, settings);
-			settingsStore.getListChannels();
+			await updateChannelData(channel.id, { settings: settings.join(',') });
 		} catch (e) {
 			toast.error(e?.response?.data?.message);
 		}
+	};
+
+	const updateChannelData = async (id: number, newData: any) => {
+		await editChannel(id, newData);
+		settingsStore.getListChannels();
 	};
 
 	watch(

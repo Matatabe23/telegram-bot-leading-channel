@@ -30,7 +30,7 @@ export const deleteChannel = async (id: number) => {
     return data;
 }
 
-export const editChannel = async (id: number, settings: string[]) => {
-    const { data } = await $autHost.put('settings/edit-channel', { id, settings });
+export const editChannel = async (id: number, settings: any) => {
+    const { data } = await $autHost.put(`settings/edit-channel/${id}`, { settings });
     return data;
 }

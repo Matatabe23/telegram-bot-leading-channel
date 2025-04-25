@@ -2,25 +2,25 @@ import { ApiOperation, ApiProperty, ApiResponse } from '@nestjs/swagger';
 import { ErrorDto } from 'src/dto/error.dto';
 import { ChannelsDto } from '../dto/channels.dto';
 
-class ChannelListResponseDto {
-	@ApiProperty({ type: [ChannelsDto] })
-	data: [ChannelsDto];
+class ChannelResponseDto {
+	@ApiProperty({ type: ChannelsDto })
+	data: ChannelsDto;
 
-	@ApiProperty({ example: 'Список каналов получен' })
+	@ApiProperty({ example: 'Канал успешно получен' })
 	message: string;
 }
 
-export function GetListChannel(): MethodDecorator {
+export function getChannel(): MethodDecorator {
 	return function (target, propertyKey, descriptor) {
 		ApiOperation({
-			summary: 'Список каналов',
-			description: 'Возвращает список каналов и время публикации связанное с ними'
+			summary: 'Получение канала',
+			description: 'Метод для получения конкретного канала по его айди'
 		})(target, propertyKey, descriptor);
 
 		ApiResponse({
 			status: 200,
-			description: 'Список успешно получен',
-			type: ChannelListResponseDto
+			description: 'Канал успешно получен',
+			type: ChannelResponseDto
 		})(target, propertyKey, descriptor);
 
 		ApiResponse({

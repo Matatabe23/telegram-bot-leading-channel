@@ -30,7 +30,7 @@ export class ChannelsDto {
 
 	@ApiProperty({
 		description: 'Настройки канала в виде строки JSON',
-		example: '{"timezone": "UTC"}',
+		example: 'private, public',
 		required: false
 	})
 	@IsOptional()
@@ -44,12 +44,4 @@ export class ChannelsDto {
 	})
 	@IsOptional()
 	regularPublicationTimes?: RegularPublicationTimeDto[];
-
-	constructor(channel: any) {
-		this.id = channel.id;
-		this.name = channel.name;
-		this.chatId = channel.chatId;
-		this.settings = channel.settings;
-		this.regularPublicationTimes = channel.regularPublicationTimes;
-	}
 }
