@@ -69,7 +69,7 @@ export class SettingsController {
 	@updateChannel()
 	async updateFullChannel(@Param('id') id: number, @Body() body) {
 		try {
-			const result = await this.settingsService.updateChannel(+id, body);
+			const result = await this.settingsService.updateChannel(id, body);
 			return result;
 		} catch (error) {
 			throw new BadRequestException(error.message);

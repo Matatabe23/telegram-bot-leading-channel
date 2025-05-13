@@ -20,15 +20,6 @@ export interface IGetListRoles {
     updatedAt: string
 }
 
-export interface IStateChannels {
-    form: {
-        name: string,
-        chatId: string,
-
-        listChannels: IListChannels[]
-    }
-}
-
 export enum IEditChannelType {
     PRIVATED = 'privated',
 }

@@ -5,14 +5,14 @@
 				clearable
 				label="Имя канала"
 				variant="outlined"
-				v-model="state.form.name"
+				v-model="name"
 				class="w-full"
 			></v-text-field>
 			<v-text-field
 				clearable
 				label="айди чата"
 				variant="outlined"
-				v-model="state.form.chatId"
+				v-model="chatId"
 				class="w-full"
 			></v-text-field>
 			<v-btn
@@ -30,18 +30,22 @@
 			class="detal-task__expansion-panels"
 		>
 			<v-expansion-panel
-				v-for="channel in listChannels"
+				v-for="channel in settingsStore.listChannels"
 				:key="channel.id"
 				:title="channel.name"
 				:value="channel.id"
+				class="border-[1px]"
 			>
 				<v-expansion-panel-text>
 					<div class="flex flex-col md:flex-row justify-between items-center">
 						<v-text-field
-							:model-value="channel.chatId"
+							v-model="channel.chatId"
 							variant="solo-filled"
 							label="Айди чата"
 							class="md:max-w-[50%] w-full"
+							@update:model-value="
+								updateChannel(channel.id, { chatId: channel.chatId })
+							"
 						/>
 
 						<v-btn
@@ -53,11 +57,13 @@
 						>
 					</div>
 					<VSwitch
-						hide-details
-						label="Приватность чата"
-						@change="updateDefaultChannel(channel, IEditChannelType.PRIVATED)"
-						:model-value="channel.settings?.includes(IEditChannelType.PRIVATED)"
+						v-for="(label, key) in IEditChannelType"
+						:key="key"
+						:label="`Настройка: ${label}`"
+						:model-value="channel.settings.includes(label)"
 						color="success"
+						@update:model-value="() => updateSettings(channel, label)"
+						hide-details
 					/>
 				</v-expansion-panel-text>
 			</v-expansion-panel>
@@ -66,15 +72,14 @@
 </template>
 
 <script lang="ts" setup>
-	import { reactive, ref, watch } from 'vue';
+	import { ref } from 'vue';
 	import { addingNewChannels, deleteChannel, editChannel, useSettings } from '@/shared';
-	import { IStateChannels, IEditChannelType, IListChannels } from '@/entities';
+	import { IEditChannelType, IListChannels } from '@/entities';
 	import { useToast } from 'vue-toastification';
-	import { storeToRefs } from 'pinia';
 	import { useAppStore } from '@/app/app.store';
+	import { debounce } from 'lodash';
 
 	const settingsStore = useSettings();
-	const { listChannels } = storeToRefs(settingsStore);
 
 	const toast = useToast();
 	const appStore = useAppStore();
@@ -83,30 +88,24 @@
 		'get-list': [];
 	}>();
 
+	const name = ref('');
+	const chatId = ref('');
 	const panel = ref([]);
-
-	const state: IStateChannels = reactive({
-		form: {
-			name: '',
-			chatId: '',
-			listChannels: []
-		}
-	});
 
 	const saveChannel = async () => {
 		try {
-			if (state.form.name === '' || state.form.chatId === '') {
+			if (name.value === '' || chatId.value === '') {
 				toast.error('Заполните поля');
 				return;
 			}
 
-			const result = await addingNewChannels(state.form.name, state.form.chatId);
+			const result = await addingNewChannels(name.value, chatId.value);
 
 			if (result) {
 				settingsStore.getListChannels();
 				toast.success('Успешное добавление!');
-				state.form.name = '';
-				state.form.chatId = '';
+				name.value = '';
+				chatId.value = '';
 			}
 		} catch (e: any) {
 			toast.error(e.response.data.message);
@@ -117,7 +116,7 @@
 		try {
 			appStore.isLoading = false;
 			const result = await deleteChannel(id);
-			toast.success(result);
+			toast.success(result?.message);
 			await settingsStore.getListChannels();
 		} catch (e) {
 			toast.error(e.response.data.message);
@@ -126,34 +125,20 @@
 		}
 	};
 
-	const updateDefaultChannel = async (channel: IListChannels, type: IEditChannelType) => {
-		try {
-			const settings = channel.settings?.length > 0 ? [...channel.settings.split(',')] : [];
+	const updateSettings = async (channelData: IListChannels, value: IEditChannelType) => {
+		let settingsArray = channelData.settings ? channelData.settings.split(',') : [];
 
-			if (settings.includes(type)) {
-				const index = settings.indexOf(type);
-				if (index > -1) {
-					settings.splice(index, 1);
-				}
-			} else if (!settings.includes(type)) {
-				settings.push(type);
-			}
-
-			await updateChannelData(channel.id, { settings: settings.join(',') });
-		} catch (e) {
-			toast.error(e?.response?.data?.message);
+		if (channelData.settings?.includes(value)) {
+			settingsArray = settingsArray.filter((item) => item !== value);
+		} else {
+			settingsArray.push(value);
 		}
+
+		channelData.settings = settingsArray.join(',');
+		await updateChannel(channelData.id, { settings: channelData.settings });
 	};
 
-	const updateChannelData = async (id: number, newData: any) => {
-		await editChannel(id, newData);
-		settingsStore.getListChannels();
-	};
-
-	watch(
-		() => listChannels.value,
-		(value) => {
-			state.form.listChannels = value;
-		}
-	);
+	const updateChannel = debounce(async (id: number, settings: any) => {
+		await editChannel(id, settings);
+	}, 500);
 </script>

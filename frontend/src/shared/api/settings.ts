@@ -1,5 +1,25 @@
 import { $autHost } from "@/shared";
 
+export const addingNewChannels = async (name: string, chatId: string) => {
+    const { data } = await $autHost.post('/settings/channel/create', { name, chatId });
+    return data;
+}
+
+export const getListChannel = async () => {
+    const { data } = await $autHost.get('/settings/channel/list');
+    return data;
+}
+
+export const deleteChannel = async (id: number) => {
+    const { data } = await $autHost.delete(`/settings/channel/${id}`);
+    return data;
+}
+
+export const editChannel = async (id: number, settings: any) => {
+    const { data } = await $autHost.put(`/settings/channel/${id}`, settings );
+    return data;
+}
+
 export const addingPublicationTime = async (hour: string, minute: string, channelId: number) => {
     const { data } = await $autHost.post('settings/adding-publication-time', { hour, minute, channelId });
     return data;
@@ -15,22 +35,6 @@ export const deleteItemPublicationTimes = async (id: number) => {
     return data;
 }
 
-export const addingNewChannels = async (name: string, chatId: string) => {
-    const { data } = await $autHost.post('settings/adding-new-channels', { name, chatId });
-    return data;
-}
 
-export const getListChannel = async () => {
-    const { data } = await $autHost.get('settings/get-list-channel');
-    return data;
-}
 
-export const deleteChannel = async (id: number) => {
-    const { data } = await $autHost.delete(`settings/delete-channel/${id}`);
-    return data;
-}
 
-export const editChannel = async (id: number, settings: any) => {
-    const { data } = await $autHost.put(`settings/edit-channel/${id}`, { settings });
-    return data;
-}

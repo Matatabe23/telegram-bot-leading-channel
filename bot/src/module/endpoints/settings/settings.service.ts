@@ -65,7 +65,7 @@ export class SettingsService {
 
 		const updateData: Record<string, any> = {};
 		for (const key in data) {
-			if (data[key] !== undefined && data[key] !== null && data[key] !== '') {
+			if (data[key] !== undefined && data[key] !== null) {
 				updateData[key] = data[key];
 			}
 		}
