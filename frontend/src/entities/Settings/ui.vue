@@ -36,10 +36,20 @@
 	import { useAppStore } from '@/app/app.store';
 	import { checkPermissions } from '@/shared';
 	import { AddingNewChannels, AddingPublicationTimeSettings } from '@/widgets';
-	import { ref } from 'vue';
+	import { computed } from 'vue';
+	import { useRoute, useRouter } from 'vue-router';
 	import { ETabs } from './model';
 
 	const appStore = useAppStore();
+	const route = useRoute();
+	const router = useRouter();
 
-	const tab = ref(ETabs.ADD_CHANNEL);
+	const tab = computed({
+		get: () => {
+			return (route.query.tab as ETabs) || ETabs.ADD_CHANNEL;
+		},
+		set: (value: ETabs) => {
+			router.replace({ query: { ...route.query, tab: value } });
+		}
+	});
 </script>

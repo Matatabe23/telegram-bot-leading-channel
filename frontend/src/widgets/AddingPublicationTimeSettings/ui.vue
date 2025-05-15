@@ -1,109 +1,113 @@
 <template>
-	<div class="flex justify-center items-center flex-col text-center my-5">
-		<div
-			class="bg-gray-800 text-white border border-gray-600 p-5 rounded-lg shadow-lg mx-2 md:w-80"
-		>
-			<h3 class="text-lg font-bold">Настройка времени публикации</h3>
+	<div class="flex flex-col">
+		<div class="flex flex-col md:flex-row items-center gap-2 mt-2">
 			<v-select
-				class="mt-2"
-				:items="formattedChannels"
-				label="Выберите канал"
-				@update:model-value="selectChanel"
+				id="hourInput"
+				v-model="selectChannel"
+				:items="settingsStore.listChannels"
+				item-title="name"
+				return-object
+				label="Канал"
 				variant="outlined"
-			></v-select>
+				class="w-full"
+			/>
 
-			<div class="flex justify-between items-center mt-2 gap-2">
+			<div class="flex justify-between w-full items-center gap-2">
 				<v-select
 					id="hourInput"
-					v-model="state.hour"
+					v-model="hour"
 					:items="hoursSelectValue"
 					label="Часы"
 					variant="outlined"
+					:disabled="!selectChannel"
 				></v-select>
 				<v-select
 					id="minuteInput"
-					v-model="state.minute"
+					v-model="minute"
 					:items="minutesSelectValue"
 					label="Минуты"
 					variant="outlined"
+					:disabled="!selectChannel"
 				></v-select>
 			</div>
 
 			<v-btn
-				color="#5865f2"
-				variant="flat"
+				class="w-full md:w-auto"
+				color="primary"
 				@click="saveTime"
-				class="mt-3"
 				>Сохранить</v-btn
 			>
-			<h3
-				v-if="state.listPublicationTimes.length"
-				class="mt-4"
-			>
-				Время регулярной публикации
-			</h3>
-			<div
-				class="flex justify-between items-center mt-2 border border-gray-600 rounded p-2 bg-gray-700 text-white shadow-sm"
-				v-for="listPublicationTime in state.listPublicationTimes"
-				:key="listPublicationTime.id"
-			>
-				<div>Часы: {{ listPublicationTime.hour }}</div>
-				<div>Минуты: {{ listPublicationTime.minute }}</div>
-				<v-btn
-					color="#5865f2"
-					variant="flat"
-					@click="deleteTime(listPublicationTime.id)"
-					>Удалить</v-btn
-				>
-			</div>
 		</div>
+
+		<v-expansion-panels
+			v-model="panel"
+			multiple
+			class="detal-task__expansion-panels"
+		>
+			<v-expansion-panel
+				v-for="time in selectChannel?.regularPublicationTimes"
+				:key="time.id"
+				:title="`${time.hour}:${time.minute}`"
+				:value="time.id"
+				class="border-[1px]"
+			>
+				<v-expansion-panel-text>
+					<v-btn
+						color="#5865f2"
+						variant="flat"
+						@click="deleteTime(time.id)"
+						class="text-white bg-indigo-600 hover:bg-indigo-700 w-full md:w-auto"
+						>Удалить</v-btn
+					>
+				</v-expansion-panel-text>
+			</v-expansion-panel>
+		</v-expansion-panels>
 	</div>
 </template>
 
 <script lang="ts" setup>
-	import { computed, reactive } from 'vue';
-	import {
-		addingPublicationTime,
-		getListRegularPublicationTimes,
-		deleteItemPublicationTimes,
-		useSettings
-	} from '@/shared';
-	import { IAddingPublicationTimeSettings } from '@/entities';
+	import { computed, ref } from 'vue';
+	import { editChannel, useSettings } from '@/shared';
+	import { IListChannels } from '@/entities';
 	import { useToast } from 'vue-toastification';
 	import { VSelect } from 'vuetify/components';
-	import { storeToRefs } from 'pinia';
 
 	const settingsStore = useSettings();
-	const { listChannels } = storeToRefs(settingsStore);
 
 	const toast = useToast();
 
-	const state: IAddingPublicationTimeSettings = reactive({
-		timeType: 'constant',
-		hour: '0',
-		minute: '0',
-		channelId: 0,
-		listPublicationTimes: []
-	});
+	const selectChannel = ref<IListChannels>(null);
+	const hour = ref('0');
+	const minute = ref('0');
+	const panel = ref([]);
 
-	const getList = async () => {
-		state.listPublicationTimes = await getListRegularPublicationTimes(state.channelId);
-	};
+	const hoursSelectValue = computed(() => Array.from({ length: 24 }, (_, i) => i.toString()));
+	const minutesSelectValue = computed(() => Array.from({ length: 60 }, (_, i) => i.toString()));
 
 	const saveTime = async () => {
 		try {
-			if (state.hour === '' || state.minute === '') {
+			if (hour.value === '' || minute.value === '') {
 				toast.error('Заполните поля');
 				return;
 			}
 
-			const result = await addingPublicationTime(state.hour, state.minute, state.channelId);
+			const result = await editChannel(selectChannel.value?.id, {
+				regularPublicationTimes: [
+					...selectChannel.value.regularPublicationTimes,
+					{
+						hour: hour.value,
+						minute: minute.value,
+						channelId: selectChannel.value
+					}
+				]
+			});
+
+			selectChannel.value = result.data;
 
 			if (result) {
-				await getList();
 				toast.success('Успешное добавление!');
-				state.hour = '0';
-				state.minute = '0';
+				hour.value = '0';
+				minute.value = '0';
 			}
 		} catch (e: any) {
 			toast.error(e.response.data.message);
@@ -111,21 +115,12 @@
 	};
 
 	const deleteTime = async (id: number) => {
-		const result = await deleteItemPublicationTimes(id);
-		toast.success(result);
-		await getList();
+		const result = await editChannel(selectChannel.value?.id, {
+			regularPublicationTimes: [
+				...selectChannel.value.regularPublicationTimes.filter((item) => item.id !== id)
+			]
+		});
+
+		selectChannel.value = result.data;
 	};
-
-	const formattedChannels = computed(() => {
-		return listChannels.value.map((channel) => channel.name);
-	});
-
-	const selectChanel = (name: string | null) => {
-		const channel = listChannels.value.find((channel) => channel.name === name);
-		state.channelId = Number(channel?.id);
-		getList();
-	};
-
-	const hoursSelectValue = computed(() => Array.from({ length: 25 }, (_, i) => i.toString()));
-	const minutesSelectValue = computed(() => Array.from({ length: 61 }, (_, i) => i.toString()));
 </script>

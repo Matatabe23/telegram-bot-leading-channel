@@ -17,6 +17,7 @@ export const useSettings = defineStore('useSettings', {
         async getListChannels() {
             const listChannel = await getListChannel()
             this.listChannels = listChannel.data
+            return this.listChannels
         },
 
         async getListRoles() {

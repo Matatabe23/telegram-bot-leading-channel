@@ -20,11 +20,6 @@ export const editChannel = async (id: number, settings: any) => {
     return data;
 }
 
-export const addingPublicationTime = async (hour: string, minute: string, channelId: number) => {
-    const { data } = await $autHost.post('settings/adding-publication-time', { hour, minute, channelId });
-    return data;
-}
-
 export const getListRegularPublicationTimes = async (channelId: number) => {
     const { data } = await $autHost.get('settings/get-list-regular-publication-times', { params: { channelId } });
     return data;

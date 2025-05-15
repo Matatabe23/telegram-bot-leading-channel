@@ -3,6 +3,7 @@ export interface IListChannels {
     name: string,
     chatId: string,
     settings: string,
+    regularPublicationTimes: IGetListRegularPublicationTimes[]
     createdAt: string,
     updatedAt: string
 }
