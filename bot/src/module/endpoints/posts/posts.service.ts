@@ -84,7 +84,10 @@ export class PostsService {
 			const channelIds = channels.map((item) => item?.dataValues.id);
 
 			for (const file of files) {
-				const compressedBuffer = await this.fileRepository.compressImage(file.buffer);
+				const compressedBuffer = await this.fileRepository.compressImage(
+					file.buffer,
+					file.mimetype.split('/')[1] as any
+				);
 				const resultCompress = { buffer: compressedBuffer };
 
 				const url = await this.s3Repository.uploadFileToS3(

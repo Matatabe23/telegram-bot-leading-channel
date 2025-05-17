@@ -108,6 +108,7 @@
 				toast.success('Успешное добавление!');
 				hour.value = '0';
 				minute.value = '0';
+				settingsStore.getListChannels();
 			}
 		} catch (e: any) {
 			toast.error(e.response.data.message);
@@ -122,5 +123,6 @@
 		});
 
 		selectChannel.value = result.data;
+		settingsStore.getListChannels();
 	};
 </script>

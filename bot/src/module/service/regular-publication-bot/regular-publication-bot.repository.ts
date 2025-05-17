@@ -37,21 +37,24 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 	//Публикация постов
 	async scheduleFunctionExecution() {
 		const times = await this.getPublishTimesFromDB();
-		const scheduleTimes = times.map((time) => {
+		const scheduleTimes = times.map((time, index) => {
 			const moscowTime = moment()
 				.hour(time.hour)
 				.minute(time.minute)
 				.second(0)
-				.millisecond(0);
+				.millisecond(index);
 			return { time: moscowTime.toDate(), chatId: time.chatId };
 		});
 
 		this.jobs.forEach((job) => schedule.cancelJob(job));
 		this.jobs = [];
 
-		scheduleTimes.forEach((time) => {
+		scheduleTimes.forEach((time, index) => {
+			console.log(time);
 			const job = schedule.scheduleJob(time.time, () => {
-				this.tGBotPostsRepository.sendMessageAtScheduledTime(time);
+				setTimeout(() => {
+					this.tGBotPostsRepository.sendMessageAtScheduledTime(time);
+				}, 1000 + index);
 			});
 			if (job) {
 				this.jobs.push(job);

@@ -9,7 +9,6 @@ import {
 } from '@aws-sdk/client-s3';
 import { getS3ClientConfig } from 'src/config/s3.config';
 import { ConfigService } from '@nestjs/config';
-import { lookup } from 'mime-types';
 
 @Injectable()
 export class S3Repository {
@@ -23,14 +22,10 @@ export class S3Repository {
 
 	async uploadFileToS3(file: { buffer: Buffer }, fileName: string): Promise<string> {
 		try {
-			const finalContentType = lookup(fileName) || 'application/octet-stream';
-
 			const params = {
 				Bucket: process.env.S3_BUCKET_NAME,
 				Key: fileName,
-				Body: file.buffer,
-				ContentType: finalContentType,
-				ContentDisposition: 'inline'
+				Body: file.buffer
 			};
 
 			const uploadCommand = new PutObjectCommand(params);

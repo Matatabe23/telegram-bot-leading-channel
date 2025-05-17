@@ -60,7 +60,7 @@
 						v-for="(label, key) in IEditChannelType"
 						:key="key"
 						:label="`Настройка: ${label}`"
-						:model-value="channel.settings.includes(label)"
+						:model-value="channel.settings?.includes(label)"
 						color="success"
 						@update:model-value="() => updateSettings(channel, label)"
 						hide-details
