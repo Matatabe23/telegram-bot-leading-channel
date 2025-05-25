@@ -48,13 +48,18 @@
 							"
 						/>
 
-						<v-btn
-							color="#5865f2"
-							variant="flat"
-							@click="delChannel(channel.id)"
-							class="text-white bg-indigo-600 hover:bg-indigo-700 w-full md:w-auto"
-							>Удалить</v-btn
+						<ConfirmAction
+							:onConfirm="delChannel"
+							:confirmParams="channel.id"
+							confirmText="Вы уверены, что хотите удалить канал?"
 						>
+							<v-btn
+								color="#5865f2"
+								variant="flat"
+								class="text-white bg-indigo-600 hover:bg-indigo-700 w-full md:w-auto"
+								>Удалить</v-btn
+							>
+						</ConfirmAction>
 					</div>
 					<VSwitch
 						v-for="(label, key) in IEditChannelType"
@@ -78,6 +83,7 @@
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
 	import { debounce } from 'lodash';
+import { ConfirmAction } from '@/widgets';
 
 	const settingsStore = useSettings();
 

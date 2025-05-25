@@ -50,7 +50,6 @@ export class RegularPublicationBotRepository implements OnModuleInit {
 		this.jobs = [];
 
 		scheduleTimes.forEach((time, index) => {
-			console.log(time);
 			const job = schedule.scheduleJob(time.time, () => {
 				setTimeout(() => {
 					this.tGBotPostsRepository.sendMessageAtScheduledTime(time);
