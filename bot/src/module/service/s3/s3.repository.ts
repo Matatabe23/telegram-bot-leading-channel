@@ -40,16 +40,20 @@ export class S3Repository {
 	}
 
 	async deleteImageFromS3(imageUrl: string): Promise<void> {
-		const urlParts = imageUrl.split('/');
-		const imageKey = urlParts[urlParts.length - 1];
-		const idFolder = urlParts[urlParts.length - 2];
-
-		const params = new DeleteObjectCommand({
-			Bucket: process.env.S3_BUCKET_NAME,
-			Key: `${process.env.S3_FOLDER_SAVED}/${idFolder}/${imageKey}`
-		});
-
 		try {
+			const bucketBaseUrl = `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/`;
+
+			if (!imageUrl.startsWith(bucketBaseUrl)) {
+				throw new Error('Неверный формат URL — не совпадает с путём хранилища S3');
+			}
+
+			const imageKey = imageUrl.replace(bucketBaseUrl, '');
+
+			const params = new DeleteObjectCommand({
+				Bucket: process.env.S3_BUCKET_NAME,
+				Key: imageKey
+			});
+
 			await this.s3Client.send(params);
 		} catch (err) {
 			this.logger.error('Ошибка при удалении изображения из хранилища S3:', err);
