@@ -44,7 +44,7 @@ export class FilesController {
 	}
 
 	@Delete('delete-files-from-s3')
-	// @UseGuards(AuthGuard)
+	@UseGuards(AuthGuard)
 	@DeleteFilesFromS3Swagger()
 	async deleteFilesFromS3(@Body('urls') urls: string[]) {
 		try {

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "deploy",
+    "execute-command": "/home/prod/deploy.sh",
+    "command-working-directory": "/home/prod",
+    "response-message": "🚀 Деплой начат.",
+    "trigger-rule": {
+      "match": {
+        "type": "value",
+        "parameter": {
+          "source": "payload",
+          "name": "ref"
+        },
+        "value": "refs/heads/main"
+      }
+    }
+  }
+]
