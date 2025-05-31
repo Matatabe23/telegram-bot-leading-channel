@@ -1,5 +1,4 @@
 <template>
-    13333
 	<v-container
 		v-if="dataLoading"
 		class="d-flex align-center justify-center"
