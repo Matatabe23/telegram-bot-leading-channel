@@ -101,7 +101,8 @@ export class TGBotPostsRepository {
 				await Promise.all(
 					postWithImages.dataValues.images.map(async (item: any) => {
 						await this.imageData.destroy({ where: { id: item.id } });
-						this.s3Repository.deleteImageFromS3(item.image);
+						const bucketBaseUrl = `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}`;
+						this.s3Repository.deleteImageFromS3(`${bucketBaseUrl}/${item.image}`);
 					})
 				);
 				await this.channelPosts.destroy({ where: { postId: postWithImages.id } });

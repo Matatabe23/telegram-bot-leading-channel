@@ -25,3 +25,14 @@ export enum EPermissions {
 export enum ESettingChannels {
 	PRIVATED = 'privated'
 }
+
+export enum WaterMarkPosition {
+	BOTTOM_RIGHT = 'bottom-right',
+	CENTER = 'center',
+	BOTTOM_CENTER = 'bottom-center',
+	TOP_LEFT = 'top-left',
+	TOP_RIGHT = 'top-right',
+	TOP_CENTER = 'top-center',
+	LEFT_CENTER = 'left-center',
+	RIGHT_CENTER = 'right-center'
+}

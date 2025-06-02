@@ -4,6 +4,10 @@ import { RegularPublicationBotRepository } from 'src/module/service/regular-publ
 
 import { RegularPublicationTime } from 'src/module/db/models/regular-publication-time.repository';
 import { Channels } from 'src/module/db/models/channels.repository';
+import { WaterMark } from 'src/module/db/models/water-mark.repository';
+import { WaterMarkPosition } from 'src/types/types';
+import { S3Repository } from 'src/module/service/s3/s3.repository';
+import { CreateWaterMarkRequestDto } from './dto/create-water-mark.dto';
 
 @Injectable()
 export class SettingsService {
@@ -12,7 +16,10 @@ export class SettingsService {
 		private readonly regularPublicationTime: typeof RegularPublicationTime,
 		@InjectModel(Channels)
 		private readonly channels: typeof Channels,
-		private readonly regularPublicationBotRepository: RegularPublicationBotRepository
+		@InjectModel(WaterMark)
+		private readonly waterMark: typeof WaterMark,
+		private readonly regularPublicationBotRepository: RegularPublicationBotRepository,
+		private readonly s3Repository: S3Repository
 	) {}
 
 	async channelCreate(name: string, chatId: string) {
@@ -121,5 +128,29 @@ export class SettingsService {
 		this.regularPublicationBotRepository.scheduleFunctionExecution();
 
 		return { message: 'Время успешно удалено' };
+	}
+
+	async addWaterMark(dto: CreateWaterMarkRequestDto, file: Express.Multer.File) {
+		const channelId = dto.channelId;
+		const fileName = `waterMark/${channelId}/${Date.now()}_${file.originalname}`;
+
+		// Загружаем в S3 и получаем путь
+		await this.s3Repository.uploadFileToS3(file, fileName);
+
+		// Сохраняем в базу
+		const waterMark = await this.waterMark.create({
+			name: dto.name,
+			imageUrl: fileName,
+			startDate: dto.startDate,
+			endDate: dto.endDate,
+			isDefault: dto.isDefault ?? false,
+			position: dto.position ?? WaterMarkPosition.BOTTOM_RIGHT,
+			channelId
+		});
+
+		return {
+			data: waterMark,
+			message: 'Водяной знак успешно создан'
+		};
 	}
 }

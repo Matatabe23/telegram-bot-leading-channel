@@ -8,7 +8,9 @@ import {
 	Query,
 	Param,
 	UseGuards,
-	BadRequestException
+	BadRequestException,
+	UseInterceptors,
+	UploadedFile
 } from '@nestjs/common';
 import { SettingsService } from './settings.service';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -21,6 +23,9 @@ import { DeleteTime } from './decorators/delete-time.decorator';
 import { channelCreate } from './decorators/channel-create.decorator';
 import { GetListChannel } from './decorators/get-list-channel.decorator';
 import { DeleteChannel } from './decorators/delete-channel.decorator';
+import { createWaterMark } from './decorators/create-water-mark.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateWaterMarkRequestDto } from './dto/create-water-mark.dto';
 
 @Controller('settings')
 @ApiTags('Настройки')
@@ -95,6 +100,22 @@ export class SettingsController {
 		try {
 			const result = await this.settingsService.deleteTime(id);
 			return result;
+		} catch (error) {
+			throw new BadRequestException(error.message);
+		}
+	}
+
+	@Post('add-water-mark')
+	// @UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
+	@createWaterMark()
+	@UseInterceptors(FileInterceptor('image'))
+	async addWaterMark(
+		@UploadedFile() file: Express.Multer.File,
+		@Body() dto: CreateWaterMarkRequestDto
+	) {
+		try {
+			console.log(dto);
+			return await this.settingsService.addWaterMark(dto, file);
 		} catch (error) {
 			throw new BadRequestException(error.message);
 		}
