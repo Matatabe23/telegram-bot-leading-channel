@@ -43,6 +43,7 @@ export class S3Repository {
 		try {
 			const bucketBaseUrl = `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/`;
 
+            console.log(imageUrl)
 			if (!imageUrl.startsWith(bucketBaseUrl)) {
 				throw new Error('Неверный формат URL — не совпадает с путём хранилища S3');
 			}

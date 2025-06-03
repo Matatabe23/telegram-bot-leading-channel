@@ -324,7 +324,10 @@ export class PostsService {
 			await post.destroy();
 
 			for (const image of images) {
-				await this.s3Repository.deleteImageFromS3(image.dataValues.image);
+				const bucketBaseUrl = `${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/`;
+				await this.s3Repository.deleteImageFromS3(
+					`${bucketBaseUrl}${image.dataValues.image}`
+				);
 			}
 		};
 
