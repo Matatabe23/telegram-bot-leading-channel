@@ -72,7 +72,7 @@
 		}
 	};
 
-	const copyToClipboard = (website: string = 'https://qugor.online/') => {
+	const copyToClipboard = (website: string = 'https://qugor.ru/') => {
 		const text = `Логин: ${state.form.name}
 Пароль: ${state.form.password}
 
