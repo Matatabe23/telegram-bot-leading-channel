@@ -1,6 +1,0 @@
-FROM nginx:stable-alpine
-
-COPY --chmod=755 entrypoint.sh /docker-entrypoint.sh
-COPY nginx.conf.template /etc/nginx/nginx.conf.template
-
-ENTRYPOINT ["/docker-entrypoint.sh"]

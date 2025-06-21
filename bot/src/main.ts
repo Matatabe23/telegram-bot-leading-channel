@@ -18,9 +18,9 @@ async function bootstrap() {
 
 	app.useGlobalPipes(
 		new ValidationPipe({
-			transform: true, // Автоматически преобразует данные в типы из DTO
-			forbidNonWhitelisted: true, // Не разрешает передавать данные, которых нет в DTO
-			whitelist: true, // Очищает лишние поля, которые не указаны в DTO
+			transform: true,
+			forbidNonWhitelisted: true,
+			whitelist: true,
 			exceptionFactory: (errors) => {
 				const formattedErrors = {};
 
@@ -29,7 +29,6 @@ async function bootstrap() {
 						formattedErrors[error.property] = Object.values(error.constraints);
 					}
 
-					// Если есть вложенные ошибки (например, через @ValidateNested), то рекурсивно обрабатываем:
 					if (error.children && error.children.length) {
 						formattedErrors[error.property] = error.children.map((child) => {
 							return {
