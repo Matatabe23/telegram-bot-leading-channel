@@ -1,5 +1,5 @@
 <template>
-	<section class="publish-posts-list w-11/12 relative mx-4">
+	<section class="w-11/12 relative mx-4">
 		<div class="flex justify-between mb-2.5">
 			<div class="mb-3 text-sm md:text-base">
 				<div v-if="editorStore.totalCount">Всего постов: {{ editorStore.totalCount }}</div>
@@ -78,7 +78,10 @@
 			</template>
 
 			<template v-slot:footer>
-				<div class="flex justify-center items-center my-5" v-if="editorStore.postsList?.length > 0">
+				<div
+					class="flex justify-center items-center my-5"
+					v-if="editorStore.postsList?.length > 0"
+				>
 					<v-pagination
 						v-model="editorStore.form.currentPage"
 						:length="lastPage"
@@ -90,12 +93,13 @@
 
 					<div class="w-[80px] hidden md:block ml-4">
 						<v-select
-							class="publish-posts-list__none-message-select"
 							v-model="editorStore.form.postsPerPage"
 							:items="perPage"
+							hide-details
 							variant="outlined"
 							@update:model-value="updatePostsPerPage"
 							:loading="appStore.isLoading"
+                            				density="comfortable"
 						/>
 					</div>
 				</div>
@@ -270,20 +274,3 @@
 		}
 	});
 </script>
-
-<style scoped lang="scss">
-	.publish-posts-list {
-		&__none-message-select {
-			.v-input__details {
-				min-height: 0;
-				height: 0;
-				max-height: 0;
-				padding: 0;
-			}
-			.v-messages {
-				min-height: 0px;
-				height: 0;
-			}
-		}
-	}
-</style>

@@ -1,22 +1,22 @@
 <template>
 	<div class="x-ident mt-4">
-		<div class="md:flex items-center gap-4 w-full lg:w-4/6">
-			<v-text-field
-				clearable
-				label="id, имя, телеграмм"
-				variant="outlined"
-				v-model="search"
-				@update:model-value="updateSearch"
-				:loading="appStore.isLoading"
-			/>
-		</div>
+		<v-text-field
+			clearable
+			label="id, имя, телеграмм"
+			variant="outlined"
+			v-model="search"
+			@update:model-value="updateSearch"
+			:loading="appStore.isLoading"
+			hide-details
+			density="compact"
+		/>
 
 		<v-data-table-server
 			:loading="appStore.isLoading"
 			:headers="headers"
 			:items="usersList"
 			item-value="id"
-			class="my-4 elevation-1"
+			class="my-2 elevation-1"
 			v-model:items-per-page="perPage"
 			v-model:page="currentPage"
 			:items-length="totalItems"
@@ -64,7 +64,7 @@
 					hide-details
 					@change="updateDataUsers(item, { isTeamMember: true })"
 					:model-value="item.isTeamMember"
-                    color="success"
+					color="success"
 				/>
 			</template>
 

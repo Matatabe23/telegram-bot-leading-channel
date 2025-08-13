@@ -1,12 +1,14 @@
 <template>
 	<div class="flex flex-col items-center w-full text-center">
-		<div class="flex flex-col md:flex-row gap-2 w-full my-4">
+		<div class="flex flex-col md:flex-row gap-2 w-full mb-4 mt-2 items-center">
 			<v-text-field
 				clearable
 				label="Имя канала"
 				variant="outlined"
 				v-model="name"
 				class="w-full"
+				density="compact"
+                hide-details
 			></v-text-field>
 			<v-text-field
 				clearable
@@ -14,12 +16,14 @@
 				variant="outlined"
 				v-model="chatId"
 				class="w-full"
+				density="compact"
+                hide-details
 			></v-text-field>
 			<v-btn
 				color="#5865f2"
 				variant="flat"
 				@click="saveChannel"
-				class="text-white bg-indigo-600 hover:bg-indigo-700 md:mt-3"
+				class="text-white bg-indigo-600 hover:bg-indigo-700"
 				>Сохранить</v-btn
 			>
 		</div>
@@ -83,7 +87,7 @@
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
 	import { debounce } from 'lodash';
-import { ConfirmAction } from '@/widgets';
+	import { ConfirmAction } from '@/widgets';
 
 	const settingsStore = useSettings();
 

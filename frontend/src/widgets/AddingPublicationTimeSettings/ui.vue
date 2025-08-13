@@ -10,6 +10,8 @@
 				label="Канал"
 				variant="outlined"
 				class="w-full"
+				density="compact"
+				hide-details
 			/>
 
 			<div class="flex justify-between w-full items-center gap-2">
@@ -20,6 +22,8 @@
 					label="Часы"
 					variant="outlined"
 					:disabled="!selectChannel"
+					density="compact"
+					hide-details
 				></v-select>
 				<v-select
 					id="minuteInput"
@@ -28,6 +32,8 @@
 					label="Минуты"
 					variant="outlined"
 					:disabled="!selectChannel"
+					density="compact"
+					hide-details
 				></v-select>
 			</div>
 
@@ -42,7 +48,7 @@
 		<v-expansion-panels
 			v-model="panel"
 			multiple
-			class="detal-task__expansion-panels"
+			class="detal-task__expansion-panels mt-4"
 		>
 			<v-expansion-panel
 				v-for="time in selectChannel?.regularPublicationTimes"
