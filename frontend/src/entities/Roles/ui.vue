@@ -6,9 +6,9 @@
 				label="Имя роли"
 				variant="outlined"
 				v-model="name"
-                hide-details
+				hide-details
 				class="w-full"
-                density="compact"
+				density="compact"
 			/>
 
 			<v-btn
@@ -36,7 +36,7 @@
 					:items="appStore.data.PERMISSIONS_LIST"
 					v-model="item.permissions"
 					multiple
-                    chips
+					chips
 					variant="outlined"
 					@update:model-value="handlePermissionsUpdate(item.id, $event)"
 					:loading="appStore.isLoading"

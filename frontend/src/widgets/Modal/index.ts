@@ -1,1 +1,1 @@
-export * from './ModalWatchTime'
+export * from './ModalWatchTime';

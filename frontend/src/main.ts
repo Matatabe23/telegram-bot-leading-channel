@@ -18,14 +18,14 @@ const pinia = createPinia();
 app.config.globalProperties.$socket = socket;
 
 app.use(FloatingVue)
-    .use(pinia)
-    .use(router)
-    .use(VueLazyload, {
-        preLoad: 2
-    })
-    .use(Toast, toastOptions)
-    .use(vuetify)
-    .use(VueTheMask)
-    .mount('#app');
+	.use(pinia)
+	.use(router)
+	.use(VueLazyload, {
+		preLoad: 2
+	})
+	.use(Toast, toastOptions)
+	.use(vuetify)
+	.use(VueTheMask)
+	.mount('#app');
 
 socket.connect();

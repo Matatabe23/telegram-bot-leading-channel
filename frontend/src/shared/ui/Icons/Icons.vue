@@ -76,8 +76,10 @@
 	const FILE = defineAsyncComponent(async () => await import('./icons/file.vue'));
 	const EDIT_PENCIL = defineAsyncComponent(async () => await import('./icons/editPencil.vue'));
 	const CHEVRON_LEFT = defineAsyncComponent(async () => await import('./icons/chevronLeft.vue'));
-    const MENU_TWO_STRIPES = defineAsyncComponent(async () => await import('./icons/menuTwoStripes.vue'));
-    const CAMERA = defineAsyncComponent(async () => await import('./icons/camera.vue'));
+	const MENU_TWO_STRIPES = defineAsyncComponent(
+		async () => await import('./icons/menuTwoStripes.vue')
+	);
+	const CAMERA = defineAsyncComponent(async () => await import('./icons/camera.vue'));
 
 	const Icons = {
 		TG_GRAY,
@@ -141,8 +143,8 @@
 		FILE,
 		EDIT_PENCIL,
 		CHEVRON_LEFT,
-        MENU_TWO_STRIPES,
-        CAMERA
+		MENU_TWO_STRIPES,
+		CAMERA
 	};
 
 	defineProps<{

@@ -17,9 +17,7 @@
 				:class="sliderClass"
 				class="w-full h-full bg-center bg-no-repeat bg-cover"
 				v-lazy:background-image="
-					slide.includes('data:image')
-						? slide
-						: `${slide}.${photoType}`
+					slide.includes('data:image') ? slide : `${slide}.${photoType}`
 				"
 			>
 			</SwiperSlide>

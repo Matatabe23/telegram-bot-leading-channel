@@ -8,7 +8,7 @@
 				v-model="name"
 				class="w-full"
 				density="compact"
-                hide-details
+				hide-details
 			></v-text-field>
 			<v-text-field
 				clearable
@@ -17,7 +17,7 @@
 				v-model="chatId"
 				class="w-full"
 				density="compact"
-                hide-details
+				hide-details
 			></v-text-field>
 			<v-btn
 				color="#5865f2"

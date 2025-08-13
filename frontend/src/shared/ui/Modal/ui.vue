@@ -15,7 +15,7 @@
 				<div class="flex gap-4">
 					<Icons
 						v-if="arrowRoute"
-						@click="customEmit ? $emit('custom-emit') :router.go(-1)"
+						@click="customEmit ? $emit('custom-emit') : router.go(-1)"
 						class="lg:h-8 lg:w-8 md:h-[26px] md:w-6 w-[20px] h-[22px] stroke-[3] rotate-90 cursor-pointer"
 						icon="ARROW_STROKE"
 					/>

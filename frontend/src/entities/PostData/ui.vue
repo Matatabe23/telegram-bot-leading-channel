@@ -16,7 +16,11 @@
 				:key="index"
 				class="relative"
 			>
-				<v-skeleton-loader class="post-data__image-skelet" v-show="imagesToLoad > 1" type="image"></v-skeleton-loader>
+				<v-skeleton-loader
+					class="post-data__image-skelet"
+					v-show="imagesToLoad > 1"
+					type="image"
+				></v-skeleton-loader>
 				<div v-show="imagesToLoad <= 0">
 					<img
 						:src="photo.img"
@@ -94,7 +98,12 @@
 			const watched = localStorage.getItem('watched') || '';
 			const channel = localStorage.getItem('channel') || '';
 
-			const response = await receivingPostOrChangePage(Number(route.params.id), who, watched, channel);
+			const response = await receivingPostOrChangePage(
+				Number(route.params.id),
+				who,
+				watched,
+				channel
+			);
 			images.value = response.imageList;
 			useChannelList.value = response.channels?.map((item) => item.id);
 			checkListImage.value = [];
@@ -190,11 +199,11 @@
 </script>
 
 <style lang="scss">
-.post-data{
-    &__image-skelet{
-        .v-skeleton-loader__image{
-            @apply h-[58vh] w-[26vw]
-        }
-    }
-}
+	.post-data {
+		&__image-skelet {
+			.v-skeleton-loader__image {
+				@apply h-[58vh] w-[26vw];
+			}
+		}
+	}
 </style>

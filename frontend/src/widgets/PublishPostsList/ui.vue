@@ -99,7 +99,7 @@
 							variant="outlined"
 							@update:model-value="updatePostsPerPage"
 							:loading="appStore.isLoading"
-                            				density="comfortable"
+							density="comfortable"
 						/>
 					</div>
 				</div>

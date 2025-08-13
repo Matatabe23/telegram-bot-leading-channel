@@ -1,2 +1,2 @@
-export * from './usePosts'
-export * from './useSettings'
+export * from './usePosts';
+export * from './useSettings';

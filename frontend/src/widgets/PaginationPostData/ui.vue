@@ -76,7 +76,7 @@
 				@click="$emit('backPage')"
 				color="#5865f2"
 			>
-				<v-icon >mdi-arrow-left</v-icon>
+				<v-icon>mdi-arrow-left</v-icon>
 			</v-btn>
 
 			<v-btn
@@ -101,7 +101,7 @@
 				@click="$emit('nextPage')"
 				color="#5865f2"
 			>
-				<v-icon >mdi-arrow-right</v-icon>
+				<v-icon>mdi-arrow-right</v-icon>
 			</v-btn>
 		</div>
 	</div>

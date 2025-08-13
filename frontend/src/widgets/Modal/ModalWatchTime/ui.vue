@@ -64,9 +64,9 @@
 			state.form.name = faker.internet.userName();
 			state.form.password = faker.internet.password();
 
-            await emit('update-list')
+			await emit('update-list');
 		} catch (e) {
-            toast.error(e.response.data.message);
+			toast.error(e.response.data.message);
 		} finally {
 			appStore.isLoading = false;
 		}
