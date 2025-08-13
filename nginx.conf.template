@@ -38,8 +38,8 @@ http {
 
         location /.well-known/acme-challenge/ { root /var/www/certbot; }
 
-        ssl_certificate /etc/letsencrypt/live/${MY_DOMAIN}/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/${MY_DOMAIN}/privkey.pem;
+        ssl_certificate /etc/letsencrypt/live/api.${MY_DOMAIN}/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/api.${MY_DOMAIN}/privkey.pem;
     }
 
     server {
@@ -54,8 +54,8 @@ http {
 
         location /.well-known/acme-challenge/ { root /var/www/certbot; }
 
-        ssl_certificate /etc/letsencrypt/live/${MY_DOMAIN}/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/${MY_DOMAIN}/privkey.pem;
+        ssl_certificate /etc/letsencrypt/live/phpmyadmin.${MY_DOMAIN}/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/phpmyadmin.${MY_DOMAIN}/privkey.pem;
     }
 
 }
