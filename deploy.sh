@@ -10,21 +10,27 @@ cd "$APP_DIR" || exit 1
 
 echo "=== Деплой начат: $(date)" >> "$LOG_FILE" 2>&1
 
-echo "➤ Сброс и стягивание последней версии..." | tee -a "$LOG_FILE"
-git pull >> "$LOG_FILE" 2>&1
+# Обёртка для выполнения команд с префиксом "git pull"
+run_cmd() {
+    echo "git pull $*" | tee -a "$LOG_FILE"
+    "$@" >> "$LOG_FILE" 2>&1
+}
 
-echo "➤ Генерация nginx.conf из шаблона..." | tee -a "$LOG_FILE"
+run_cmd echo "➤ Сброс и стягивание последней версии..."
+run_cmd git pull
 
-# Загрузка переменных из .env и генерация nginx.conf
+run_cmd echo "➤ Генерация nginx.conf из шаблона..."
+
+# Загрузка переменных из .env
 set -o allexport
-source <(grep -v '^#' .env | tr -d '\r')
+run_cmd source <(grep -v '^#' .env | tr -d '\r')
 set +o allexport
 
-envsubst '${MY_DOMAIN}' < "$NGINX_TEMPLATE" > "$NGINX_CONFIG"
-echo "nginx.conf сгенерирован успешно." | tee -a "$LOG_FILE"
+run_cmd envsubst '${MY_DOMAIN}' < "$NGINX_TEMPLATE" > "$NGINX_CONFIG"
+run_cmd echo "nginx.conf сгенерирован успешно."
 
-echo "➤ Пересборка контейнеров..." | tee -a "$LOG_FILE"
-docker compose build --no-cache >> "$LOG_FILE" 2>&1
-docker compose up -d >> "$LOG_FILE" 2>&1
+run_cmd echo "➤ Пересборка контейнеров..."
+run_cmd docker compose build --no-cache
+run_cmd docker compose up -d
 
 echo "✅ Деплой завершён: $(date)" >> "$LOG_FILE" 2>&1
