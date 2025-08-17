@@ -156,7 +156,9 @@ export class PostsService {
 			for (const element of post.images) {
 				const imageRecord = await this.imageData.findByPk(element.id);
 				if (imageRecord) {
-					await this.s3Repository.deleteImageFromS3(imageRecord.dataValues.image);
+					await this.s3Repository.deleteImageFromS3(
+						`${process.env.S3_PATH}${process.env.S3_BUCKET_NAME}/${imageRecord.dataValues.image}`
+					);
 					await this.imageData.destroy({ where: { id: imageRecord.dataValues.id } });
 				}
 			}
