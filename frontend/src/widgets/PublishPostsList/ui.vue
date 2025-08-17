@@ -190,9 +190,6 @@
 
 	const delPost = async (id: number) => {
 		try {
-			if (!confirm('Вы уверены, что хотите удалить пост?')) {
-				return;
-			}
 			appStore.isLoading = true;
 			const result = await deletePost(id);
 			toast.success(result.message);
@@ -206,9 +203,6 @@
 
 	const publishInstantlyPost = async (id: number) => {
 		try {
-			if (!confirm('Вы уверены, что хотите опубликовать пост?')) {
-				return;
-			}
 			appStore.isLoading = true;
 			const result = await publishInstantly(id);
 			toast.success(result.message);

@@ -13,7 +13,11 @@
 		</template>
 
 		<v-card>
-			<v-card-title class="text-h6">{{ confirmText }}</v-card-title>
+			<v-card-title class="text-h6">
+				<div class="break-normal whitespace-normal text-center">
+					{{ confirmText }}
+				</div>
+			</v-card-title>
 			<v-card-actions>
 				<v-spacer />
 				<v-btn

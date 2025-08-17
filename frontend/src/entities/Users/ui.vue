@@ -69,15 +69,20 @@
 			</template>
 
 			<template #item.actions="{ item }">
-				<v-btn
-					:loading="appStore.isLoading"
-					:disabled="appStore.isLoading"
-					@click="deleteUsers(item.id)"
-					color="red"
-					icon
+				<ConfirmAction
+					:onConfirm="deleteUsers"
+					:confirmParams="item.id"
+					confirmText="Вы уверены, что хотите удалить пользователя?"
 				>
-					<v-icon>mdi-delete</v-icon>
-				</v-btn>
+					<v-btn
+						:loading="appStore.isLoading"
+						:disabled="appStore.isLoading"
+						color="red"
+						icon
+					>
+						<v-icon>mdi-delete</v-icon>
+					</v-btn>
+				</ConfirmAction>
 			</template>
 		</v-data-table-server>
 	</div>
@@ -89,6 +94,7 @@
 	import { useToast } from 'vue-toastification';
 	import { useAppStore } from '@/app/app.store';
 	import { getUsersList, updateDataUser, deleteUser, useSettings } from '@/shared';
+import { ConfirmAction } from '@/widgets';
 
 	const settingsStore = useSettings();
 	const toast = useToast();
@@ -157,7 +163,6 @@
 	};
 
 	const deleteUsers = async (id: number) => {
-		if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) return;
 		try {
 			appStore.isLoading = true;
 			await deleteUser(id);

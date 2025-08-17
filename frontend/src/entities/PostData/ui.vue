@@ -129,9 +129,6 @@
 
 	const delPost = async () => {
 		try {
-			if (!confirm('Вы уверены, что хотите удалить пост?')) {
-				return;
-			}
 			appStore.isLoading = true;
 			const result = await deletePost(Number(route.params.id));
 			nextPage();

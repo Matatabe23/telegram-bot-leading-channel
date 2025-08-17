@@ -11,15 +11,19 @@
 			<v-icon>mdi-arrow-left</v-icon>
 		</v-btn>
 
-		<v-btn
-			v-if="checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
-			variant="flat"
-			@click="$emit('delPost')"
-			color="red"
-			:loading="appStore.isLoading"
+		<ConfirmAction
+			:onConfirm="() => $emit('delPost')"
+			confirmText="Вы уверены, что хотите удалить пост?"
 		>
-			<v-icon>mdi-trash-can-outline</v-icon>
-		</v-btn>
+			<v-btn
+				v-if="checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
+				variant="flat"
+				color="red"
+				:loading="appStore.isLoading"
+			>
+				<v-icon>mdi-trash-can-outline</v-icon>
+			</v-btn>
+		</ConfirmAction>
 
 		<div class="min-w-[30%] text-white">
 			<v-select
@@ -111,6 +115,7 @@
 	import { computed } from 'vue';
 	import { useSettings, checkPermissions } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
+	import { ConfirmAction } from '../ConfirmAction';
 
 	const { listChannels } = useSettings();
 	const appStore = useAppStore();

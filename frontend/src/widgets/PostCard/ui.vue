@@ -12,15 +12,20 @@
 					id: {{ props.post.id }}
 				</h2>
 				<div class="flex gap-2 flex-wrap md:flex-nowrap">
-					<v-btn
+					<ConfirmAction
 						v-if="checkPermissions(appStore.data?.EPermissions?.DELETE_POSTS)"
-						color="red"
-						variant="flat"
-						@click="emit('delete-post', props.post.id)"
-						class="w-full md:w-auto"
-						:loading="appStore.isLoading"
-						>Удалить</v-btn
+						:onConfirm="() => emit('delete-post', props.post.id)"
+						confirmText="Вы уверены, что хотите удалить пост?"
 					>
+						<v-btn
+							color="red"
+							variant="flat"
+							class="w-full md:w-auto"
+							:loading="appStore.isLoading"
+							>Удалить</v-btn
+						>
+					</ConfirmAction>
+
 					<v-btn
 						color="#5865f2"
 						variant="flat"
@@ -29,15 +34,22 @@
 						:loading="appStore.isLoading"
 						>Открыть</v-btn
 					>
-					<v-btn
+
+					<ConfirmAction
 						v-if="checkPermissions(appStore.data?.EPermissions?.PUBLISH_POSTS)"
-						color="green"
-						variant="flat"
-						@click="emit('publish-instantly-post', props.post.id)"
-						class="w-full md:w-auto"
-						:loading="appStore.isLoading"
-						>Опубликовать</v-btn
+						:onConfirm="() => emit('publish-instantly-post', props.post.id)"
+						confirmText="Вы уверены, что хотите опубликовать пост?"
 					>
+						<v-btn
+							v-if="checkPermissions(appStore.data?.EPermissions?.PUBLISH_POSTS)"
+							color="green"
+							variant="flat"
+							class="w-full md:w-auto"
+							:loading="appStore.isLoading"
+							>Опубликовать</v-btn
+						>
+					</ConfirmAction>
+
 					<v-btn
 						v-if="props.post.promt"
 						color="#5865f2"
@@ -59,6 +71,7 @@
 	import { IPosts } from '@/entities';
 	import { useAppStore } from '@/app/app.store';
 	import { checkPermissions } from '@/shared';
+	import { ConfirmAction } from '../ConfirmAction';
 
 	const router = useRouter();
 	const appStore = useAppStore();
