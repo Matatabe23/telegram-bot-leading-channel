@@ -17,7 +17,9 @@ run_cmd() {
 }
 
 run_cmd echo "➤ Сброс и стягивание последней версии..."
-run_cmd git pull
+# Затираем локальные изменения, берём только origin/main
+run_cmd git fetch origin
+run_cmd git reset --hard origin/main
 
 run_cmd echo "➤ Генерация nginx.conf из шаблона..."
 
