@@ -7,6 +7,8 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
+	app.getHttpAdapter().getInstance().set('trust proxy', true);
+
 	app.use(json({ limit: '100mb' }));
 	app.use(urlencoded({ limit: '100mb', extended: true }));
 
