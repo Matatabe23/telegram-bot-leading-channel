@@ -23,7 +23,7 @@ import { UpdateAccessToken } from './decorators/update-access-token.decorator';
 import { UpdateUserData } from './decorators/update-data-user.decorator';
 import { GetUsersList } from './decorators/get-users-list.decorator';
 import { DeleteUser } from './decorators/delete-post.decorator';
-
+import { Request } from 'express';
 @Controller('user')
 @ApiTags('Пользователи')
 export class UsersController {
@@ -31,9 +31,12 @@ export class UsersController {
 
 	@Get('login')
 	@LoginUser()
-	async login(@Query('name') name: string) {
+	async login(@Query('name') name: string, @Req() req: Request) {
 		try {
-			const result = await this.userService.login(name);
+			const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+			const userAgent = req.headers['user-agent'] || 'unknown';
+
+			const result = await this.userService.login(name, ip, userAgent);
 			return result;
 		} catch (e) {
 			throw new HttpException(

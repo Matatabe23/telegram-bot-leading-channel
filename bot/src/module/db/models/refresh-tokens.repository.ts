@@ -6,7 +6,11 @@ export class RefreshTokens extends Model {
 	@Column({ primaryKey: true, autoIncrement: true })
 	id: number;
 
-	@Column({ unique: true })
+	@Column({
+		type: DataType.STRING(512), // 512*4=2048, это допустимо
+		allowNull: false,
+		unique: true
+	})
 	token: string;
 
 	@Column({

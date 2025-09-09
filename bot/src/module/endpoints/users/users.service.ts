@@ -5,17 +5,20 @@ import { UsersDto } from './dto/user.dto';
 import { TokenRepository } from 'src/module/service/token/token.repository';
 import { TGBotUsersRepository } from 'src/module/service/tg-bot/repository/tg-bot-users.repository';
 import { Op } from 'sequelize';
+import { RefreshTokens } from 'src/module/db/models/refresh-tokens.repository';
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectModel(Users)
 		private readonly usersRepository: typeof Users,
+		@InjectModel(RefreshTokens)
+		private readonly refreshTokens: typeof RefreshTokens,
 		private readonly tokenRepository: TokenRepository,
 		private readonly tGBotUsersRepository: TGBotUsersRepository
 	) {}
 
-	async login(name: string) {
+	async login(name: string, ip: string | string[], userAgent: string) {
 		if (!name) throw new UnauthorizedException('Некорректные данные');
 
 		const lowerName = name.toLowerCase();
@@ -34,7 +37,16 @@ export class UsersService {
 		const resultDto = new UsersDto(user.dataValues);
 
 		const accessToken = this.tokenRepository.generateToken(resultDto, '15m');
-		const refreshToken = this.tokenRepository.generateToken(resultDto, '7d', true);
+		const refreshToken = this.tokenRepository.generateToken(resultDto, '30d', true);
+
+		await this.refreshTokens.create({
+			token: refreshToken,
+			expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 дней
+			ip: Array.isArray(ip) ? ip[0] : ip,
+			userAgent: userAgent,
+			device: userAgent,
+			userId: user.id
+		});
 
 		return { accessToken, refreshToken, user: { ...resultDto } };
 	}
