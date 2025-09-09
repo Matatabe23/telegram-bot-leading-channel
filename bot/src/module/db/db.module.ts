@@ -15,6 +15,7 @@ import { Tags } from './models/tags.repository';
 import { PostTags } from './models/post-tags.repository';
 import { Holiday } from './models/holiday.repository';
 import { WaterMark } from './models/water-mark.repository';
+import { RefreshTokens } from './models/refresh-tokens.repository';
 
 const dbList = [
 	Users,
@@ -28,7 +29,8 @@ const dbList = [
 	Tags,
 	PostTags,
 	Holiday,
-	WaterMark
+	WaterMark,
+	RefreshTokens
 ];
 
 @Module({

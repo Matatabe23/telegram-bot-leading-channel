@@ -1,5 +1,6 @@
-import { Column, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { Column, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
 import { RolesSettings } from './roles-settings.repository';
+import { RefreshTokens } from './refresh-tokens.repository';
 
 @Table
 export class Users extends Model {
@@ -24,4 +25,7 @@ export class Users extends Model {
 
 	@Column({ defaultValue: 0 })
 	coin: number;
+
+	@HasMany(() => RefreshTokens)
+	tokens: RefreshTokens[];
 }
