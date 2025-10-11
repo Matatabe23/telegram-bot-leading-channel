@@ -18,7 +18,7 @@
 				<v-skeleton-loader type="table-row@10"></v-skeleton-loader>
 			</template>
 
-			<template v-slot:tfoot>
+			<template v-slot:thead>
 				<tr>
 					<td></td>
 					<td>
@@ -121,7 +121,6 @@
 				</v-form>
 			</v-card-text>
 
-			<!-- Действия внизу -->
 			<v-card-actions class="justify-between">
 				<v-btn
 					@click="isDateModel = false"
