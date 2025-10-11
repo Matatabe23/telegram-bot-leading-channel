@@ -29,6 +29,7 @@
 			<v-select
 				v-if="checkPermissions(appStore.data?.EPermissions?.EDIT_POSTS)"
 				label="Каналы публикации"
+                hide-details
 				:items="channelsListSelect"
 				multiple
 				variant="outlined"
@@ -66,6 +67,7 @@
 		<div class="w-full text-white">
 			<v-select
 				label="Каналы публикации"
+                hide-details
 				:items="channelsListSelect"
 				multiple
 				variant="outlined"
