@@ -24,7 +24,7 @@
 		<v-app-bar
 			v-if="!isHomePage"
 			app
-		>1
+		>11
 			<v-app-bar-nav-icon @click="drawer = !drawer">
 				<Icons
 					icon="MENU"
