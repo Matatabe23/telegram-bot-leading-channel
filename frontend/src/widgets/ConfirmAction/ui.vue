@@ -7,7 +7,7 @@
 			<span
 				v-bind="props"
 				@click.stop="open"
-                class="w-full"
+                class="w-full md:w-auto"
 			>
 				<slot />
 			</span>
