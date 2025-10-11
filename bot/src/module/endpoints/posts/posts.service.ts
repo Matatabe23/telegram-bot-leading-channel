@@ -198,7 +198,7 @@ export class PostsService {
 
 		let whereCondition: {
 			watched?: boolean;
-			id?: string;
+			id?: string | { [Op.like]: string };
 		} = {};
 
 		if (watched === 'watched') {
@@ -208,7 +208,12 @@ export class PostsService {
 		}
 
 		if (search) {
-			whereCondition = { ...whereCondition, id: search };
+			whereCondition = {
+				...whereCondition,
+				id: {
+					[Op.like]: `%${search}%` // или [Op.iLike] для PostgreSQL
+				}
+			};
 		}
 
 		const posts = await this.dataBasePosts.findAll({
