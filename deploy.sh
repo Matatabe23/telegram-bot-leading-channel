@@ -1,30 +1,44 @@
+#!/usr/bin/env bash
+set -e
+
 APP_DIR="/home/prod"
 LOG_DIR="$APP_DIR/data/deploy"
 LOG_FILE="$LOG_DIR/deploy.log"
 NGINX_TEMPLATE="$APP_DIR/nginx.conf.template"
 NGINX_CONFIG="$APP_DIR/nginx.conf"
 
+# Создание папки логов, если её нет
 mkdir -p "$LOG_DIR"
 
+# Переход в директорию приложения
 cd "$APP_DIR" || exit 1
 
-echo "=== Деплой начат: $(date)" >> "$LOG_FILE" 2>&1
+# Функция для логирования и одновременного вывода в консоль
+log() {
+    echo -e "$1" | tee -a "$LOG_FILE"
+}
 
-echo "➤ Сброс и стягивание последней версии..." | tee -a "$LOG_FILE"
-git pull >> "$LOG_FILE" 2>&1
+# Начало деплоя
+log "=== 🚀 Деплой начат: $(date)"
 
-echo "➤ Генерация nginx.conf из шаблона..." | tee -a "$LOG_FILE"
+# Сброс и стягивание последней версии
+log "➤ Сброс и стягивание последней версии..."
+git fetch 2>&1 | tee -a "$LOG_FILE"
+git reset --hard origin/main 2>&1 | tee -a "$LOG_FILE"
+git pull 2>&1 | tee -a "$LOG_FILE"
 
-# Загрузка переменных из .env и генерация nginx.conf
+# Генерация nginx.conf из шаблона
+log "➤ Генерация nginx.conf из шаблона..."
 set -o allexport
 source <(grep -v '^#' .env | tr -d '\r')
 set +o allexport
+envsubst '${MY_DOMAIN}' < "$NGINX_TEMPLATE" | tee "$NGINX_CONFIG" | tee -a "$LOG_FILE"
+log "✅ nginx.conf сгенерирован успешно."
 
-envsubst '${MY_DOMAIN}' < "$NGINX_TEMPLATE" > "$NGINX_CONFIG"
-echo "nginx.conf сгенерирован успешно." | tee -a "$LOG_FILE"
+# Пересборка контейнеров
+log "➤ Пересборка контейнеров..."
+docker compose build --no-cache 2>&1 | tee -a "$LOG_FILE"
+docker compose up -d 2>&1 | tee -a "$LOG_FILE"
 
-echo "➤ Пересборка контейнеров..." | tee -a "$LOG_FILE"
-docker compose build --no-cache >> "$LOG_FILE" 2>&1
-docker compose up -d >> "$LOG_FILE" 2>&1
-
-echo "✅ Деплой завершён: $(date)" >> "$LOG_FILE" 2>&1
+# Завершение деплоя
+log "✅ Деплой завершён: $(date)"
