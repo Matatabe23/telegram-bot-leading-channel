@@ -25,7 +25,6 @@
 			v-if="!isHomePage"
 			app
 		>
-        1
 			<v-app-bar-nav-icon @click="drawer = !drawer">
 				<Icons
 					icon="MENU"
