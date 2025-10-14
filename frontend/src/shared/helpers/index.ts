@@ -40,8 +40,11 @@ export const getIpAddress = async (): Promise<string> => {
 
             const data = await response.json();
 
+
+
             // Обработка для ipify.org
             if (apiUrl.includes('ipify.org')) {
+
                 return data.ip;
             }
 
@@ -113,6 +116,8 @@ export const getDeviceInfo = async () => {
         // Получаем информацию о геолокации (если доступна)
         const locationInfo = await getLocationInfo(ipAddress);
 
+
+
         return {
             deviceName: `${osInfo.name} ${osInfo.version}`,
             deviceType,
@@ -145,6 +150,7 @@ export const getDeviceInfo = async () => {
             }
         };
     } catch (error) {
+        console.log(error)
         // В случае ошибки возвращаем базовую информацию
         return {
             deviceName: 'unknown',
@@ -197,12 +203,13 @@ const getOSInfo = (userAgent: string) => {
     for (const os of osList) {
         const match = userAgent.match(os.regex);
         if (match) {
-            return { name: os.name, version: match[1].replace(/_/g, '.') };
+            return { name: os.name, version: match[1] ? match[1].replace(/_/g, '.') : 'unknown' };
         }
     }
 
     return { name: 'unknown', version: 'unknown' };
 };
+
 
 
 // Функция для получения информации о местоположении по IP

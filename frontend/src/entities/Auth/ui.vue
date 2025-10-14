@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 	import { onMounted, ref } from 'vue';
-	import { getDeviceInfo, login, useSettings } from '@/shared';
+	import { login, useSettings } from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { useRouter } from 'vue-router';
 	import { useAppStore } from '@/app/app.store';
