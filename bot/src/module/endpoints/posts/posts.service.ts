@@ -211,7 +211,7 @@ export class PostsService {
 			whereCondition = {
 				...whereCondition,
 				id: {
-					[Op.like]: `%${search}%` // или [Op.iLike] для PostgreSQL
+					[Op.like]: `%${search}%`
 				}
 			};
 		}
