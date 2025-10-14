@@ -9,34 +9,33 @@ import {
 	Put,
 	Body,
 	Delete,
-	Param
+	Param,
+	Post
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { UsersDto } from './dto/user.dto';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/types/types';
-import { ApiTags } from '@nestjs/swagger';
-import { LoginUser } from './decorators/login-user.decorator';
-import { CheckUserData } from './decorators/check-data-web.decorator';
-import { UpdateAccessToken } from './decorators/update-access-token.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateUserData } from './decorators/update-data-user.decorator';
 import { GetUsersList } from './decorators/get-users-list.decorator';
 import { DeleteUser } from './decorators/delete-post.decorator';
-import { Request } from 'express';
+import { RefreshTokenDoc } from './decorators/refresh-token.decorator';
+import { LogoutDoc } from './decorators/logout.decorator';
+import { GetProfileDoc } from './decorators/get-profile.decorator';
+import { LoginDoc } from './decorators/login-user.decorator';
+import { LoginUserDto } from './dto/login.dto';
 @Controller('user')
 @ApiTags('Пользователи')
 export class UsersController {
 	constructor(private readonly userService: UsersService) {}
 
-	@Get('login')
-	@LoginUser()
-	async login(@Query('name') name: string, @Req() req: Request) {
+	@Post('login')
+	@LoginDoc()
+	async login(@Body() dto: LoginUserDto, @Req() req: Request) {
 		try {
-			const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			const userAgent = req.headers['user-agent'] || 'unknown';
-
-			const result = await this.userService.login(name, ip, userAgent);
+			const result = await this.userService.login(dto, req);
 			return result;
 		} catch (e) {
 			throw new HttpException(
@@ -49,38 +48,36 @@ export class UsersController {
 		}
 	}
 
-	@Get('check-data')
+	@Post('refresh-token')
+	@RefreshTokenDoc()
+	async updateAccessToken(@Body('refreshToken') token: string) {
+		try {
+			return await this.userService.refreshAccessToken(token);
+		} catch (e) {
+			throw new HttpException(
+				{
+					status: HttpStatus.INTERNAL_SERVER_ERROR,
+					message: e.message
+				},
+				HttpStatus.INTERNAL_SERVER_ERROR
+			);
+		}
+	}
+
+	@Post('logout')
+	@ApiBearerAuth('access-token')
 	@UseGuards(AuthGuard)
-	@CheckUserData()
-	async checkDataWeb(@Req() request: any) {
-		try {
-			const result = await this.userService.checkDataWeb(request.authData.id);
-			return result;
-		} catch (e) {
-			throw new HttpException(
-				{
-					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					message: e.message
-				},
-				HttpStatus.INTERNAL_SERVER_ERROR
-			);
-		}
+	@LogoutDoc()
+	async logout(@Body('refreshToken') token: string) {
+		return this.userService.logout(token);
 	}
 
-	@Get('update-access-token')
-	@UpdateAccessToken()
-	async updateAccessToken(@Query('refreshToken') refreshToken: string) {
-		try {
-			return await this.userService.updateAccessToken(refreshToken);
-		} catch (e) {
-			throw new HttpException(
-				{
-					status: HttpStatus.INTERNAL_SERVER_ERROR,
-					message: e.message
-				},
-				HttpStatus.INTERNAL_SERVER_ERROR
-			);
-		}
+	@Get('me')
+	@ApiBearerAuth('access-token')
+	@UseGuards(AuthGuard)
+	@GetProfileDoc()
+	async getProfile(@Req() req: any) {
+		return this.userService.getProfile(req.user.id);
 	}
 
 	@Put('update-data-user')

@@ -1,41 +1,23 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 
 @Injectable()
 export class TokenRepository {
-	constructor(
-		private readonly configService: ConfigService,
-		private readonly jwtService: JwtService
-	) {}
+	constructor(private readonly jwtService: JwtService) {}
 
-	generateToken(payload: any, tokenTime: string, isRefreshToken: boolean = false) {
-		if (!payload) throw new Error('Payload is undefined');
-
-		const secretKey = isRefreshToken
-			? this.configService.get('SECRET_KEY_REFRESH')
-			: this.configService.get('SECRET_KEY_ACCESS');
-
-		if (!secretKey) {
-			throw new Error('SECRET_KEY is not defined');
-		}
-
-		const token = this.jwtService.sign(
-			{ ...payload },
-			{
-				secret: secretKey,
-				expiresIn: tokenTime
-			}
-		);
-		return token;
+	/**
+	 * Универсальная генерация токена
+	 */
+	sign<T extends object>(payload: T, options: JwtSignOptions): string {
+		return this.jwtService.sign(payload, options);
 	}
 
-	validateRefreshToken(refreshToken: string) {
-		try {
-			const secret = this.configService.get('SECRET_KEY_REFRESH');
-			return this.jwtService.verify(refreshToken, { secret });
-		} catch (e) {
-			throw new UnauthorizedException('Invalid or expired refresh token');
-		}
+	/**
+	 * Проверка токена
+	 * @param token - строка токена
+	 * @param secret - секрет для верификации (если отличается от дефолтного)
+	 */
+	verifyToken<T extends object = any>(token: string, secret?: string): T {
+		return this.jwtService.verify<T>(token, secret ? { secret } : {});
 	}
 }

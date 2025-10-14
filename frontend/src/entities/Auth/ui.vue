@@ -29,7 +29,7 @@
 
 <script lang="ts" setup>
 	import { onMounted, ref } from 'vue';
-	import { login, useSettings } from '@/shared';
+	import { getDeviceInfo, login, useSettings } from '@/shared';
 	import { useToast } from 'vue-toastification';
 	import { useRouter } from 'vue-router';
 	import { useAppStore } from '@/app/app.store';
@@ -57,9 +57,26 @@
 				timeout: 60000
 			});
 
-			const response: any = await login(name.value);
+			const result = await login({
+				name: name.value,
+				deviceInfo: {
+					deviceName: appStore.deviceInfo.deviceName,
+					deviceType: appStore.deviceInfo.deviceType,
+					userAgent: appStore.deviceInfo.userAgent,
+					ipAddress: appStore.deviceInfo.ipAddress,
+					timezone: appStore.deviceInfo.timezone,
+					location: appStore.deviceInfo.locationInfo?.city
+						? `${appStore.deviceInfo.locationInfo.city}, ${appStore.deviceInfo.locationInfo.country}`
+						: null,
+					latitude: appStore.deviceInfo.locationInfo?.latitude,
+					longitude: appStore.deviceInfo.locationInfo?.longitude,
+					country: appStore.deviceInfo.locationInfo?.country,
+					city: appStore.deviceInfo.locationInfo?.city,
+					region: appStore.deviceInfo.locationInfo?.region
+				}
+			});
 
-			await appStore.setUserData(response);
+			await appStore.setUserData(result);
 			await settingsStore.getListChannels();
 			await appStore.getInfo();
 

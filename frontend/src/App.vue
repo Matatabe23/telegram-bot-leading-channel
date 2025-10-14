@@ -23,6 +23,8 @@
 	import { useRouter, useRoute } from 'vue-router';
 	import { useAppStore } from '@/app/app.store';
 	import { useToast } from 'vue-toastification';
+import { getDeviceInfo } from './shared';
+import { IDeviceInfo } from './shared/types/deviceTypes';
 
 	const router = useRouter();
 	const route = useRoute();
@@ -32,14 +34,8 @@
 	const dataLoading = ref(true);
 
 	const getDataUser = async () => {
-		await appStore.checkDataWeb();
-
-		setInterval(
-			async () => {
-				await appStore.checkDataWeb();
-			},
-			10 * 60 * 1000
-		);
+		if (!localStorage.getItem('accessToken')) return;
+		await appStore.getMeProfile();
 
 		if (route.path === '/' && appStore.auth === true) {
 			await router.push('/publishing-page');
@@ -50,6 +46,12 @@
 
 	onMounted(async () => {
 		try {
+			const deviceInfo = await getDeviceInfo();
+
+            appStore.deviceInfo = deviceInfo as IDeviceInfo
+            console.log(appStore.deviceInfo)
+
+
 			dataLoading.value = true;
 			await getDataUser();
 			await appStore.getInfo();

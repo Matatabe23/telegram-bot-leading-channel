@@ -1,19 +1,27 @@
-import { ApiResponse, ApiQuery } from '@nestjs/swagger';
-import { UsersDto } from '../dto/user.dto';
+import { ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { LoginUserDto } from '../dto/login.dto';
 import { ErrorDto } from 'src/dto/error.dto';
 
-export function LoginUser(): MethodDecorator {
+export function LoginDoc(): MethodDecorator {
 	return function (target, propertyKey, descriptor) {
-		ApiQuery({
-			name: 'name',
-			description: 'Имя пользователя для входа',
-			example: 'Иван Иванов'
+		// Описание ручки
+		ApiOperation({
+			summary: 'Вход пользователя',
+			description: 'Позволяет пользователю авторизоваться по email или имени и паролю'
 		})(target, propertyKey, descriptor);
+
 		ApiResponse({
 			status: 200,
-			description: 'Успешный вход пользователя',
-			type: UsersDto
+			description: 'Пользователь успешно вошёл в систему',
+			type: LoginUserDto // Можно заменить на DTO ответа, если есть
 		})(target, propertyKey, descriptor);
+
+		ApiResponse({
+			status: 400,
+			description: 'Неверный логин/email или пароль',
+			type: ErrorDto
+		})(target, propertyKey, descriptor);
+
 		ApiResponse({
 			status: 500,
 			description: 'Ошибка сервера',

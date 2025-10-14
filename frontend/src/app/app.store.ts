@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useWindowSize } from '@vueuse/core/index.cjs';
-import { userData, checkDataWeb, getMainInfo, IAppStore } from '@/shared';
+import { userData, getMainInfo, IAppStore, getMeProfile } from '@/shared';
 import { useToast } from 'vue-toastification';
 
 const toast = useToast();
@@ -21,6 +21,7 @@ export const useAppStore = defineStore('app', {
 		width: 0,
 		height: 0,
 		isLoading: false,
+        deviceInfo: null,
 		data: {} // Здесь будем хранить все данные
 	}),
 
@@ -34,12 +35,13 @@ export const useAppStore = defineStore('app', {
 			this[key] = value;
 		},
 
-		async checkDataWeb() {
+		async getMeProfile() {
 			try {
-				const response: any = await checkDataWeb();
+				const response: any = await getMeProfile();
 				this.userData = parseDataForUser(response);
 				this.auth = true;
 			} catch (e) {
+                toast.error('Недействительная сессия')
 				//
 			}
 		},

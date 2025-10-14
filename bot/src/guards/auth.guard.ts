@@ -1,42 +1,42 @@
 // src/guards/auth.guard.ts
-import {
-	Injectable,
-	CanActivate,
-	ExecutionContext,
-	HttpException,
-	HttpStatus
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ModuleRef } from '@nestjs/core';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-	constructor(private readonly jwtService: JwtService) {}
+	private jwtService: JwtService;
+
+	constructor(private readonly moduleRef: ModuleRef) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const request = context.switchToHttp().getRequest();
+		// получаем JwtService вручную при первом вызове
+		if (!this.jwtService) {
+			this.jwtService = this.moduleRef.get(JwtService, { strict: false });
+		}
+
+		const request = context.switchToHttp().getRequest<Request>();
 		const authHeader = request.headers.authorization;
 
 		if (!authHeader) {
-			throw new HttpException('Нету авторизации', HttpStatus.UNAUTHORIZED);
+			throw new UnauthorizedException('Вы не авторизированы');
 		}
 
-		const token = authHeader.split(' ')[1];
+		const [bearer, token] = authHeader.split(' ');
 
-		if (!token) {
-			throw new HttpException('Нету авторизации', HttpStatus.UNAUTHORIZED);
+		if (bearer !== 'Bearer' || !token) {
+			throw new UnauthorizedException('Неверный формат токена');
 		}
 
 		try {
-			const decoded = this.jwtService.verify(token);
+			const decoded = await this.jwtService.verifyAsync(token);
 
-			if (!decoded.isTeamMember) {
-				return false;
-			}
-
-			request.authData = decoded;
+			(request as any).user = decoded;
 			return true;
-		} catch (e) {
-			throw new HttpException('Нету авторизации', HttpStatus.UNAUTHORIZED);
+		} catch (error) {
+			console.log(error);
+			throw new UnauthorizedException('Токен недействителен или просрочен');
 		}
 	}
 }
