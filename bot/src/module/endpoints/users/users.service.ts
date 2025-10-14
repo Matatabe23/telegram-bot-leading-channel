@@ -46,7 +46,7 @@ export class UsersService {
 		};
 		const accessToken = this.tokenRepository.sign(payload, {
 			secret: process.env.JWT_ACCESS_SECRET,
-			expiresIn: '15m'
+			expiresIn: '10m'
 		});
 		const refreshToken = this.tokenRepository.sign(payload, {
 			secret: process.env.JWT_REFRESH_SECRET,

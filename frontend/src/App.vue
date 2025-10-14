@@ -49,7 +49,6 @@ import { IDeviceInfo } from './shared/types/deviceTypes';
 			const deviceInfo = await getDeviceInfo();
 
             appStore.deviceInfo = deviceInfo as IDeviceInfo
-            console.log(appStore.deviceInfo)
 
 
 			dataLoading.value = true;
