@@ -163,7 +163,7 @@ export class PostsController {
 	) {
 		try {
 			const isPermissions = await this.helpersRepository.checkPermissions(
-				request.authData.role,
+				request.user.roles,
 				EPermissions.MARK_POST_VIEWED
 			);
 

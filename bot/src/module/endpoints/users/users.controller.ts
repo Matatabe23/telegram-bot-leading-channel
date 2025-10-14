@@ -107,6 +107,7 @@ export class UsersController {
 		@Query('sortBy') sortBy: string,
 		@Query('sortOrder') sortOrder: 'ASC' | 'DESC'
 	) {
+		console.log('qugor23');
 		try {
 			return await this.userService.getUsersList(
 				Number(page),

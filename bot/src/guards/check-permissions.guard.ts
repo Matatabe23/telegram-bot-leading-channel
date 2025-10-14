@@ -34,7 +34,7 @@ export class CheckPermissionsGuard implements CanActivate {
 			throw new HttpException('Нет разрешения', HttpStatus.FORBIDDEN);
 		}
 
-		const requiredPermissions = await this.getRolePermissions(user.role);
+		const requiredPermissions = await this.getRolePermissions(user.roles);
 
 		if (!requiredPermissions || !this.permission || !requiredPermissions.permissions) {
 			throw new HttpException('У вас нет необходимых разрешений', HttpStatus.FORBIDDEN);
