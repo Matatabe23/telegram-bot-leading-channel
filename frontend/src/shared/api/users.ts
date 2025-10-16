@@ -31,15 +31,10 @@ export const getMeProfile = async () => {
     return data;
 };
 
-// Обновление accessToken
-export const updateAccessToken = async (refreshToken: string) => {
-    if (!refreshToken) {
-        throw new Error('No refresh token found.');
-    }
-    const { data } = await $host.get('user/update-access-token', { params: { refreshToken } });
-    localStorage.setItem('accessToken', data.accessToken);
-    localStorage.setItem('refreshToken', data.refreshToken);
-    return data.accessToken;
+// Проверка данных пользователя с обновлением токена, если он невалидный
+export const logout = async (refreshToken: string) => {
+    const { data } = await $autHost.post('user/logout', { refreshToken });
+    return data;
 };
 
 // Обновление информации

@@ -82,7 +82,6 @@ export class TGBotUsersRepository {
 			await this.users.create({
 				name,
 				role: userCount === 0 ? process.env.DEFAULT_ROLE : null,
-				avatarUrl: 'https://api.dicebear.com/9.x/bottts/svg',
 				telegramId,
 				isTeamMember: userCount === 0,
 				coin: 0

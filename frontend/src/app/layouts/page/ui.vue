@@ -49,8 +49,8 @@
 						<v-avatar
 							v-bind="props"
 							:image="
-								appStore.userData.avatarUrl ||
-								'https://api.dicebear.com/9.x/bottts/svg'
+								appStore.userData?.avatarUrl ||
+								'/images/defaultAvatar.jpg'
 							"
 						></v-avatar>
 					</template>
@@ -79,7 +79,7 @@
 <script setup lang="ts">
 	import { ref, computed, onMounted, reactive } from 'vue';
 	import { useRouter } from 'vue-router';
-	import { checkPermissions, Icons, useSocket } from '@/shared';
+	import { checkPermissions, Icons, logout, useSocket } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
 	import { PublishPostsPanel } from '@/widgets';
 
@@ -134,9 +134,12 @@
 	const visiblePages = computed(() => PAGES.filter((page) => page.visible));
 
 	const exit = async () => {
-		localStorage.removeItem('user');
-		localStorage.removeItem('accessToken');
-		localStorage.removeItem('refreshToken');
+		logout(localStorage.getItem('refreshToken')).then(() => {
+			localStorage.removeItem('user');
+			localStorage.removeItem('accessToken');
+			localStorage.removeItem('refreshToken');
+		});
+
 		appStore.auth = false;
 		await router.push('/');
 	};
