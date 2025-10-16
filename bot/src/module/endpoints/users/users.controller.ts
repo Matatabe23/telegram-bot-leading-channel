@@ -82,6 +82,7 @@ export class UsersController {
 
 	@Put('update-data-user')
 	@UseGuards(AuthGuard)
+	@ApiBearerAuth('access-token')
 	@UpdateUserData()
 	async updateDataUsers(@Body() data: UsersDto) {
 		try {
@@ -99,6 +100,7 @@ export class UsersController {
 
 	@Get('get-users-list')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
+	@ApiBearerAuth('access-token')
 	@GetUsersList()
 	async getUsersList(
 		@Query('page') page: number,
@@ -107,7 +109,6 @@ export class UsersController {
 		@Query('sortBy') sortBy: string,
 		@Query('sortOrder') sortOrder: 'ASC' | 'DESC'
 	) {
-		console.log('qugor23');
 		try {
 			return await this.userService.getUsersList(
 				Number(page),
@@ -129,6 +130,7 @@ export class UsersController {
 
 	@Delete('delete-post/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
+	@ApiBearerAuth('access-token')
 	@DeleteUser()
 	async deleteUser(@Param('id') id: number) {
 		try {

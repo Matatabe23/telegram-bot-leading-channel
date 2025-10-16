@@ -13,7 +13,7 @@ import { FilesService } from './files.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { UploadFilesDto } from './dto/UploadFiles.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UploadFilesToS3Swagger } from './decorators/upload-files-to-s3.decorator';
 import { DeleteFilesFromS3Swagger } from './decorators/delete-files-from-s3.decorator';
 
@@ -24,6 +24,7 @@ export class FilesController {
 
 	@Post('upload-files-to-s3')
 	@UseGuards(AuthGuard)
+	@ApiBearerAuth('access-token')
 	@UseInterceptors(FilesInterceptor('files[]'))
 	@UploadFilesToS3Swagger()
 	async uploadFilesToS3(
@@ -45,6 +46,7 @@ export class FilesController {
 
 	@Delete('delete-files-from-s3')
 	@UseGuards(AuthGuard)
+	@ApiBearerAuth('access-token')
 	@DeleteFilesFromS3Swagger()
 	async deleteFilesFromS3(@Body('urls') urls: string[]) {
 		try {

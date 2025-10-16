@@ -21,7 +21,7 @@ import { IImageBlock } from 'src/types/types';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/types/types';
 import { HelpersRepository } from 'src/module/service/helpers/helpers.repository';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiUnifiedPublication } from './decorators/api-unified-publication.decorator';
 import { ApiReceiving } from './decorators/api-receiving.decorator';
 import { ApiDeletePost } from './decorators/api-delete-post.decorator';
@@ -41,6 +41,7 @@ export class PostsController {
 
 	@Post('unified-publication')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
+	@ApiBearerAuth('access-token')
 	@UseInterceptors(FilesInterceptor('files[]'))
 	@ApiUnifiedPublication()
 	async unifiedPublication(
@@ -75,6 +76,7 @@ export class PostsController {
 
 	@Put('update-posts')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_POSTS))
+	@ApiBearerAuth('access-token')
 	@ApiUpdatePost()
 	async updatePosts(@Body() body: { id: number; channelIds: number[]; idList: IImageBlock[] }) {
 		try {
@@ -92,6 +94,7 @@ export class PostsController {
 
 	@Get('receiving')
 	@UseGuards(AuthGuard)
+	@ApiBearerAuth('access-token')
 	@ApiReceiving()
 	async receiving(
 		@Query('page') page: number,
@@ -117,6 +120,7 @@ export class PostsController {
 
 	@Delete('delete-post/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.DELETE_POSTS))
+	@ApiBearerAuth('access-token')
 	@ApiDeletePost()
 	async deletePost(@Param('id') id: number) {
 		try {
@@ -135,6 +139,7 @@ export class PostsController {
 
 	@Post('publish-instantly/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.PUBLISH_POSTS))
+	@ApiBearerAuth('access-token')
 	@ApiPublishInstantly()
 	async publishInstantly(@Param('id') id: number) {
 		try {
@@ -153,6 +158,7 @@ export class PostsController {
 
 	@Get('receiving-post-or-change-page/:id')
 	@UseGuards(AuthGuard)
+	@ApiBearerAuth('access-token')
 	@ApiChangePage()
 	async changePage(
 		@Req() request: any,
@@ -188,6 +194,7 @@ export class PostsController {
 
 	@Get('get-tags')
 	@UseGuards(AuthGuard)
+	@ApiBearerAuth('access-token')
 	@ApiGetTags()
 	async getTags(
 		@Query('page') page: number,
@@ -217,6 +224,7 @@ export class PostsController {
 
 	@Post('update-holiday-tag/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_TAGS))
+	@ApiBearerAuth('access-token')
 	async updateHolidayTag(
 		@Param('id') id: number,
 		@Body() body: { holidays: UpdateHolidaysDto[] }

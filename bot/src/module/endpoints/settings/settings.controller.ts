@@ -17,7 +17,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { CheckPermissionsGuard } from 'src/guards/check-permissions.guard';
 import { EPermissions } from 'src/types/types';
 import { updateChannel } from './decorators/update-channel.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { getChannel } from './decorators/get-channel.decorator';
 import { DeleteTime } from './decorators/delete-time.decorator';
 import { channelCreate } from './decorators/channel-create.decorator';
@@ -34,6 +34,7 @@ export class SettingsController {
 
 	@Post('channel/create')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
+	@ApiBearerAuth('access-token')
 	@channelCreate()
 	async channelCreate(@Body() body) {
 		try {
@@ -47,6 +48,7 @@ export class SettingsController {
 
 	@Get('channel/list')
 	@UseGuards(AuthGuard)
+	@ApiBearerAuth('access-token')
 	@GetListChannel()
 	async getListChannel() {
 		try {
@@ -59,6 +61,7 @@ export class SettingsController {
 
 	@Get('channel/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
+	@ApiBearerAuth('access-token')
 	@getChannel()
 	async getChannel(@Query('id') id: number) {
 		try {
@@ -71,6 +74,7 @@ export class SettingsController {
 
 	@Put('channel/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
+	@ApiBearerAuth('access-token')
 	@updateChannel()
 	async updateFullChannel(@Param('id') id: number, @Body() body) {
 		try {
@@ -83,6 +87,7 @@ export class SettingsController {
 
 	@Delete('channel/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
+	@ApiBearerAuth('access-token')
 	@DeleteChannel()
 	async deleteChannel(@Param('id') id: string) {
 		try {
@@ -95,6 +100,7 @@ export class SettingsController {
 
 	@Delete('time/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.SET_PUBLICATION_TIME))
+	@ApiBearerAuth('access-token')
 	@DeleteTime()
 	async deleteTime(@Param('id') id: string) {
 		try {
@@ -106,7 +112,8 @@ export class SettingsController {
 	}
 
 	@Post('add-water-mark')
-	// @UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
+	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.CREATE_CHANNEL))
+	@ApiBearerAuth('access-token')
 	@createWaterMark()
 	@UseInterceptors(FileInterceptor('image'))
 	async addWaterMark(

@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "@nestjs/schedule": "^6.0.0"
-  },
-  "devDependencies": {
-    "@types/cron": "^2.0.1"
-  }
-}
