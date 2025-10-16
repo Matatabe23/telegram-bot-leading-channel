@@ -226,9 +226,13 @@ export class UsersService {
 			currentPage: limit === -1 ? 1 : page
 		};
 	}
+
 	async getRefreshTokens(userId: number) {
 		const tokens = await this.refreshTokens.findAll({
-			where: { userId },
+			where: {
+				userId,
+				isRevoked: false
+			},
 			order: [['createdAt', 'DESC']]
 		});
 
