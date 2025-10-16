@@ -77,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-	import { ref, computed, onMounted } from 'vue';
+	import { ref, computed, onMounted, reactive } from 'vue';
 	import { useRouter } from 'vue-router';
 	import { checkPermissions, Icons, useSocket } from '@/shared';
 	import { useAppStore } from '@/app/app.store';
@@ -95,7 +95,7 @@
 		router.push(path);
 	};
 
-	const PAGES = [
+	const PAGES = reactive([
 		{
 			title: 'Главная страница',
 			path: '/publishing-page',
@@ -128,7 +128,7 @@
 				checkPermissions(appStore.data?.EPermissions?.CREATE_CHANNEL) ||
 				checkPermissions(appStore.data?.EPermissions?.SET_PUBLICATION_TIME)
 		}
-	];
+	]);
 
 	const isHomePage = computed(() => router.currentRoute.value.path === '/');
 	const visiblePages = computed(() => PAGES.filter((page) => page.visible));
