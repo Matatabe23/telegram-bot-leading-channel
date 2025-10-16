@@ -26,6 +26,7 @@ import { LogoutDoc } from './decorators/logout.decorator';
 import { GetProfileDoc } from './decorators/get-profile.decorator';
 import { LoginDoc } from './decorators/login-user.decorator';
 import { LoginUserDto } from './dto/login.dto';
+import { GetRefreshSessionsDocs } from './decorators/get-refresh-sessions.decorator';
 @Controller('user')
 @ApiTags('Пользователи')
 export class UsersController {
@@ -117,6 +118,24 @@ export class UsersController {
 				sortBy ? sortBy : 'id',
 				sortOrder ? sortOrder : 'ASC'
 			);
+		} catch (e) {
+			throw new HttpException(
+				{
+					status: HttpStatus.INTERNAL_SERVER_ERROR,
+					message: e.message
+				},
+				HttpStatus.INTERNAL_SERVER_ERROR
+			);
+		}
+	}
+
+	@Get('me/tokens')
+	@UseGuards(AuthGuard)
+	@ApiBearerAuth('access-token')
+	@GetRefreshSessionsDocs()
+	async getRefreshTokens(@Req() req) {
+		try {
+			return await this.userService.getRefreshTokens(req.user.id);
 		} catch (e) {
 			throw new HttpException(
 				{
