@@ -1,7 +1,8 @@
 <template>
-	<section>
+	<section class="flex flex-col x-ident">
 		<div
-			class="x-ident flex flex-col justify-center rounded-2xl md:border-2 md:p-4 md:w-min mx-auto mt-8"
+			v-if="userDataLocal"
+			class="flex flex-col justify-center rounded-2xl md:border-2 md:p-4 md:w-min mx-auto mt-8"
 		>
 			<div class="md:flex items-center gap-8 justify-center w-full">
 				<EditAvatar
@@ -41,20 +42,50 @@
 				</v-btn>
 			</div>
 		</div>
+
+		<div class="lg:w-[85%] mx-auto mt-4">
+			<v-data-table
+				:headers="HEADERS_TABLE_TOKEN"
+				:items="sessions"
+				:items-per-page="sessions.length"
+				hide-default-footer
+			>
+				<template v-slot:item.buttons="{ item }">
+					<ConfirmAction
+						:onConfirm="deleteSession"
+						:confirmParams="item.id"
+						confirmText="Вы уверены, что хотите завершить сессию?"
+					>
+						<v-btn
+							:loading="isDeleteSession === item.id"
+							:disabled="item.token === currentToken"
+							color="red"
+						>
+							<v-icon left>mdi-logout</v-icon>
+						</v-btn>
+					</ConfirmAction>
+				</template>
+			</v-data-table>
+		</div>
 	</section>
 </template>
 
 <script lang="ts" setup>
-	import { EditAvatar } from '@/widgets';
+	import { ConfirmAction, EditAvatar } from '@/widgets';
 	import { useAppStore } from '@/app/app.store';
-	import { ref, watch } from 'vue';
-	import { userData, updateDataUser } from '@/shared';
+	import { onMounted, ref, watch } from 'vue';
+	import { userData, updateDataUser, getRefreshTokens, deleteToken } from '@/shared';
 	import { useToast } from 'vue-toastification';
+	import { HEADERS_TABLE_TOKEN } from './consts';
 
 	const appStore = useAppStore();
 	const toast = useToast();
 
 	const userDataLocal = ref<userData>(JSON.parse(JSON.stringify(appStore.userData)));
+	const isLoadingSession = ref(true);
+	const sessions = ref([]);
+	const currentToken = ref(localStorage.getItem('refreshToken'));
+	const isDeleteSession = ref<number | null>(null);
 
 	const updateUserData = () => {
 		try {
@@ -69,6 +100,29 @@
 		}
 	};
 
+	const getSession = async () => {
+		try {
+			sessions.value = await getRefreshTokens();
+		} catch (e) {
+			//
+		} finally {
+			isLoadingSession.value = false;
+		}
+	};
+
+	const deleteSession = async (id: number) => {
+		try {
+			isDeleteSession.value = id;
+			await deleteToken(id);
+
+            sessions.value = sessions.value.filter(item => item.id !== id)
+		} catch (e) {
+			//
+		} finally {
+			isDeleteSession.value = null;
+		}
+	};
+
 	watch(
 		() => appStore.userData,
 		(val) => {
@@ -76,4 +130,10 @@
 		},
 		{ deep: true, immediate: true }
 	);
+
+	onMounted(() => {
+		if (userDataLocal.value) {
+			getSession();
+		}
+	});
 </script>

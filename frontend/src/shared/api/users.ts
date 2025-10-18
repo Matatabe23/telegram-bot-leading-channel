@@ -62,6 +62,11 @@ export const getRefreshTokens = async () => {
     return response.data;
 };
 
+export const deleteToken = async (id: number) => {
+    const response = await $autHost.delete(`user/me/token/${id}`);
+    return response.data;
+};
+
 //Удалить пользователя
 export const deleteUser = async (id: number) => {
     const response = await $autHost.delete(`user/delete-post/${id}`);
