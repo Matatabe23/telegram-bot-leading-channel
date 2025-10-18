@@ -239,6 +239,21 @@ export class UsersService {
 		return tokens;
 	}
 
+	async deleteMyToken(userId: number, tokenId: number) {
+		const tokenRecord = await this.refreshTokens.findOne({
+			where: { id: tokenId, userId, isRevoked: false }
+		});
+
+		if (!tokenRecord) {
+			throw new NotFoundException('Токен не найден или уже удален');
+		}
+
+		tokenRecord.isRevoked = true;
+		await tokenRecord.save();
+
+		return { message: 'Токен успешно удален' };
+	}
+
 	async deleteUser(id: number) {
 		const user = await this.usersRepository.findByPk(id);
 		if (!user) {

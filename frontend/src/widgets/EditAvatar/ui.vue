@@ -7,7 +7,7 @@
 	>
 		<img
 			class="object-cover object-center w-full h-full"
-			:src="model"
+			:src="model || '/images/defaultAvatar.jpg'"
 			alt="User Avatar"
 			:style="{ opacity: isUploading ? 0.5 : 1 }"
 		/>

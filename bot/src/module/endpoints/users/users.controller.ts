@@ -147,6 +147,23 @@ export class UsersController {
 		}
 	}
 
+	@Delete('me/token/:tokenId')
+	@ApiBearerAuth('access-token')
+	@UseGuards(AuthGuard)
+	async deleteMyToken(@Req() req: any, @Param('tokenId') tokenId: number) {
+		try {
+			return await this.userService.deleteMyToken(req.user.id, Number(tokenId));
+		} catch (e) {
+			throw new HttpException(
+				{
+					status: HttpStatus.INTERNAL_SERVER_ERROR,
+					message: e.message
+				},
+				HttpStatus.INTERNAL_SERVER_ERROR
+			);
+		}
+	}
+
 	@Delete('delete-post/:id')
 	@UseGuards(AuthGuard, CheckPermissionsGuard.withPermission(EPermissions.EDIT_USERS))
 	@ApiBearerAuth('access-token')
